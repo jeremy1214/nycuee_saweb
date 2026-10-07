@@ -1,0 +1,608 @@
+已依草圖配置設計：導覽列、輪播、三欄消息、四個展開選單、月曆及頁尾，採深藍／青綠配色。
+
+目前環境寫檔工具故障，無法直接附檔；請將以下完整內容存成 **`nctu-ee-home.html`**，用瀏覽器開啟。消息與活動為示意，Google 日曆尚未串接。
+
+```html
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>交大電機｜首頁設計稿</title>
+<style>
+:root{
+  --navy:#102c43;--teal:#087f80;--mint:#bcebdc;
+  --ink:#203746;--muted:#6c7c86;--line:#dae4e7;--paper:#f5f8f8;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif}
+a{color:inherit;text-decoration:none}
+button,input{font:inherit}
+button,a{ -webkit-tap-highlight-color:transparent}
+button{cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{
+  outline:3px solid #e4af49;outline-offset:5px}
+.wrap{width:min(1160px,calc(100% - 64px));margin:auto}
+header{background:#fff;border-top:4px solid var(--teal);
+  border-bottom:1px solid var(--line)}
+.header{min-height:106px;display:flex;align-items:center;gap:36px}
+.brand{display:flex;align-items:center;gap:13px;flex-shrink:0}
+.mark{width:54px;height:54px;border:1px solid currentColor;border-radius:50%;
+  display:grid;place-items:center;font-size:21px;font-weight:800;letter-spacing:-2px;
+  position:relative;color:var(--teal)}
+.mark:after{content:"";position:absolute;inset:5px;border:1px solid currentColor;
+  border-radius:50%;opacity:.35}
+.brand strong{display:block;font-size:23px;letter-spacing:3px}
+.brand small{display:block;margin-top:5px;font-size:9px;letter-spacing:1.8px;
+  color:var(--muted)}
+nav{display:flex;gap:24px;margin-left:auto}
+nav a{font-size:14px;padding:12px 0;position:relative}
+nav a:after{content:"";position:absolute;bottom:3px;left:0;width:0;height:2px;
+  background:var(--teal);transition:.2s}
+nav a:hover:after{width:100%}
+.tools{display:flex;gap:12px;align-items:center}
+.icon-btn{background:none;border:0;color:var(--ink);font-size:22px;padding:6px}
+.login{background:var(--navy);color:#fff;border:0;border-radius:3px;
+  padding:11px 16px;font-size:12px}
+.hero{margin-top:30px;position:relative;overflow:hidden;background:var(--navy);
+  height:330px;border-radius:5px;color:#fff}
+.hero-art{position:absolute;inset:0;width:100%;height:100%}
+.hero:after{content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,rgba(10,32,48,.96),rgba(10,32,48,.65) 44%,transparent)}
+.hero-copy{position:relative;z-index:1;padding:50px 70px;max-width:660px}
+.eyebrow{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);
+  font-weight:700}
+.hero .eyebrow{color:var(--mint)}
+.hero h1{font-size:39px;line-height:1.45;letter-spacing:3px;margin:18px 0 13px}
+.hero p{font-size:14px;line-height:1.9;color:#c9d8df;margin:0}
+.hero-link{display:inline-flex;align-items:center;gap:28px;
+  margin-top:22px;font-size:12px;color:var(--mint)}
+.arrow{position:absolute;z-index:2;top:calc(50% - 18px);width:34px;height:36px;
+  border:1px solid #ffffff45;background:#ffffff08;color:#fff;border-radius:3px}
+.arrow:hover{background:#ffffff20}
+.prev{left:15px}.next{right:15px}
+.hero-bottom{position:absolute;z-index:2;bottom:20px;left:70px;right:35px;
+  display:flex;justify-content:space-between;align-items:center}
+.dots{display:flex;gap:8px}
+.dot{padding:0;width:7px;height:7px;border:0;border-radius:20px;background:#ffffff55}
+.dot.active{width:26px;background:var(--mint)}
+.counter{font-size:11px;letter-spacing:2px;color:#c5d9e1}
+section{padding-top:46px}
+.section-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:22px}
+.section-head h2{font-size:25px;letter-spacing:2px;margin:7px 0 0}
+.more{font-size:12px;color:var(--teal);display:flex;gap:18px;align-items:center}
+.news-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.news-card{background:#fff;border:1px solid var(--line);border-radius:4px;
+  overflow:hidden;transition:transform .2s,box-shadow .2s}
+.news-card:hover{transform:translateY(-4px);box-shadow:0 12px 25px #1438470d}
+.news-art{height:145px;position:relative;overflow:hidden}
+.news-art svg{width:100%;height:100%;display:block}
+.badge{position:absolute;bottom:13px;left:18px;background:#fff;
+  color:var(--teal);font-size:10px;letter-spacing:1px;padding:5px 9px;border-radius:2px}
+.card-body{padding:21px}
+.date{color:var(--muted);font-size:10px;letter-spacing:1.5px}
+.card-body h3{font-size:17px;line-height:1.65;margin:10px 0 13px;font-weight:600}
+.card-bottom{display:flex;justify-content:space-between;font-size:11px;
+  color:var(--muted);align-items:center}
+.card-bottom b{color:var(--teal);font-size:18px;font-weight:400}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;
+  margin-top:35px;position:relative;z-index:3}
+.quick-item{position:relative}
+.quick-item summary{list-style:none;cursor:pointer;background:#fff;
+  border:1px solid var(--line);border-top:3px solid var(--teal);border-radius:3px;
+  padding:20px;display:flex;align-items:center;gap:13px;font-weight:600;font-size:14px}
+.quick-item summary::-webkit-details-marker{display:none}
+.quick-icon{font-size:21px;color:var(--teal);font-weight:400}
+.quick-item summary .plus{margin-left:auto;color:var(--teal);font-weight:400}
+.quick-item[open] summary,.quick-item:hover summary{
+  color:#fff;background:var(--teal);border-color:var(--teal)}
+.quick-item[open] summary span,.quick-item:hover summary span{color:#fff}
+.quick-panel{position:absolute;top:100%;left:0;width:100%;background:#fff;
+  border:1px solid var(--line);padding:7px 14px;box-shadow:0 12px 22px #102c4312;
+  border-radius:0 0 4px 4px}
+.quick-panel a{display:flex;justify-content:space-between;padding:13px 5px;
+  font-size:12px;border-bottom:1px solid #edf1f2}
+.quick-panel a:last-child{border-bottom:0}
+.quick-panel a:hover{color:var(--teal)}
+.calendar-section{padding-top:50px;padding-bottom:46px}
+.calendar-note{font-size:11px;color:var(--muted)}
+.calendar{background:#fff;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.calendar-top{display:flex;justify-content:space-between;align-items:center;
+  padding:20px 24px;border-bottom:1px solid var(--line)}
+.month-controls{display:flex;align-items:center;gap:16px}
+.month-controls button{border:1px solid var(--line);background:#fff;color:var(--ink);
+  width:29px;height:29px;border-radius:3px}
+.month-controls strong{font-size:16px;letter-spacing:1px;min-width:140px}
+.today-btn{border:1px solid var(--line);border-radius:3px;padding:7px 12px;
+  background:#fff;font-size:11px}
+.calendar-label{display:flex;gap:17px;font-size:10px;color:var(--muted)}
+.calendar-label span:before{content:"";display:inline-block;width:6px;height:6px;
+  border-radius:50%;background:var(--teal);margin-right:6px}
+.calendar-label span:last-child:before{background:#dca34d}
+.weekdays,.days{display:grid;grid-template-columns:repeat(7,1fr)}
+.weekdays div{text-align:right;padding:12px 15px;background:#f5f8f9;
+  font-size:11px;color:var(--muted);border-bottom:1px solid var(--line)}
+.day{min-height:82px;padding:9px 10px;border-right:1px solid #e9eff1;
+  border-bottom:1px solid #e9eff1;font-size:11px;overflow:hidden}
+.day:nth-child(7n){border-right:0}
+.day .number{display:grid;place-items:center;width:25px;height:25px;margin-left:auto}
+.day.outside{color:#b5c0c5;background:#fafcfc}
+.day.current .number{background:var(--teal);color:#fff;border-radius:50%}
+.event{display:block;border:0;text-align:left;width:100%;background:#e6f3ef;
+  border-left:2px solid var(--teal);color:#22665f;font-size:10px;
+  padding:5px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.event.gold{background:#fbf2df;border-color:#dca34d;color:#906d32}
+.event:hover{filter:brightness(.96)}
+footer{background:var(--navy);color:#d4e0e6}
+.footer-main{padding:35px 0;display:flex;justify-content:space-between;gap:40px}
+footer .brand strong{color:#fff;font-size:21px}
+footer .brand small{color:#a9c1cf}
+footer .mark{color:var(--mint)}
+.contact{font-size:12px;line-height:1.9;max-width:410px}
+.contact h3{font-size:14px;color:#fff;margin:0 0 8px;letter-spacing:2px}
+.contact p{margin:0;color:#a9c1cf}
+.social{display:flex;gap:9px;margin-top:15px}
+.social a{width:29px;height:29px;border:1px solid #66808e;border-radius:3px;
+  display:grid;place-items:center;font-size:12px}
+.footer-bottom{border-top:1px solid #ffffff16;padding:15px 0;
+  display:flex;justify-content:space-between;font-size:10px;color:#91acba}
+dialog{border:0;border-radius:8px;max-width:460px;width:calc(100% - 40px);
+  padding:30px;color:var(--ink);box-shadow:0 25px 80px #0003}
+dialog::backdrop{background:#102c4377}
+dialog h2{font-size:20px;margin-top:0}
+dialog p{font-size:14px;line-height:1.9;color:var(--muted)}
+dialog .close{display:block;margin-left:auto;padding:9px 18px;
+  border:0;border-radius:3px;background:var(--teal);color:#fff}
+#searchInput{width:100%;padding:12px;border:1px solid var(--line);border-radius:3px}
+#searchResults{padding-top:12px}
+#searchResults a{display:block;padding:12px 0;border-bottom:1px solid var(--line);
+  font-size:13px}
+@media(min-width:901px){
+  .quick-item:not([open]):hover .quick-panel{display:block!important}
+}
+@media(max-width:1050px){
+  .header{gap:18px}nav{gap:14px}nav a{font-size:12px}
+  .brand strong{font-size:20px}.brand small{font-size:8px}
+}
+@media(max-width:900px){
+  .header{flex-wrap:wrap;padding:18px 0;gap:15px}
+  .tools{margin-left:auto}nav{order:3;width:100%;justify-content:space-between;margin:0}
+  .hero{height:310px}.hero-copy{padding:42px 50px}.hero h1{font-size:32px}
+  .hero-bottom{left:50px}.quick{grid-template-columns:repeat(2,1fr)}
+  .quick-panel{position:static}.news-grid{gap:14px}.card-body{padding:16px}
+  .card-body h3{font-size:15px}.calendar-label{display:none}
+}
+@media(max-width:600px){
+  .wrap{width:calc(100% - 32px)}.brand strong{font-size:19px}
+  .mark{width:43px;height:43px}.brand small{letter-spacing:1px;font-size:7px}
+  .login{padding:9px 11px}.tools{gap:4px}nav{gap:10px;overflow:auto}
+  nav a{white-space:nowrap;font-size:12px}
+  .hero{margin-top:18px;height:300px}.hero-copy{padding:35px 38px}
+  .hero h1{font-size:28px;letter-spacing:2px}.hero p{font-size:12px}
+  .hero-bottom{left:38px;right:25px}.hero-art{opacity:.6}
+  .arrow{width:26px}.prev{left:6px}.next{right:6px}
+  section{padding-top:30px}.section-head h2{font-size:22px}
+  .news-grid{grid-template-columns:1fr}.news-card{display:grid;grid-template-columns:115px 1fr}
+  .news-art{height:100%;min-height:165px}.card-body{padding:17px}
+  .card-body h3{font-size:15px;margin:8px 0}
+  .quick{gap:12px;margin-top:24px}.quick-item summary{padding:16px 12px;font-size:13px}
+  .quick-icon{font-size:18px}.calendar-section{padding-top:32px;padding-bottom:30px}
+  .calendar-note{font-size:9px}.calendar-top{padding:14px 12px}
+  .month-controls{gap:8px}.month-controls strong{font-size:14px;min-width:115px}
+  .weekdays div{padding:10px 7px}.day{min-height:68px;padding:5px 2px;font-size:10px}
+  .event{font-size:9px;padding:4px 2px}.footer-main{flex-direction:column;gap:25px;padding:28px 0}
+  .footer-bottom{flex-direction:column;gap:8px;line-height:1.8}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}*{transition:none!important}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap header">
+    <a class="brand" href="#" aria-label="交大電機首頁">
+      <span class="mark" aria-hidden="true">EE</span>
+      <span><strong>交大電機</strong><small>ELECTRICAL ENGINEERING · NYCU</small></span>
+    </a>
+    <nav aria-label="主要導覽">
+      <a href="#quick">關於本系</a>
+      <a href="#quick">師資與研究</a>
+      <a href="#quick">課程與招生</a>
+      <a href="#news">最新消息</a>
+      <a href="#contact">聯絡我們</a>
+    </nav>
+    <div class="tools">
+      <button class="icon-btn" id="searchBtn" aria-label="搜尋">⌕</button>
+      <button class="login" data-demo="系統登入">Sign in ↗</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="hero" aria-label="首頁焦點輪播" aria-roledescription="輪播">
+    <svg class="hero-art" viewBox="0 0 1160 330" preserveAspectRatio="xMidYMid slice"
+      aria-hidden="true">
+      <defs>
+        <linearGradient id="bg" x1="0" y1="1" x2="1" y2="0">
+          <stop stop-color="#102c43"/><stop offset="1" stop-color="#125963"/>
+        </linearGradient>
+        <linearGradient id="chip" x1="0" x2="1" y2="1">
+          <stop stop-color="#155e6c"/><stop offset="1" stop-color="#092a41"/>
+        </linearGradient>
+        <pattern id="grid" width="27" height="27" patternUnits="userSpaceOnUse">
+          <path d="M27 0H0V27" fill="none" stroke="#94d8cc" stroke-opacity=".1"/>
+        </pattern>
+        <filter id="glow"><feGaussianBlur stdDeviation="3"/></filter>
+      </defs>
+      <rect width="1160" height="330" fill="url(#bg)"/>
+      <rect width="1160" height="330" fill="url(#grid)"/>
+      <circle cx="875" cy="170" r="145" fill="#62e4cf" opacity=".04"/>
+      <circle cx="875" cy="170" r="115" fill="none" stroke="#79dcca" opacity=".17"/>
+      <g fill="none" stroke="#75d9c6" stroke-width="1.3" opacity=".5">
+        <path d="M680 90H755L785 120H820M650 165H770L805 145H820"/>
+        <path d="M715 245H760L807 198H820M882 105V62L925 19"/>
+        <path d="M935 132H992L1044 80H1160M935 160H1080L1120 120H1160"/>
+        <path d="M935 187H1020L1080 247H1160M880 220V270L923 313"/>
+        <path d="M855 105V82L824 51H732M855 220V248L814 289H703"/>
+      </g>
+      <g fill="#a7ead5">
+        <circle cx="680" cy="90" r="3"/><circle cx="650" cy="165" r="3"/>
+        <circle cx="715" cy="245" r="3"/><circle cx="732" cy="51" r="3"/>
+        <circle cx="1044" cy="80" r="3"/><circle cx="1080" cy="247" r="3"/>
+      </g>
+      <rect x="818" y="104" width="120" height="120" rx="7" fill="#0a2437"
+        stroke="#85daca" stroke-width="2"/>
+      <rect x="829" y="115" width="98" height="98" rx="3" fill="url(#chip)"
+        stroke="#8ed8ca" stroke-opacity=".35"/>
+      <path d="M846 185V144H862V163H891V144H907V185H891V173H862V185Z"
+        fill="#bcebdc" opacity=".85"/>
+      <g stroke="#a2dccb" stroke-width="3" opacity=".5">
+        <path d="M838 97V104M853 97V104M868 97V104M883 97V104M898 97V104M913 97V104"/>
+        <path d="M838 224V231M853 224V231M868 224V231M883 224V231M898 224V231M913 224V231"/>
+        <path d="M811 124H818M811 139H818M811 154H818M811 169H818M811 184H818M811 199H818"/>
+        <path d="M938 124H945M938 139H945M938 154H945M938 169H945M938 184H945M938 199H945"/>
+      </g>
+      <path d="M935 132H992L1044 80H1120" fill="none" stroke="#b4ffe1"
+        stroke-width="3" filter="url(#glow)" opacity=".45"/>
+      <text x="1015" y="292" fill="#bcebdc" opacity=".28" font-size="11"
+        font-family="monospace" letter-spacing="4">IDEAS → IMPACT</text>
+    </svg>
+    <div class="hero-copy">
+      <div class="eyebrow" id="heroTag">CONNECTING IDEAS. ENGINEERING THE FUTURE.</div>
+      <h1 id="heroTitle">以電機，連結未來。</h1>
+      <p id="heroText">從一個想法，到改變世界的技術。<br>在交大電機，探索、實作，讓創新發生。</p>
+      <a class="hero-link" href="#quick">探索交大電機 <span>↗</span></a>
+    </div>
+    <button class="arrow prev" id="prevSlide" aria-label="上一張">‹</button>
+    <button class="arrow next" id="nextSlide" aria-label="下一張">›</button>
+    <div class="hero-bottom">
+      <div class="dots" aria-label="選擇輪播">
+        <button class="dot active" aria-label="第 1 張" aria-pressed="true"></button>
+        <button class="dot" aria-label="第 2 張" aria-pressed="false"></button>
+        <button class="dot" aria-label="第 3 張" aria-pressed="false"></button>
+      </div>
+      <span class="counter" id="slideCount">01 / 03</span>
+    </div>
+  </div>
+
+  <section id="news">
+    <div class="section-head">
+      <div><div class="eyebrow">WHAT'S NEW</div><h2>系所新訊</h2></div>
+      <a class="more" href="#news" data-demo="全部消息">查看全部 <span>↗</span></a>
+    </div>
+    <div class="news-grid">
+      <a class="news-card" href="#news" data-demo="研究交流｜智慧電機與未來科技">
+        <div class="news-art">
+          <svg viewBox="0 0 360 145" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <rect width="360" height="145" fill="#e2eeea"/>
+            <g fill="none" stroke="#79a99b">
+              <circle cx="245" cy="78" r="62"/><circle cx="245" cy="78" r="43"/>
+              <circle cx="245" cy="78" r="23"/>
+              <path d="M0 28H143L177 62H222M0 94H150L180 78H222M270 78H360"/>
+            </g>
+            <g fill="#087f80"><circle cx="245" cy="78" r="8"/>
+              <circle cx="143" cy="28" r="3"/><circle cx="150" cy="94" r="3"/></g>
+            <text x="24" y="38" fill="#437e70" font-size="11"
+              font-family="monospace" letter-spacing="3">RESEARCH</text>
+          </svg>
+          <span class="badge">研究交流</span>
+        </div>
+        <div class="card-body">
+          <span class="date">2026.10.06 · 示意消息</span>
+          <h3>智慧電機與未來科技<br>研究交流系列活動</h3>
+          <div class="card-bottom"><span>探索研究的更多可能</span><b>↗</b></div>
+        </div>
+      </a>
+      <a class="news-card" href="#news" data-demo="招生資訊｜走進交大電機">
+        <div class="news-art">
+          <svg viewBox="0 0 360 145" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <rect width="360" height="145" fill="#e5ecf1"/>
+            <path d="M68 145V68L179 25L294 68V145" fill="#b5c7d3"/>
+            <path d="M91 145V77H271V145" fill="#d7e1e7"/>
+            <path d="M165 145V98H199V145" fill="#5b7a91"/>
+            <g fill="#7392a6">
+              <path d="M107 88H124V106H107ZM139 88H156V106H139ZM209 88H226V106H209ZM241 88H258V106H241Z"/>
+              <path d="M107 117H124V135H107ZM139 117H156V135H139ZM209 117H226V135H209ZM241 117H258V135H241Z"/>
+            </g>
+            <path d="M50 69L179 18L313 69" fill="none" stroke="#638399" stroke-width="3"/>
+            <text x="24" y="30" fill="#59798d" font-size="11"
+              font-family="monospace" letter-spacing="3">ADMISSIONS</text>
+          </svg>
+          <span class="badge">招生資訊</span>
+        </div>
+        <div class="card-body">
+          <span class="date">2026.10.03 · 示意消息</span>
+          <h3>走進交大電機<br>開啟你的工程探索之旅</h3>
+          <div class="card-bottom"><span>認識課程與學習環境</span><b>↗</b></div>
+        </div>
+      </a>
+      <a class="news-card" href="#news" data-demo="學生活動｜專題成果展">
+        <div class="news-art">
+          <svg viewBox="0 0 360 145" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <rect width="360" height="145" fill="#f0eadb"/>
+            <g transform="translate(187 17)">
+              <rect width="99" height="85" rx="4" fill="#cbbb98"/>
+              <rect x="7" y="7" width="85" height="63" rx="2" fill="#f8f5ec"/>
+              <path d="M18 46L32 46L40 23L49 56L59 36L69 46H81"
+                stroke="#91805a" stroke-width="2" fill="none"/>
+              <path d="M43 85V106M24 106H75" stroke="#9e8c66" stroke-width="5"/>
+            </g>
+            <circle cx="147" cy="103" r="13" fill="#dfcfaa"/>
+            <path d="M128 145V126Q147 110 167 126V145" fill="#af9972"/>
+            <text x="24" y="30" fill="#9c8660" font-size="11"
+              font-family="monospace" letter-spacing="3">STUDENT LIFE</text>
+          </svg>
+          <span class="badge">學生活動</span>
+        </div>
+        <div class="card-body">
+          <span class="date">2026.09.28 · 示意消息</span>
+          <h3>從課堂走向實作<br>電機專題成果交流展</h3>
+          <div class="card-bottom"><span>看見學生的創意與實力</span><b>↗</b></div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <div class="quick" id="quick" aria-label="常用資訊">
+    <details class="quick-item">
+      <summary><span class="quick-icon">◎</span>認識電機<span class="plus">＋</span></summary>
+      <div class="quick-panel">
+        <a href="#quick" data-demo="系所簡介">系所簡介 <span>↗</span></a>
+        <a href="#quick" data-demo="教學理念">教學理念 <span>↗</span></a>
+        <a href="#contact">聯絡與交通 <span>↗</span></a>
+      </div>
+    </details>
+    <details class="quick-item">
+      <summary><span class="quick-icon">⌘</span>師資研究<span class="plus">＋</span></summary>
+      <div class="quick-panel">
+        <a href="#quick" data-demo="師資陣容">師資陣容 <span>↗</span></a>
+        <a href="#quick" data-demo="研究領域">研究領域 <span>↗</span></a>
+        <a href="#quick" data-demo="實驗室介紹">實驗室介紹 <span>↗</span></a>
+      </div>
+    </details>
+    <details class="quick-item">
+      <summary><span class="quick-icon">▤</span>課程招生<span class="plus">＋</span></summary>
+      <div class="quick-panel">
+        <a href="#quick" data-demo="大學部課程">大學部課程 <span>↗</span></a>
+        <a href="#quick" data-demo="研究所課程">研究所課程 <span>↗</span></a>
+        <a href="#quick" data-demo="入學資訊">入學資訊 <span>↗</span></a>
+      </div>
+    </details>
+    <details class="quick-item">
+      <summary><span class="quick-icon">↗</span>學生專區<span class="plus">＋</span></summary>
+      <div class="quick-panel">
+        <a href="#quick" data-demo="表單下載">表單下載 <span>↗</span></a>
+        <a href="#quick" data-demo="獎助學金">獎助學金 <span>↗</span></a>
+        <a href="#calendar">活動日曆 <span>↗</span></a>
+      </div>
+    </details>
+  </div>
+
+  <section class="calendar-section" id="calendar">
+    <div class="section-head">
+      <div><div class="eyebrow">UPCOMING EVENTS</div><h2>電機行事曆</h2></div>
+      <span class="calendar-note">Google 日曆預留區 · 示意畫面</span>
+    </div>
+    <div class="calendar">
+      <div class="calendar-top">
+        <div class="month-controls">
+          <button id="prevMonth" aria-label="上一個月">‹</button>
+          <strong id="monthTitle"></strong>
+          <button id="nextMonth" aria-label="下一個月">›</button>
+          <button class="today-btn" id="today" style="width:auto">本月</button>
+        </div>
+        <div class="calendar-label"><span>系所活動</span><span>學術交流</span></div>
+      </div>
+      <div class="weekdays">
+        <div>日</div><div>一</div><div>二</div><div>三</div>
+        <div>四</div><div>五</div><div>六</div>
+      </div>
+      <div class="days" id="calendarDays"></div>
+    </div>
+  </section>
+</main>
+
+<footer id="contact">
+  <div class="wrap">
+    <div class="footer-main">
+      <a class="brand" href="#">
+        <span class="mark" aria-hidden="true">EE</span>
+        <span><strong>交大電機</strong><small>EXPLORE. CREATE. CONNECT.</small></span>
+      </a>
+      <div class="contact">
+        <h3>聯絡資訊</h3>
+        <p>系辦地址、電話與電子信箱預留位置<br>正式上線時可置入系所聯絡資訊</p>
+      </div>
+      <div class="contact">
+        <h3>與我們連結</h3>
+        <p>Follow our community</p>
+        <div class="social">
+          <a href="#contact" data-demo="Instagram" aria-label="Instagram">◎</a>
+          <a href="#contact" data-demo="Facebook" aria-label="Facebook">f</a>
+          <a href="#contact" data-demo="YouTube" aria-label="YouTube">▶</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>交大電機系首頁 · 視覺概念稿</span>
+      <span>標誌、消息與活動為示意內容｜2026</span>
+    </div>
+  </div>
+</footer>
+
+<dialog id="demoDialog">
+  <h2 id="demoTitle"></h2>
+  <p id="demoText"></p>
+  <button class="close">關閉</button>
+</dialog>
+<dialog id="searchDialog">
+  <h2>搜尋系所資訊</h2>
+  <input id="searchInput" type="search" placeholder="輸入消息、課程、研究等關鍵字"
+    aria-label="搜尋關鍵字">
+  <div id="searchResults"></div>
+  <button class="close" style="margin-top:20px">關閉</button>
+</dialog>
+
+<script>
+const slides=[
+  ["CONNECTING IDEAS. ENGINEERING THE FUTURE.","以電機，連結未來。",
+    "從一個想法，到改變世界的技術。<br>在交大電機，探索、實作，讓創新發生。"],
+  ["EXPLORE THE POSSIBILITIES.","探索科技的下一步。",
+    "讓好奇成為起點，讓研究走向實現。<br>從電路、系統到智慧應用，展開你的探索。"],
+  ["LEARN. BUILD. MAKE AN IMPACT.","讓想法，成為實力。",
+    "在課堂中理解，在實作中突破。<br>與夥伴一起，把創意轉化為真實作品。"]
+];
+let slide=0;
+const dots=[...document.querySelectorAll(".dot")];
+function showSlide(index){
+  slide=(index+slides.length)%slides.length;
+  document.getElementById("heroTag").textContent=slides[slide][0];
+  document.getElementById("heroTitle").textContent=slides[slide][1];
+  document.getElementById("heroText").innerHTML=slides[slide][2];
+  document.getElementById("slideCount").textContent=
+    String(slide+1).padStart(2,"0")+" / 03";
+  dots.forEach((dot,i)=>{
+    dot.classList.toggle("active",i===slide);
+    dot.setAttribute("aria-pressed",String(i===slide));
+  });
+}
+document.getElementById("prevSlide").onclick=()=>showSlide(slide-1);
+document.getElementById("nextSlide").onclick=()=>showSlide(slide+1);
+dots.forEach((dot,i)=>dot.onclick=()=>showSlide(i));
+
+const demo=document.getElementById("demoDialog");
+function openDemo(title,text){
+  document.getElementById("demoTitle").textContent=title;
+  document.getElementById("demoText").textContent=text;
+  demo.showModal();
+}
+document.querySelectorAll("[data-demo]").forEach(link=>{
+  link.addEventListener("click",event=>{
+    event.preventDefault();
+    openDemo(link.dataset.demo,
+      "這是首頁視覺稿的示意入口。正式版本可在此連結對應內容、公告或校內系統。");
+  });
+});
+document.querySelectorAll("dialog .close").forEach(button=>{
+  button.onclick=()=>button.closest("dialog").close();
+});
+document.querySelectorAll("dialog").forEach(dialog=>{
+  dialog.addEventListener("click",event=>{
+    const r=dialog.getBoundingClientRect();
+    if(event.clientX<r.left||event.clientX>r.right||
+       event.clientY<r.top||event.clientY>r.bottom)dialog.close();
+  });
+});
+
+/* 滑鼠懸停展開；觸控裝置與鍵盤可點擊展開。 */
+document.querySelectorAll(".quick-item").forEach(item=>{
+  item.addEventListener("mouseenter",()=>{
+    if(matchMedia("(hover:hover)").matches)item.open=true;
+  });
+  item.addEventListener("mouseleave",()=>{
+    if(matchMedia("(hover:hover)").matches&&
+       !item.contains(document.activeElement))item.open=false;
+  });
+  item.addEventListener("focusout",()=>{
+    setTimeout(()=>{if(!item.contains(document.activeElement))item.open=false},0);
+  });
+});
+
+let year=2026,month=9;
+const events={
+  "2026-10-06":["新生交流活動",""],
+  "2026-10-14":["智慧電機專題講座","gold"],
+  "2026-10-22":["研究交流分享會","gold"],
+  "2026-10-28":["學生專題成果展",""]
+};
+function renderCalendar(){
+  document.getElementById("monthTitle").textContent=year+" 年 "+(month+1)+" 月";
+  const start=new Date(year,month,1).getDay();
+  const count=new Date(year,month+1,0).getDate();
+  const rows=Math.ceil((start+count)/7);
+  const grid=document.getElementById("calendarDays");
+  grid.replaceChildren();
+  for(let i=0;i<rows*7;i++){
+    const d=new Date(year,month,1-start+i);
+    const key=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+
+      "-"+String(d.getDate()).padStart(2,"0");
+    const cell=document.createElement("div");
+    cell.className="day"+(d.getMonth()!==month?" outside":"")+
+      (key==="2026-10-06"?" current":"");
+    const number=document.createElement("span");
+    number.className="number";
+    number.textContent=d.getDate();
+    cell.append(number);
+    if(events[key]){
+      const button=document.createElement("button");
+      button.className="event "+events[key][1];
+      button.textContent=events[key][0];
+      button.title=events[key][0]+"（示意活動）";
+      button.onclick=()=>openDemo(events[key][0],
+        key+"｜此活動為月曆版面示意；正式版本可串接系所 Google 日曆。");
+      cell.append(button);
+    }
+    grid.append(cell);
+  }
+}
+function changeMonth(offset){
+  const d=new Date(year,month+offset,1);
+  year=d.getFullYear();month=d.getMonth();renderCalendar();
+}
+document.getElementById("prevMonth").onclick=()=>changeMonth(-1);
+document.getElementById("nextMonth").onclick=()=>changeMonth(1);
+document.getElementById("today").onclick=()=>{year=2026;month=9;renderCalendar()};
+renderCalendar();
+
+const searchDialog=document.getElementById("searchDialog");
+const input=document.getElementById("searchInput");
+const searchItems=[
+  ["系所新訊","#news"],["師資與研究","#quick"],["課程與招生","#quick"],
+  ["學生專區","#quick"],["電機行事曆","#calendar"],["聯絡資訊","#contact"]
+];
+function search(){
+  const result=document.getElementById("searchResults");
+  result.replaceChildren();
+  const found=searchItems.filter(item=>item[0].includes(input.value.trim()));
+  found.forEach(item=>{
+    const link=document.createElement("a");
+    link.textContent=item[0]+" ↗";link.href=item[1];
+    link.onclick=()=>searchDialog.close();
+    result.append(link);
+  });
+  if(!found.length){
+    const p=document.createElement("p");
+    p.textContent="沒有符合的項目，請試試其他關鍵字。";result.append(p);
+  }
+}
+document.getElementById("searchBtn").onclick=()=>{
+  searchDialog.showModal();search();input.focus();
+};
+input.oninput=search;
+</script>
+</body>
+</html>
+```

@@ -191,7 +191,7 @@ interface QuickGroup {
 }
 
 const quickGroups: QuickGroup[] = [
-  { icon: "◎", title: "系上活動", items: [{ label: "活動日曆", href: "#calendar" }, { label: "最新消息", href: "https://dee.nycu.edu.tw/news.php?locale=tw", external: true }, { label: "學術交流" }] },
+  { icon: "◎", title: "系上活動", items: [{ label: "活動首頁", to: "/activities" }, { label: "活動日曆", href: "#calendar" }, { label: "最新消息", href: "https://dee.nycu.edu.tw/news.php?locale=tw", external: true }] },
   { icon: "⌘", title: "系隊", items: [{ label: "系隊介紹" }, { label: "招募資訊" }, { label: "聯絡方式" }] },
   { icon: "▤", title: "系學會", items: [{ label: "系學會介紹" }, { label: "學生消息" }, { label: "活動資訊" }] },
   { icon: "↗", title: "學習資料", items: [{ label: "關於修課", to: "/resources/courses" }, { label: "獎助學金", to: "/resources/scholarships" }, { label: "交換資訊", to: "/resources/exchange" }, { label: "研究所", to: "/resources/graduate" }] },

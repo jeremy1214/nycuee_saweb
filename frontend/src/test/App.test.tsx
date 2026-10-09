@@ -77,6 +77,24 @@ describe("NYCU EE website", () => {
     expect(screen.getByText("2026.10.28")).toBeInTheDocument();
   });
 
+  it("opens the activities page from the global navigation", async () => {
+    const user = userEvent.setup();
+    renderApp();
+
+    await user.click(screen.getByRole("link", { name: "系上活動" }));
+    expect(screen.getByRole("heading", { name: "活動總覽" })).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: /查看活動詳情/ })).toHaveLength(5);
+  });
+
+  it("provides an activities page entry in the home quick links", async () => {
+    const user = userEvent.setup();
+    renderApp();
+
+    await user.click(screen.getByText("系上活動", { selector: "summary" }));
+    await user.click(screen.getByRole("link", { name: /活動首頁/ }));
+    expect(screen.getByRole("heading", { name: "活動總覽" })).toBeInTheDocument();
+  });
+
   it("opens and closes a placeholder modal", async () => {
     const user = userEvent.setup();
     renderApp();

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import { Modal, SiteFooter, SiteHeader } from "./components/SiteChrome";
 import { SearchDialog } from "./components/SearchDialog";
+import ActivitiesPage from "./features/activities";
 import ResourcePage from "./features/resources";
 import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
@@ -38,6 +39,7 @@ export default function App() {
     <Routes>
       <Route element={<AppShell />}>
         <Route index element={<HomePage />} />
+        <Route path="activities" element={<ActivitiesPage />} />
         <Route path="resources" element={<Navigate to="/resources/courses" replace />} />
         <Route path="resources/:category" element={<ResourcePage />} />
         <Route path="*" element={<NotFoundPage />} />

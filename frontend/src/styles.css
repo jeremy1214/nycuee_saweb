@@ -204,6 +204,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visibl
   .header-inner { flex-wrap: wrap; padding: 16px 0; }.header-tools { margin-left: auto; }.primary-nav { order: 3; width: 100%; justify-content: space-between; margin: 0; overflow-x: auto; }
   .hero { height: 310px; }.hero-copy { padding: 42px 50px; }.hero-bottom { left: 50px; }
   .news-grid { gap: 14px; }.news-body { padding: 17px; }.quick-panel { position: static; }
+  .footer-main { flex-wrap: wrap; }
 }
 
 @media (max-width: 600px) {

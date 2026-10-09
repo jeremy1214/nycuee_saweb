@@ -51,6 +51,7 @@ export const calendarEvents: CalendarEvent[] = [
 
 export const searchItems = [
   { label: "系所新訊", description: "首頁的最新焦點與學習資訊", to: "/#news" },
+  { label: "系上活動", description: "電機營、系露營、電機週、光舞與其他活動", to: "/activities" },
   { label: "關於修課", description: "修業規定、課程地圖與選課入口", to: "/resources/courses" },
   { label: "獎助學金", description: "系級、校級與出國獎助", to: "/resources/scholarships" },
   { label: "交換資訊", description: "交換申請流程與文件準備", to: "/resources/exchange" },

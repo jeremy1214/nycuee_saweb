@@ -41,6 +41,7 @@ http://127.0.0.1:5173/
 ### 常用頁面
 
 - 首頁：`http://127.0.0.1:5173/#/`
+- 系上活動：`http://127.0.0.1:5173/#/activities`
 - 關於修課：`http://127.0.0.1:5173/#/resources/courses`
 - 獎助學金：`http://127.0.0.1:5173/#/resources/scholarships`
 - 交換資訊：`http://127.0.0.1:5173/#/resources/exchange`
@@ -85,6 +86,7 @@ nycuee_saweb/
 │  │  ├─ data/
 │  │  │  └─ home.ts               # 首頁輪播、焦點與月曆資料
 │  │  ├─ features/
+│  │  │  ├─ activities/           # 系上活動總覽、分類篩選與活動資料
 │  │  │  └─ resources/            # 完整的學習資源功能模組
 │  │  │     ├─ components/        # 資源頁區塊元件
 │  │  │     ├─ data/              # 四類資源內容與官方連結
@@ -109,13 +111,16 @@ nycuee_saweb/
 1. `main.tsx` 建立 React 應用程式並啟用 Hash Router。
 2. `App.tsx` 根據網址載入首頁、Resource Page 或 404 頁面。
 3. 首頁內容由 `data/home.ts` 提供，再交給 `HomeSections.tsx` 呈現。
-4. Resource Page 從網址取得目前分類，讀取 `features/resources/data/resources.ts` 的對應資料。
-5. 共用 Header、Footer、搜尋及 Modal 由 `SiteChrome.tsx` 等共用元件負責。
+4. Activities Page 使用本地示意資料提供活動分類篩選與詳情視窗。
+5. Resource Page 從網址取得目前分類，讀取 `features/resources/data/resources.ts` 的對應資料。
+6. 共用 Header、Footer、搜尋及 Modal 由 `SiteChrome.tsx` 等共用元件負責。
 
 ## 共編指南
 
 - 修改首頁文字、輪播或月曆資料：`frontend/src/data/home.ts`
 - 修改首頁區塊與快捷連結：`frontend/src/components/HomeSections.tsx`
+- 修改活動內容與分類：`frontend/src/features/activities/data/activities.ts`
+- 修改活動頁版面：`frontend/src/features/activities/components/ActivitySections.tsx`
 - 修改學習資源文字與官方連結：`frontend/src/features/resources/data/resources.ts`
 - 修改學習資源版面：`frontend/src/features/resources/components/ResourceSections.tsx`
 - 修改學習資源樣式：`frontend/src/features/resources/resources.css`

@@ -13,6 +13,7 @@ export function SiteHeader({ onSearch, onPlaceholder }: SiteHeaderProps) {
         <Brand />
         <nav className="primary-nav" aria-label="主要導覽">
           <NavLink to="/" end>首頁</NavLink>
+          <NavLink to="/activities">系上活動</NavLink>
           <button type="button" onClick={() => onPlaceholder("關於本系")}>關於本系</button>
           <button type="button" onClick={() => onPlaceholder("師資與研究")}>師資與研究</button>
           <NavLink to="/resources/courses">學習資源</NavLink>

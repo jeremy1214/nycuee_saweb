@@ -1,8 +1,8 @@
 import { useEffect, useRef, type KeyboardEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { resourceCategories, resourceOrder } from "../data/resources";
-import type { ResourceCategory, ResourceSlug } from "../types";
-import { ExternalLink, SectionHeading } from "./SiteChrome";
+import type { ResourceCategory, ResourceSlug } from "../resourceTypes";
+import { ExternalLink, SectionHeading } from "../../../components/SiteChrome";
 
 export function ResourceTabs({ active }: { active: ResourceSlug }) {
   const navigate = useNavigate();

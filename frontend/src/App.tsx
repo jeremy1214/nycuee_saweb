@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import { Modal, SiteFooter, SiteHeader } from "./components/SiteChrome";
 import { SearchDialog } from "./components/SearchDialog";
+import ResourcePage from "./features/resources";
 import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
-import ResourcePage from "./pages/ResourcePage";
 
 export interface AppOutletContext {
   openPlaceholder: (title: string) => void;

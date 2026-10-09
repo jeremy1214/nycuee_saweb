@@ -1,4 +1,4 @@
-import type { ResourceCategory, ResourceSlug } from "../types";
+import type { ResourceCategory, ResourceSlug } from "../resourceTypes";
 
 export const resourceOrder: ResourceSlug[] = [
   "courses",

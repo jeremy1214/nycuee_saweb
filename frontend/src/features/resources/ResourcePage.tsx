@@ -1,7 +1,8 @@
 import { Navigate, useParams } from "react-router-dom";
-import { Checklist, InfoCardGrid, OfficialLinks, ProcessTimeline, ResourceOverview, ResourceTabs } from "../components/ResourceSections";
-import { PageContainer } from "../components/SiteChrome";
-import { isResourceSlug, resourceCategories } from "../data/resources";
+import { PageContainer } from "../../components/SiteChrome";
+import { Checklist, InfoCardGrid, OfficialLinks, ProcessTimeline, ResourceOverview, ResourceTabs } from "./components/ResourceSections";
+import { isResourceSlug, resourceCategories } from "./data/resources";
+import "./resources.css";
 
 export default function ResourcePage() {
   const { category: slug } = useParams();

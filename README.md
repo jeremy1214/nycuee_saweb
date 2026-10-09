@@ -1,6 +1,14 @@
 # 陽明交大電機系網站
 
-以 Vite、React 與 TypeScript 製作的電機系網站前端。首頁延續深藍、青綠的視覺風格，並提供修課、獎助學金、交換資訊與研究所等學習資源頁面。
+以 Vite、React 與 TypeScript 製作的電機系網站前端。網站延續深藍、青綠的視覺風格，提供首頁焦點資訊、系上活動總覽，以及修課、獎助學金、交換資訊與研究所等學習資源頁面。
+
+## 目前功能
+
+- 首頁焦點輪播、系上新訊、快捷入口與互動式行事曆
+- 系上活動總覽，以及電機營、系露營、電機週、光舞、其他活動五類篩選
+- 活動卡片與無障礙詳情視窗，支援鍵盤操作及 Escape 關閉
+- 修課、獎助學金、交換資訊與研究所四類學習資源
+- 全站搜尋、響應式版面及 reduced-motion 動態偏好
 
 ## 技術架構
 
@@ -86,7 +94,12 @@ nycuee_saweb/
 │  │  ├─ data/
 │  │  │  └─ home.ts               # 首頁輪播、焦點與月曆資料
 │  │  ├─ features/
-│  │  │  ├─ activities/           # 系上活動總覽、分類篩選與活動資料
+│  │  │  ├─ activities/           # 系上活動功能模組
+│  │  │  │  ├─ components/        # 活動總覽、分類泡泡與近期活動列表
+│  │  │  │  ├─ data/              # 活動分類及五筆示意活動
+│  │  │  │  ├─ ActivitiesPage.tsx # 活動頁入口與互動狀態
+│  │  │  │  ├─ activityTypes.ts   # 活動分類與資料型別
+│  │  │  │  └─ activities.css     # 活動頁桌面及響應式樣式
 │  │  │  └─ resources/            # 完整的學習資源功能模組
 │  │  │     ├─ components/        # 資源頁區塊元件
 │  │  │     ├─ data/              # 四類資源內容與官方連結
@@ -109,11 +122,25 @@ nycuee_saweb/
 ## 網站運作方式
 
 1. `main.tsx` 建立 React 應用程式並啟用 Hash Router。
-2. `App.tsx` 根據網址載入首頁、Resource Page 或 404 頁面。
+2. `App.tsx` 根據網址載入首頁、Activities Page、Resource Page 或 404 頁面。
 3. 首頁內容由 `data/home.ts` 提供，再交給 `HomeSections.tsx` 呈現。
 4. Activities Page 使用本地示意資料提供活動分類篩選與詳情視窗。
 5. Resource Page 從網址取得目前分類，讀取 `features/resources/data/resources.ts` 的對應資料。
 6. 共用 Header、Footer、搜尋及 Modal 由 `SiteChrome.tsx` 等共用元件負責。
+
+## 活動資料格式
+
+活動頁目前使用 `frontend/src/features/activities/data/activities.ts` 中的本地資料。每筆活動包含：
+
+- `id`：活動的唯一識別值
+- `title`：活動標題
+- `date`：`YYYY-MM-DD` 格式日期；頁面會依日期由近到遠排列
+- `category`：五個既定分類之一
+- `summary`：顯示於近期活動列表的摘要
+- `details`：顯示於活動詳情視窗的完整介紹
+- `location`：活動地點
+
+目前活動內容皆為版面示意，不代表正式系所公告。替換成真實資料時，請同步確認日期、地點、報名資訊與分類。
 
 ## 共編指南
 
@@ -121,13 +148,14 @@ nycuee_saweb/
 - 修改首頁區塊與快捷連結：`frontend/src/components/HomeSections.tsx`
 - 修改活動內容與分類：`frontend/src/features/activities/data/activities.ts`
 - 修改活動頁版面：`frontend/src/features/activities/components/ActivitySections.tsx`
+- 修改活動頁響應式樣式：`frontend/src/features/activities/activities.css`
 - 修改學習資源文字與官方連結：`frontend/src/features/resources/data/resources.ts`
 - 修改學習資源版面：`frontend/src/features/resources/components/ResourceSections.tsx`
 - 修改學習資源樣式：`frontend/src/features/resources/resources.css`
 - 修改全站 Header、Footer 或 Modal：`frontend/src/components/SiteChrome.tsx`
 - 修改全站或首頁樣式：`frontend/src/styles.css`
 
-Resource Page 的詳細分工請參考 [`frontend/src/features/resources/README.md`](frontend/src/features/resources/README.md)。
+Resource Page 的詳細分工請參考 [`frontend/src/features/resources/README.md`](frontend/src/features/resources/README.md)。活動頁的篩選、詳情與入口整合測試位於 `frontend/src/features/activities/ActivitiesPage.test.tsx` 及 `frontend/src/test/App.test.tsx`。
 
 共同編輯完成後，提交前至少執行：
 

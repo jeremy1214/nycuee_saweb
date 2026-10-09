@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import App from "../App";
@@ -19,6 +19,25 @@ describe("NYCU EE website", () => {
     expect(screen.getByRole("heading", { name: "以電機，連結未來。" })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "下一張" }));
     expect(screen.getByRole("heading", { name: "探索科技的下一步。" })).toBeInTheDocument();
+  });
+
+  it("automatically loops through every hero slide", () => {
+    vi.useFakeTimers();
+    const view = renderApp();
+
+    try {
+      act(() => vi.advanceTimersByTime(5000));
+      expect(screen.getByRole("heading", { name: "探索科技的下一步。" })).toBeInTheDocument();
+
+      act(() => vi.advanceTimersByTime(5000));
+      expect(screen.getByRole("heading", { name: "讓想法，成為實力。" })).toBeInTheDocument();
+
+      act(() => vi.advanceTimersByTime(5000));
+      expect(screen.getByRole("heading", { name: "以電機，連結未來。" })).toBeInTheDocument();
+    } finally {
+      view.unmount();
+      vi.useRealTimers();
+    }
   });
 
   it("searches site resources and follows a result", async () => {

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { calendarEvents, newsItems, slides } from "../data/home";
 import type { CalendarEvent, NewsItem } from "../types";
@@ -6,16 +6,78 @@ import { SectionHeading } from "./SiteChrome";
 
 export function HeroCarousel() {
   const [current, setCurrent] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const [hasFocus, setHasFocus] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(() =>
+    typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches,
+  );
+  const touchStartX = useRef<number | null>(null);
   const slide = slides[current];
+  const isPaused = isHovered || hasFocus || prefersReducedMotion;
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+    if (!mediaQuery) return;
+
+    const updateMotionPreference = () => setPrefersReducedMotion(mediaQuery.matches);
+    mediaQuery.addEventListener("change", updateMotionPreference);
+    return () => mediaQuery.removeEventListener("change", updateMotionPreference);
+  }, []);
+
+  useEffect(() => {
+    if (isPaused || slides.length < 2) return;
+
+    const timer = window.setTimeout(() => {
+      setCurrent((index) => (index + 1) % slides.length);
+    }, 5000);
+
+    return () => window.clearTimeout(timer);
+  }, [current, isPaused]);
 
   function showSlide(index: number) {
     setCurrent((index + slides.length) % slides.length);
   }
 
+  function handleKeyDown(event: React.KeyboardEvent<HTMLElement>) {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      showSlide(current - 1);
+    }
+
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      showSlide(current + 1);
+    }
+  }
+
+  function handleTouchEnd(event: React.TouchEvent<HTMLElement>) {
+    if (touchStartX.current === null) return;
+
+    const distance = event.changedTouches[0].clientX - touchStartX.current;
+    touchStartX.current = null;
+
+    if (Math.abs(distance) < 50) return;
+    showSlide(current + (distance < 0 ? 1 : -1));
+  }
+
   return (
-    <section className="hero" aria-label="首頁焦點輪播" aria-roledescription="carousel">
+    <section
+      className="hero"
+      aria-label="首頁焦點輪播"
+      aria-roledescription="carousel"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onFocus={() => setHasFocus(true)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setHasFocus(false);
+      }}
+      onKeyDown={handleKeyDown}
+      onTouchStart={(event) => { touchStartX.current = event.touches[0].clientX; }}
+      onTouchEnd={handleTouchEnd}
+      onTouchCancel={() => { touchStartX.current = null; }}
+    >
       <HeroArtwork />
-      <div className="hero-copy" aria-live="polite">
+      <div className="hero-copy" key={current} aria-live={isPaused ? "polite" : "off"}>
         <span className="eyebrow">{slide.eyebrow}</span>
         <h1>{slide.title}</h1>
         <p>{slide.description.map((line) => <span key={line}>{line}<br /></span>)}</p>
@@ -33,6 +95,7 @@ export function HeroCarousel() {
               onClick={() => showSlide(index)}
               aria-label={`第 ${index + 1} 張`}
               aria-pressed={index === current}
+              aria-current={index === current ? "true" : undefined}
             />
           ))}
         </div>

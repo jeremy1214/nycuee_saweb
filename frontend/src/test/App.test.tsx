@@ -68,11 +68,20 @@ describe("NYCU EE website", () => {
     expect(labels).toEqual(["◎系上活動", "⌘系隊", "▤系學會", "↗學習資料"]);
   });
 
+  it("shows three dated department activity updates", () => {
+    renderApp();
+
+    expect(screen.getByRole("heading", { name: "系上活動" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /查看最新消息/ })).toBeInTheDocument();
+    expect(screen.getAllByRole("time")).toHaveLength(3);
+    expect(screen.getByText("2026.10.28")).toBeInTheDocument();
+  });
+
   it("opens and closes a placeholder modal", async () => {
     const user = userEvent.setup();
     renderApp();
 
-    await user.click(screen.getByRole("button", { name: /智慧電機與未來科技研究交流系列/ }));
+    await user.click(screen.getByRole("button", { name: /學生專題成果展：讓創意走進真實世界/ }));
     expect(screen.getByRole("dialog")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "關閉視窗" }));
     await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());

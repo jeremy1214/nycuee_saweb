@@ -87,16 +87,18 @@ button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visibl
 .section-heading h2 { margin: 6px 0 0; font-size: 1.58rem; letter-spacing: .06em; }
 .section-more { display: flex; align-items: center; gap: 16px; color: var(--teal); font-size: .76rem; }
 .news-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
-.news-card { display: block; width: 100%; padding: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 4px; background: #fff; color: inherit; text-align: left; transition: transform .2s ease, box-shadow .2s ease; }
-.news-card:hover { transform: translateY(-4px); box-shadow: 0 12px 25px rgb(20 56 71 / 10%); }
-.news-art { position: relative; display: block; height: 145px; overflow: hidden; }
+.news-card { display: block; width: 100%; padding: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 4px; background: #fff; color: inherit; text-align: left; transition: transform .3s ease, border-color .3s ease, box-shadow .3s ease; }
+.news-card:is(:hover, :focus-visible) { transform: translateY(-8px); border-color: rgb(8 127 128 / 35%); box-shadow: 0 18px 35px rgb(20 56 71 / 16%); }
+.news-art { position: relative; display: block; height: 145px; overflow: hidden; transition: transform .45s cubic-bezier(.2, .75, .25, 1); }
+.news-card:is(:hover, :focus-visible) .news-art { transform: scale(1.035); }
 .news-art-research { background: #e2eeea; }
 .news-art-campus { background: #e5ecf1; }
 .news-art-student { background: #f0eadb; }
 .art-label { position: absolute; top: 23px; left: 23px; color: #437e70; font: .66rem monospace; letter-spacing: .23em; }
 .news-art-campus .art-label { color: #59798d; }
 .news-art-student .art-label { color: #9c8660; }
-.news-badge { position: absolute; bottom: 13px; left: 18px; padding: 5px 9px; border-radius: 2px; background: #fff; color: var(--teal); font-size: .62rem; letter-spacing: .08em; }
+.news-badge { position: absolute; bottom: 13px; left: 18px; padding: 5px 9px; border-radius: 2px; background: #fff; color: var(--teal); font-size: .62rem; letter-spacing: .08em; transition: transform .3s ease, background .3s ease, color .3s ease; }
+.news-card:is(:hover, :focus-visible) .news-badge { transform: translateY(-4px); background: var(--teal); color: #fff; }
 .circuit-orbit { position: absolute; top: 18px; right: 28px; width: 114px; height: 114px; border: 1px solid #79a99b; border-radius: 50%; }
 .circuit-orbit::before, .circuit-orbit::after { content: ""; position: absolute; border: 1px solid #79a99b; border-radius: 50%; inset: 17px; }
 .circuit-orbit::after { inset: 37px; background: var(--teal); border: 7px solid #e2eeea; box-shadow: 0 0 0 1px #79a99b; }
@@ -111,11 +113,15 @@ button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visibl
 .student-screen::after { content: ""; position: absolute; top: 77px; left: 39px; width: 9px; height: 28px; background: #9e8c66; box-shadow: -22px 23px 0 4px #9e8c66; }
 .student-screen i { position: absolute; top: 85px; left: -48px; width: 28px; height: 28px; border-radius: 50%; background: #dfcfaa; }
 .news-body { display: flex; min-height: 210px; flex-direction: column; padding: 21px; }
-.news-date { color: var(--muted); font-size: .65rem; letter-spacing: .1em; }
-.news-body > strong { margin: 10px 0 9px; font-size: 1.04rem; line-height: 1.65; }
+.news-date { color: var(--teal); font-size: .65rem; font-weight: 700; letter-spacing: .14em; }
+.news-body > strong { margin: 10px 0 9px; font-size: 1.04rem; line-height: 1.65; transition: color .25s ease; }
+.news-card:is(:hover, :focus-visible) .news-body > strong { color: var(--teal-dark); }
 .news-summary { color: var(--muted); font-size: .76rem; line-height: 1.75; }
-.news-card-bottom { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 16px; border-top: 1px solid #edf1f2; color: var(--muted); font-size: .7rem; }
-.news-card-bottom b { color: var(--teal); font-size: 1.15rem; font-weight: 400; }
+.news-card-bottom { position: relative; display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 16px; border-top: 1px solid #edf1f2; color: var(--muted); font-size: .7rem; }
+.news-card-bottom::after { content: ""; position: absolute; top: -1px; right: 0; left: 0; height: 2px; background: var(--teal); transform: scaleX(0); transform-origin: left; transition: transform .35s ease; }
+.news-card-bottom b { color: var(--teal); font-size: 1.15rem; font-weight: 400; transition: transform .25s ease; }
+.news-card:is(:hover, :focus-visible) .news-card-bottom::after { transform: scaleX(1); }
+.news-card:is(:hover, :focus-visible) .news-card-bottom b { transform: translate(4px, -4px); }
 
 .quick-grid { position: relative; z-index: 5; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 35px; }
 .quick-item { position: relative; }

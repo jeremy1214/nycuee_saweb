@@ -146,15 +146,15 @@ export function NewsSection({ onPlaceholder }: { onPlaceholder: (title: string) 
     <section className="home-section" id="news">
       <SectionHeading
         eyebrow="WHAT'S NEW"
-        title="學習焦點"
-        action={<a className="section-more" href="https://dee.nycu.edu.tw/news.php?locale=tw" target="_blank" rel="noreferrer">查看官方消息 <span aria-hidden="true">↗</span></a>}
+        title="系上活動"
+        action={<a className="section-more" href="https://dee.nycu.edu.tw/news.php?locale=tw" target="_blank" rel="noreferrer">查看最新消息 <span aria-hidden="true">↗</span></a>}
       />
       <div className="news-grid">
         {newsItems.map((item) => (
           <button className="news-card" type="button" key={item.title} onClick={() => onPlaceholder(item.title)}>
             <NewsArtwork item={item} />
             <span className="news-body">
-              <span className="news-date">{item.dateLabel}</span>
+              <time className="news-date" dateTime={item.date}>{item.date.replaceAll("-", ".")}</time>
               <strong>{item.title}</strong>
               <span className="news-summary">{item.summary}</span>
               <span className="news-card-bottom">了解更多 <b aria-hidden="true">↗</b></span>
@@ -167,9 +167,15 @@ export function NewsSection({ onPlaceholder }: { onPlaceholder: (title: string) 
 }
 
 function NewsArtwork({ item }: { item: NewsItem }) {
+  const artworkLabel = {
+    research: "EXCHANGE",
+    campus: "SEMINAR",
+    student: "SHOWCASE",
+  }[item.artwork];
+
   return (
     <span className={`news-art news-art-${item.artwork}`}>
-      <span className="art-label" aria-hidden="true">{item.artwork === "research" ? "RESEARCH" : item.artwork === "campus" ? "COURSES" : "STUDENT LIFE"}</span>
+      <span className="art-label" aria-hidden="true">{artworkLabel}</span>
       {item.artwork === "research" && <span className="circuit-orbit" aria-hidden="true"><i /><i /><i /></span>}
       {item.artwork === "campus" && <span className="campus-building" aria-hidden="true"><i /><i /><i /><i /></span>}
       {item.artwork === "student" && <span className="student-screen" aria-hidden="true"><i /></span>}

@@ -20,25 +20,25 @@ export const slides: Slide[] = [
 
 export const newsItems: NewsItem[] = [
   {
-    category: "研究交流",
-    dateLabel: "探索主題 · 示意內容",
-    title: "智慧電機與未來科技研究交流系列",
-    summary: "從研究團隊與實驗室出發，探索不同領域的技術問題。",
+    category: "成果展示",
+    date: "2026-10-28",
+    title: "學生專題成果展：讓創意走進真實世界",
+    summary: "集結學生專題與實作成果，分享從問題發現到作品完成的歷程。",
+    artwork: "student",
+  },
+  {
+    category: "學術交流",
+    date: "2026-10-22",
+    title: "研究交流分享會：跨域合作的新可能",
+    summary: "由研究團隊分享近期成果，從不同領域的觀點展開技術交流。",
     artwork: "research",
   },
   {
-    category: "課程資訊",
-    dateLabel: "學習規劃 · 官方入口",
-    title: "從課程地圖找到你的專業方向",
-    summary: "整理必修、選修與跨領域學習資源，建立四年的修課節奏。",
+    category: "專題講座",
+    date: "2026-10-14",
+    title: "智慧電機專題講座：從研究走向應用",
+    summary: "邀請專家分享智慧系統發展趨勢，帶你掌握技術與產業脈動。",
     artwork: "campus",
-  },
-  {
-    category: "學生專區",
-    dateLabel: "實作成果 · 示意內容",
-    title: "從課堂走向實作的專題成果交流",
-    summary: "把知識轉化成作品，累積研究、升學與職涯所需的能力。",
-    artwork: "student",
   },
 ];
 

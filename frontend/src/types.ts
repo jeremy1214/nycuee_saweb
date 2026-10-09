@@ -6,7 +6,7 @@ export interface Slide {
 
 export interface NewsItem {
   category: string;
-  dateLabel: string;
+  date: string;
   title: string;
   summary: string;
   artwork: "research" | "campus" | "student";

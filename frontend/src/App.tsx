@@ -7,8 +7,6 @@ import ResourcePage from "./features/resources";
 import TeamPage, { TeamDetailPage } from "./features/teams";
 import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
-import SectionPage from "./pages/SectionPage";
-import { sectionPages } from "./data/navigation";
 import EesaSection, { EesaIntro, Department, DepartmentActivities, Activity, DepartmentSkills, DepartmentExperiences } from "./features/eesa";
 
 export interface AppOutletContext {
@@ -59,10 +57,9 @@ export default function App() {
         <Route path="intro/*" element={<LegacyEesaRedirect />} />
         <Route path="team" element={<TeamPage />} />
         <Route path="team/:teamKey" element={<TeamDetailPage />} />
-        {sectionPages.filter((section) => section.to !== "/eesa" && section.to !== "/team").map((section) => (
-          <Route key={section.to} path={section.to.slice(1)} element={<SectionPage section={section} />} />
-        ))}
+        <Route path="activities" element={<Navigate to="/activities/overview" replace />} />
         <Route path="activities/overview" element={<ActivitiesPage />} />
+        <Route path="resources" element={<Navigate to="/resources/courses" replace />} />
         <Route path="resources/:category" element={<ResourcePage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>

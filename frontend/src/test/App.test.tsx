@@ -81,9 +81,27 @@ describe("NYCU EE website", () => {
     const user = userEvent.setup();
     renderApp();
 
-    await user.click(screen.getByRole("link", { name: "系上活動" }));
+    const navigation = screen.getByRole("navigation", { name: "主要導覽" });
+    await user.click(within(navigation).getByRole("link", { name: "系上活動" }));
     expect(screen.getByRole("heading", { name: "活動總覽" })).toBeInTheDocument();
     expect(screen.getAllByRole("button", { name: /查看活動詳情/ })).toHaveLength(5);
+  });
+
+  it("opens the default learning resources page from the global navigation", async () => {
+    const user = userEvent.setup();
+    renderApp();
+
+    const navigation = screen.getByRole("navigation", { name: "主要導覽" });
+    await user.click(within(navigation).getByRole("link", { name: "學習資料" }));
+    expect(screen.getByRole("heading", { name: "把四年的選擇，整理成清楚的學習路徑" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "關於修課" })).toHaveAttribute("aria-selected", "true");
+  });
+
+  it("keeps the correct header item active on nested section pages", () => {
+    renderApp("/resources/exchange");
+
+    const navigation = screen.getByRole("navigation", { name: "主要導覽" });
+    expect(within(navigation).getByRole("link", { name: "學習資料" })).toHaveClass("active");
   });
 
   it("provides an activities page entry in the home quick links", async () => {

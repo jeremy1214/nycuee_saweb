@@ -17,7 +17,6 @@ export function SiteHeader({ onSearch, onPlaceholder }: SiteHeaderProps) {
           {sectionPages.map((page) => (
             <NavLink key={page.to} to={page.to}>{page.title}</NavLink>
           ))}
-          <a href="#contact">聯絡我們</a>
         </nav>
         <div className="header-tools">
           <button className="icon-button" type="button" onClick={onSearch} aria-label="搜尋網站">

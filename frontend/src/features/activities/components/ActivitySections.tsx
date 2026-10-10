@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { activities, activityCategories } from "../data/activities";
 import type { ActivityCategory, ActivityItem } from "../activityTypes";
 
@@ -27,17 +28,38 @@ export function ActivityOverview({ selectedCategory, onCategoryChange }: Activit
       <div className="activity-category-cloud" role="group" aria-label="依活動分類篩選">
         {activityCategories.map((category, index) => {
           const isSelected = category.label === selectedCategory;
-          return (
+          const filterLabel = category.label.endsWith("活動")
+            ? `篩選${category.label}`
+            : `篩選${category.label}活動`;
+          const detailActivity = activities.find(
+            (activity) => activity.category === category.label && activity.detail,
+          );
+          const categoryContent = (
+            <>
+              <span>{category.label}</span>
+              <small>{category.shortLabel}</small>
+            </>
+          );
+
+          return detailActivity ? (
+            <Link
+              className={`activity-category-bubble activity-category-bubble-${index + 1}`}
+              key={category.label}
+              to={`/activities/${detailActivity.id}`}
+              aria-label={`${category.label}，查看活動詳細頁`}
+            >
+              {categoryContent}
+            </Link>
+          ) : (
             <button
               className={`activity-category-bubble activity-category-bubble-${index + 1}`}
               type="button"
               key={category.label}
-              aria-label={`篩選${category.label}活動`}
+              aria-label={filterLabel}
               aria-pressed={isSelected}
               onClick={() => onCategoryChange(isSelected ? null : category.label)}
             >
-              <span>{category.label}</span>
-              <small>{category.shortLabel}</small>
+              {categoryContent}
             </button>
           );
         })}
@@ -71,14 +93,9 @@ export function RecentActivities({ selectedCategory, onActivitySelect }: RecentA
       </div>
 
       <div className="activity-list">
-        {visibleActivities.map((activity) => (
-          <button
-            className="activity-card"
-            type="button"
-            key={activity.id}
-            onClick={() => onActivitySelect(activity)}
-            aria-label={`${activity.title}，查看活動詳情`}
-          >
+        {visibleActivities.map((activity) => {
+          const cardContent = (
+            <>
             <time dateTime={activity.date} className="activity-card-date">
               <strong>{activity.date.slice(8, 10)}</strong>
               <span>{activity.date.slice(0, 7).replace("-", ".")}</span>
@@ -89,8 +106,30 @@ export function RecentActivities({ selectedCategory, onActivitySelect }: RecentA
               <span className="activity-card-summary">{activity.summary}</span>
             </span>
             <span className="activity-card-arrow" aria-hidden="true">↗</span>
-          </button>
-        ))}
+            </>
+          );
+
+          return activity.detail ? (
+            <Link
+              className="activity-card"
+              key={activity.id}
+              to={`/activities/${activity.id}`}
+              aria-label={`${activity.title}，查看活動詳細頁`}
+            >
+              {cardContent}
+            </Link>
+          ) : (
+            <button
+              className="activity-card"
+              type="button"
+              key={activity.id}
+              onClick={() => onActivitySelect(activity)}
+              aria-label={`${activity.title}，查看活動詳情`}
+            >
+              {cardContent}
+            </button>
+          );
+        })}
       </div>
     </section>
   );

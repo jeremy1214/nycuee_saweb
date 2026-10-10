@@ -25,7 +25,7 @@
 
 - 首頁焦點輪播、系上新訊、快捷入口與互動式行事曆
 - 系上活動總覽，以及電機營、系露營、電機週、光舞、其他活動五類篩選
-- 活動卡片與無障礙詳情視窗，支援鍵盤操作及 Escape 關閉
+- 電機營、系露營與電機週獨立詳細頁，以及其他活動的無障礙詳情視窗
 - 修課、獎助學金、交換資訊與研究所四類學習資源
 - 全站搜尋、響應式版面及 reduced-motion 動態偏好
 - 聯絡我們頁面、問題分類、欄位驗證與可設定的表單提交端點
@@ -140,7 +140,8 @@ nycuee_saweb/
 │  │  │  ├─ activities/           # 系上活動功能模組
 │  │  │  │  ├─ components/        # 活動總覽、分類泡泡與近期活動列表
 │  │  │  │  ├─ data/              # 活動分類及五筆示意活動
-│  │  │  │  ├─ ActivitiesPage.tsx # 活動頁入口與互動狀態
+│  │  │  │  ├─ ActivitiesPage.tsx # 活動總覽入口與互動狀態
+│  │  │  │  ├─ ActivityDetailPage.tsx # 共用活動詳細頁
 │  │  │  │  ├─ activityTypes.ts   # 活動分類與資料型別
 │  │  │  │  └─ activities.css     # 活動頁桌面及響應式樣式
 │  │  │  └─ resources/            # 完整的學習資源功能模組
@@ -173,7 +174,7 @@ nycuee_saweb/
 1. `main.tsx` 建立 React 應用程式並啟用 Hash Router。
 2. `App.tsx` 根據網址載入首頁、系學會、活動、系隊、學習資源、聯絡或 404 頁面。
 3. 首頁內容由 `data/home.ts` 提供，再交給 `HomeSections.tsx` 呈現。
-4. Activities Page 使用本地示意資料提供活動分類篩選與詳情視窗。
+4. Activities Page 使用本地示意資料提供活動分類篩選；有 `detail` 資料的活動會進入獨立詳細頁，其餘活動開啟詳情視窗。
 5. Resource Page 從網址取得目前分類，讀取 `features/resources/data/resources.ts` 的對應資料。
 6. `ContactPage.tsx` 驗證表單後，將資料送往環境變數指定的 API；未設定時顯示寄信備援。
 7. 共用 Header、Footer、搜尋及 Modal 由 `SiteChrome.tsx` 等共用元件負責。
@@ -189,6 +190,7 @@ nycuee_saweb/
 - `summary`：顯示於近期活動列表的摘要
 - `details`：顯示於活動詳情視窗的完整介紹
 - `location`：活動地點
+- `detail`：選填的活動專頁資料，包含頁首照片、介紹、章節導覽與可擴充圖文段落
 
 目前活動內容皆為版面示意，不代表正式系所公告。替換成真實資料時，請同步確認日期、地點、報名資訊與分類。
 

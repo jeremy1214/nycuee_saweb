@@ -3,6 +3,7 @@ import { Navigate, Outlet, Route, Routes, useLocation, useParams } from "react-r
 import { Modal, SiteFooter, SiteHeader } from "./components/SiteChrome";
 import { SearchDialog } from "./components/SearchDialog";
 import ActivitiesPage from "./features/activities";
+import ActivityDetailPage from "./features/activities/ActivityDetailPage";
 import ResourcePage from "./features/resources";
 import TeamPage, { TeamDetailPage } from "./features/teams";
 import HomePage from "./pages/HomePage";
@@ -60,6 +61,7 @@ export default function App() {
         <Route path="team/:teamKey" element={<TeamDetailPage />} />
         <Route path="activities" element={<Navigate to="/activities/overview" replace />} />
         <Route path="activities/overview" element={<ActivitiesPage />} />
+        <Route path="activities/:activityId" element={<ActivityDetailPage />} />
         <Route path="resources" element={<Navigate to="/resources/courses" replace />} />
         <Route path="resources/:category" element={<ResourcePage />} />
         <Route path="contact" element={<ContactPage />} />

@@ -93,7 +93,9 @@ describe("NYCU EE website", () => {
     const navigation = screen.getByRole("navigation", { name: "主要導覽" });
     await user.click(within(navigation).getByRole("link", { name: "系上活動" }));
     expect(screen.getByRole("heading", { name: "活動總覽" })).toBeInTheDocument();
-    expect(screen.getAllByRole("button", { name: /查看活動詳情/ })).toHaveLength(5);
+    const recentActivities = screen.getByRole("region", { name: "近期活動" });
+    expect(within(recentActivities).getAllByRole("link", { name: /查看活動詳細頁/ })).toHaveLength(3);
+    expect(within(recentActivities).getAllByRole("button", { name: /查看活動詳情/ })).toHaveLength(2);
   });
 
   it("opens the default learning resources page from the global navigation", async () => {

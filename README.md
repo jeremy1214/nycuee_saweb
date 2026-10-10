@@ -2,6 +2,26 @@
 
 以 Vite、React 與 TypeScript 製作的電機系網站前端。網站延續深藍、青綠的視覺風格，提供首頁焦點資訊、系上活動總覽，以及修課、獎助學金、交換資訊與研究所等學習資源頁面。
 
+## 首頁與主要入口
+
+首頁依照 `/home/yoei/Downloads/test.html` 的深藍／青綠視覺稿製作，保留輪播、三欄消息、四個入口、行事曆與頁尾。輪播使用從 `eesa-web` 選出的六張活動、課程與畢業照片。
+四個入口在桌面為四欄、窄螢幕為兩欄，依序為系學會、系上活動、系隊、學習資料。點選標題會進入主頁，滑鼠移入或鍵盤聚焦可展開內容連結；系隊選單先顯示五支隊伍，按「顯示更多系隊」可查看其餘隊伍。
+
+- 系學會：`/#/eesa`
+- 系上活動：`/#/activities`
+- 系隊：`/#/team`
+- 學習資料：`/#/resources`
+
+系學會入口已整合原 eesa-web 的介紹、部門、活動、學習能力與體驗談頁面；系隊入口已整合九支隊伍的照片輪播、三欄連結與隊伍詳情；系上活動與學習資料主入口目前提供導覽頁，分項內容由下拉選單進入。
+頁尾聯絡資訊附有系學會 Instagram、Facebook 與電機系 YouTube 連結及圖示。
+頁面導覽資料位於 `frontend/src/data/navigation.ts`，共用頁面位於 `frontend/src/pages/SectionPage.tsx`，後續可分別替換成正式設計。
+既有活動總覽保留在 `/#/activities/overview`，學習資料分類頁仍保留原本網址。
+本次依使用者指示未執行測試、建置或瀏覽器驗證。
+
+系學會模組與搬移說明請見 [frontend/src/features/eesa/README.md](frontend/src/features/eesa/README.md)。
+
+系隊模組與資料說明請見 [frontend/src/features/teams/README.md](frontend/src/features/teams/README.md)。
+
 ## 目前功能
 
 - 首頁焦點輪播、系上新訊、快捷入口與互動式行事曆
@@ -166,3 +186,16 @@ npm run build
 ```
 
 請勿提交 `node_modules/` 或 `dist/`；這些資料夾會由安裝與建置指令重新產生。
+
+
+## Google 日曆匯入
+
+首頁行事曆提供「匯入 Google 日曆」按鈕，可下載包含 `calendarEvents` 全部活動的 `nycu-ee-calendar.ics`，再開啟 Google 日曆匯入頁面選擇檔案與目標日曆完成批次匯入。
+點選月曆上的單一活動，則可用「加入 Google 日曆」直接開啟預填新增活動畫面，由使用者按儲存完成。
+
+- `src/utils/calendarExport.ts`：iCalendar 匯出、UTF-8 長行摺行、日期與 Google 新增活動連結。
+- `src/components/CalendarImport.tsx`：匯入操作視窗與單一活動入口。
+
+目前活動僅有日期，故匯出為全天活動；全天結束日期為隔天，不因時區而改變顯示日期。批次匯入需使用電腦版 Google 日曆，屬於一次匯入，不會自動同步網站後續更新。
+官方操作說明：https://support.google.com/calendar/answer/37118?hl=zh-Hant
+本次依使用者指示未執行測試、建置或瀏覽器驗證。

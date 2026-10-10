@@ -1,0 +1,30 @@
+[
+  {
+    "name": "活企部",
+    "nameEn": "ACTIVITIES",
+    "description": "主辦聯誼、娛樂等活動，促進同學間交流。",
+    "link": "/eesa/activities",
+    "image": "/intro/activities.webp"
+  },
+  {
+    "name": "學術部",
+    "nameEn": "TECHNICAL",
+    "description": "負責規劃並推動學術活動，協助同學學習與成長。",
+    "link": "/eesa/technical",
+    "image": "/intro/technical.webp"
+  },
+  {
+    "name": "行銷部",
+    "nameEn": "PUBLICITY",
+    "description": "負責宣傳、設計與社群經營，提升學會能見度。",
+    "link": "/eesa/publicity",
+    "image": "/intro/publicity.webp"
+  },
+  {
+    "name": "人力部",
+    "nameEn": "OPERATION",
+    "description": "協助活動人力安排，負責志工招募與管理。",
+    "link": "/eesa/operation",
+    "image": "/intro/operation.webp"
+  }
+]

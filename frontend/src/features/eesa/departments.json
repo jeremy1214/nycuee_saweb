@@ -1,0 +1,268 @@
+{
+  "operation": {
+    "title": "人力部",
+    "bannerImage": "/intro/operations-banner.jpg",
+    "groupPhotoImage": "/intro/operations-group-photo.jpg",
+    "introParagraphs": [
+      "歡迎來到人力部，人力部是個快樂吃飯開心聊八卦的地方！除了幾乎每周固定的部聚讓大家可以吃好喝好以外，我們還有一個環境很舒服，設備很齊全的部窩可以讓你休息！",
+      "歡迎大家進入人力部裡學習如何當個優秀的領導人，或是增進自己不論是簡報或是發表的能力！"
+    ],
+    "memberDescription": "致力於服務系上同學，舉辦各項活動並促進師生交流。組織包含會長與四大部門",
+    "extraSidebarItems": [
+      { "label": "學習能力", "to": "/eesa/operation/skills" },
+      { "label": "體驗談", "to": "/eesa/operation/experiences/1" }
+    ],
+    "experiences": [
+      {
+        "id": "1",
+        "title": "前輩甘苦談_1：張倍瑚（15屆）",
+        "images": ["/intro/activities/experience_1-1.png", "/intro/activities/experience_1-2.png"],
+        "content": [
+          "從還沒加入系學會時，就有聽說人力部是系學會中福利相對多，氣氛相當好的一個部門。後來很榮幸的在徵才當中得到學長姐的認可正式成為了人力部的一員，甚至到現在當上了部長。",
+          "雖然人力部有時候會面臨活動課業考試三頭大的情況，但這一年多以來我真的收穫良多，不論是在知識、能力、甚至是人際關係上都是如此。都看到這裡了還不趕快加入人力部嗎！"
+        ]
+      },
+      {
+        "id": "2",
+        "title": "前輩甘苦談_2：彭明若（15屆）",
+        "images": ["/intro/activities/experience_2-1.png", "/intro/activities/experience_2-2.png"],
+        "content": [
+          "加入系學會後，我認識了許多有才華又有想法的同學，從他們身上學習到很多不同的觀點與做事方式。",
+          "在人力部的課程中，我也接觸到各式各樣的主題，像是攝影、簡報製作、時間管理等，不僅拓展了能力，也讓我更懂得如何有效地安排時間與表達想法。",
+          "此外，透過上台分享與實際參與活動，我累積了寶貴的經驗與軟實力，這些都成為我大學生活中很重要的收穫。"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "前輩甘苦談_3：王冠博（15屆）",
+        "images": ["/intro/activities/experience_3-1.png", "/intro/activities/experience_3-2.png"],
+        "content": [
+          "一開始聽說人力部有很多簡報作業，然後還聽說十個人力九個考研，那時候有點不敢加，但真的加了之後發現也沒有想像中這麼累，甚至優點遠大於缺點。",
+          "加入人力部之後，學了如何做簡報、使用相機、還有很多活動中人際相處的應變之道。",
+          "除了學習之外，還有很多大家聚在部窩一起看電影、玩桌遊、打電動之類的快樂的時光，講了這麼多，我要說的就是人力部真的超頂的。"
+        ]
+      },
+      {
+        "id": "4",
+        "title": "前輩甘苦談_4：曾竑誠（15屆）",
+        "images": ["/intro/activities/experience_4-1.png", "/intro/activities/experience_4-2.png"],
+        "content": [
+          "剛進入人力部的時候，其實不太確定自己能幫上什麼忙，但在一次次舉辦活動、拉贊助、處理大小事的過程中，慢慢發現這個部門最迷人的地方，就是「人」。",
+          "我們要懂得照顧每個部員的感受，也要讓活動順利進行，像幕後的黏著劑一樣，把大家凝聚在一起。雖然有時候會忙到焦頭爛額，但看到整個部會越來越有凝聚力、學弟妹也玩得開心，就會覺得一切都值得。",
+          "人力部讓我學會了傾聽、協調，也學會了怎麼讓團隊更有溫度。"
+        ]
+      },
+      {
+        "id": "5",
+        "title": "前輩甘苦談_5：羅靖雯（15屆）",
+        "images": ["/intro/activities/experience_5-1.png", "/intro/activities/experience_5-2.png"],
+        "content": [
+          "高中時參加過交大的校園博覽會，原本想去隔壁學校念資工，但在攤位和一位電機系學長聊完後，被他的一番話說服，最後來這裡交作業跟被考試轟炸:D。",
+          "後來發現那位學長就是人力部的成員，讓我對這個能發揮一點影響力的位置有了小小的憧憬。",
+          "加入人力部後，參與了團體面試、一日營、高中生參訪、電機周等活動，覺得不僅能與高中生互動、協助系學會事務，也很開心遇到了一群可以一起開心玩，做事能力又好的朋友們。"
+        ]
+      }
+    ],
+    "skills": {
+      "mainTitle": "加入人力部 學到的能力 & 工作 Loading",
+      "subTitle": "下滑以了解更多",
+      "items": [
+        {
+          "title": "領導能力",
+          "content": "你會在人力部的一系列課程中學習到領導相關的知識以及經驗談，並且你也會實際成為某個活動的總召或是負責人，在這些活動中扮演領導者的角色，進一步的訓練你自己領導能力！"
+        },
+        {
+          "title": "簡報與發表能力",
+          "content": "在人力部中，你有多次的機會能夠製作簡報並且上台發表自己的想法。若不會簡報也沒關係，我們一樣也有一系列的課程會帶著大家一步一步的製作出精美的簡報！如果對於簡報製作或發表很有熱忱的話，甚至是有機會在大場合報告給許多人聽的喔！"
+        },
+        {
+          "title": "企劃規劃",
+          "content": "在企劃規劃上，人力部也在課程安排中穿插了大大下小的企劃編寫的活動，讓你成為一個真正會進行企劃規劃的人！如果企劃撰寫得不錯的話，是有機會未來就在電機系上看到你提的企劃被執行出來喔！"
+        },
+        {
+          "title": "能力需求 & 工作 Loading",
+          "content": "基本上只有要顆熱誠的心都歡迎！如果你同時又是負責任、做事積極、口條好、外向的人的話那你就更必須加入人力部了！We need you!!\nLoading的部分取決於自己接到的包是甚麼。但以人力部最基本的工作來說，Loading並不會很重哦！"
+        }
+      ]
+    },
+    "activities": [
+      {
+        "slug": "one-day-camp",
+        "name": "電機系一日營",
+        "image": "/intro/activities/one-day-camp.png",
+        "detailImages": [
+          "/intro/activities/one-day-camp.png",
+          "/intro/activities/one-day-camp-2.png"
+        ],
+        "description": [
+          "電機系一日營是一年一度會在寒假舉辦給全台灣高中生的實作課程營隊。會從人力部中選出總召群，以及從整個系學會中選出優秀的學長姐擔任隊輔。",
+          "此活動除了能夠增進台灣高中生對於電機系的認知，同時也可以當作一個高中生學弟妹與已經進入大學兩三年的學長姐的溝通橋樑。",
+          "活動團隊將於四日內走訪四縣市，雖行程緊湊、任務繁重，但過程中得以結識優秀學弟妹，一覽各地風光，收穫豐富而深刻。"
+        ]
+      },
+      {
+        "slug": "group-interview",
+        "name": "團體面試",
+        "image": "/intro/activities/group_interview.png",
+        "detailImages": [
+          "/intro/activities/group_interview.png",
+          "/intro/activities/group_interview_2.png"
+        ],
+        "description": [
+          "團體面試是高中生申請入學至交大電機系的第二階段面談。人力部會選出總召，作為系主任、系辦與學生之間的溝通橋樑，協調並執行相關事務，同時聯繫系學會成員擔任隊輔。",
+          "隊輔除了協助團體面試流程順利進行、與高中生及家長互動外，也會在面談過程中以學生的角度分享交大電機的學習與生活經驗，讓考生能更全面了解系所特色與氛圍。"
+        ]
+      },
+      {
+        "slug": "graduation",
+        "name": "小畢典",
+        "image": "/intro/activities/graduation.png",
+        "detailImages": [
+          "/intro/activities/graduation.png",
+          "/intro/activities/graduation_2.png"
+        ],
+        "description": [
+          "小畢典是由系學會辦給電機系大四畢業生的溫馨活動。在正式畢業典禮後，我們以更貼近系上的方式，一同回顧四年來的點點滴滴。",
+          "活動中將舉行頒獎、撥穗儀式，並安排精彩的回顧影片，讓每位畢業生都能留下屬於電機人的最後回憶。",
+          "這不僅是道別的時刻，更是慶祝成長與感謝同行的溫暖聚會。讓我們一起，在小畢典畫下青春最亮眼的句點！"
+        ]
+      }
+    ]
+  },
+  "publicity": {
+    "title": "行銷部",
+    "bannerImage": "/intro/publicity-banner.jpg",
+    "groupPhotoImage": "/intro/publicity-group-photo.jpg",
+    "introParagraphs": [
+      "行銷部如同系學會的創意部門，主要負責社群帳號的經營管理、貼文製作、攝影紀錄，系服與尊榮小物也是出自行銷部。",
+      "我們透過不同宣傳方式，讓電機系的特色及活動被更多系上同學看見。"
+    ],
+    "memberDescription": "致力於服務系上同學，舉辦各項活動並促進師生交流。組織包含會長與四大部門",
+    "extraSidebarItems": [
+      { "label": "學習能力", "to": "/eesa/publicity/skills" }
+    ],
+    "skills": {
+      "mainTitle": "加入行銷部 學到的能力 & 工作 Loading",
+      "subTitle": "下滑以了解更多",
+      "items": [
+        {
+          "title": "使用美編、剪輯軟體的能力",
+          "content": "行銷部每月都會有一次部聚，每次部聚都會安排不同的教學主題，例如基礎攝影、後期調色、影片剪輯等，教學內容還會介紹各個軟體的實際應用，如 Ps、Lr、Pr，讓部員能在輕鬆的氛圍中學習新技能。"
+        },
+        {
+          "title": "鍛鍊設計美感",
+          "content": "透過宣傳貼文製作、系服設計，培養部員美感、創意發想與繪圖、設計的能力。"
+        },
+        {
+          "title": "能力需求 & 工作 Loading",
+          "content": "有美感、會設計、會畫畫、會拍照、會攝影、會剪輯，或是什麼都不會，但想培養以上能力的人!!"
+        }
+      ]
+    },
+    "activities": [
+      {
+        "slug": "photography",
+        "name": "活動攝影",
+        "image": "/intro/activities/photography.png",
+        "detailImages": [
+          "/intro/activities/photography.png",
+          "/intro/activities/photo_1.png"
+        ],
+        "description": [
+          "行銷部負責系學會各項活動的攝影工作，將每個精彩的瞬間記錄下來，讓系上同學留下回憶紀念。",
+          "在部內，部員能累積豐富的拍攝經驗，即使未接觸過相機，也能透過部聚課程和學長姐的分享來學習基本技巧。"
+        ]
+      },
+      {
+        "slug": "design",
+        "name": "設計",
+        "image": "/intro/activities/design.png",
+        "detailImages": [
+          "/intro/activities/design.png",
+          "/intro/activities/shirt_114.png"
+        ],
+        "description": [
+          "行銷部同時負責系服與各式系上小物的設計，從發想、繪圖到成品訂製，每一件作品都有機會被製作出來，讓個人創意與系上特色被大家看見。",
+          "(圖片是113電機週衣服和114系服）",
+          "*114系服（左圖下）設計理念：深藍三色系服，正面印 NYCU EE，背面是趴桌睡覺的 Q 版學生與 1% 電池符號，幽默呈現電機系熬夜日常。"
+        ]
+      },
+      {
+        "slug": "social-posts",
+        "name": "宣傳貼文",
+        "image": "/intro/activities/social-posts.png",
+        "detailImages": [
+          "/intro/activities/social-posts.png",
+          "/intro/activities/social-posts_2.png"
+        ],
+        "description": [
+          "系學會社群帳號的貼文皆由行銷部部員設計，將活動公告透過有趣、創意或富有設計感的方式，吸引系上同學的目光，同時達到宣傳的效果，讓更多人參與活動。"
+        ]
+      }
+    ]
+  },
+  "technical": {
+    "title": "學術部",
+    "bannerImage": "/intro/technical-banner.jpg",
+    "groupPhotoImage": "/intro/technical-group-photo.jpg",
+    "introParagraphs": [
+      "大家好，我們是系學會的學術部，主要由大三以及大二的同學組成，平常主要會協助系學會偏學術性質的活動。",
+      "我們很希望可以透過自己幫助到系上的同學們，如果有你認為我們可以協助的內容，歡迎到下方的email與我們聯繫，最後祝大家考試順利杜絕爆卷從你我做起"
+    ],
+    "memberDescription": "致力於服務系上同學，舉辦各項活動並促進師生交流。組織包含會長與四大部門",
+    "extraSidebarItems": [],
+    "activities": [
+      {
+        "slug": "eesa-web",
+        "name": "系學會網頁",
+        "image": "/intro/activities/department-website.jpg",
+        "description": [
+          "負責系學會各類網站的前後端開發與維護，致力於運用軟體技術，清楚呈現系上資源與活動，作為學生、教授與各界間的資訊橋樑。另外也整合歷屆學術部的整理的實驗室資料，提供同學們專題教授的資訊。"
+        ]
+      },
+      {
+        "slug": "high-school-visit",
+        "name": "高中生參訪",
+        "image": "/intro/activities/high-school-visit.png",
+        "description": [
+          "協助高中生交大電機系參訪活動，由學術部帶領同學，從電路原理認識、電子元件認識到最後焊接我們設計的PCB電路板，透過實際動手實作一份電機微專題，激發來參訪的高中生對電機領域的學習興趣。"
+        ]
+      },
+      {
+        "slug": "hardware-course",
+        "name": "一日營硬體課程",
+        "image": "/intro/activities/hardware-course.jpg",
+        "description": [
+          "在寒假的時候會在北中南的學校舉行一日營，而硬體組負責硬體電路相關的課程。",
+          "從接麵包板設計電路再到pcb實作，做出一個有趣的小電路給高中生實作並且到他們學校教他們電路實作。"
+        ]
+      },
+      {
+        "slug": "software-course",
+        "name": "一日營軟體課程",
+        "image": "/intro/activities/software-course.jpg",
+        "description": [
+          "在寒假的時候會在北中南的學校舉行一日營，而軟體組負責有關程式的課程，並且擔任講師。",
+          "上課內容主要是從頭教導程式的語法並設計一個小實作給高中生們實作。"
+        ]
+      },
+      {
+        "slug": "singles-day",
+        "name": "光棍",
+        "image": "/intro/activities/singles-day.jpg",
+        "description": [
+          "自行研發並製作光棍，滿足電機系內迎新、宿營、高中生營隊等活動的表演要求。",
+          "不僅節省活動器材租借開銷，未來還可租借給外系，為系學會創造收入，將創意轉化為資源。"
+        ]
+      },
+      {
+        "slug": "course-selection",
+        "name": "選課大會",
+        "image": "/intro/activities/course-selection.jpg",
+        "description": [
+          "學長姐將分享下半學期各必選修課程的教學內容與教授風格，幫助同學在選課時更了解課程特色、找到最適合自己的課。"
+        ]
+      }
+    ]
+  }
+}

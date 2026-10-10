@@ -1,0 +1,218 @@
+{
+  "basketball-men": {
+    "name": "男籃",
+    "photo": "basketball-men/1.jpg",
+    "ballIcon": "basketball-men/ball.png",
+    "aboutImg": "basketball-men/about.jpg",
+    "intro": [
+      "提供以下服務",
+      "1. 假裝暗戀你去班上給你送吃的或是喝的（食物需自費）200/次",
+      "2. 假裝搭訕要哀居並被你毫不留情拒絕400/次",
+      "3. 在學校裡大喊你長得很像彭于晏/郭雪芙（名字可自己想）200/次",
+      "4. 假裝你的前任在走廊大喊我還愛你 被你霸氣轉頭離開400/次，打巴掌叫我離開800/次",
+      "5. 假裝你是超級富二代 在你朋友旁邊大喊 公子今天要開保時捷還是法拉利 200/次",
+      "6. 在操場高舉紅布條 大喊我愛XXX（含激烈歡呼500/次 紅布條需自備",
+      "7. 假裝你就是傳說校園人物 在你吃飯的時候小聲對同桌說對.就是那個人180/次（附一次神秘表情",
+      "8. 加入電機系籃，保你一生榮華富貴，開心打球打比賽，交到一群可以一起打球的好朋友 666666/次"
+    ],
+    "schedule": [
+      { "type": "paragraph", "text": "主要禮拜三下午1600" }
+    ],
+    "activities": [
+      { "id": "xiaolian", "month": "整年", "name": "小聯賽", "description": "每個禮拜都有比賽，打球打到爽", "image": null },
+      { "id": "beicup", "month": "寒假前後", "name": "北電盃", "description": "跟北台灣系籃比看誰比較電", "image": null },
+      { "id": "dalian", "month": "下學期", "name": "大聯賽", "description": "跟全校菁英單挑", "image": null },
+      { "id": "dacup", "month": "3月", "name": "大電盃", "description": "跟全台灣電類科系發起挑戰", "image": null },
+      { "id": "xiaomei", "month": "3月", "name": "小梅竹", "description": "跟清大電機進行的兩系之間激烈戰爭", "image": null },
+      { "id": "xijicup", "month": "4月", "name": "系際盃", "description": "交大校內最激烈、最熱的盃賽", "image": null }
+    ],
+    "contact": {
+      "intro": "衷居私訊正副隊長獲取更多資訊",
+      "people": [
+        {
+          "header": null,
+          "lines": ["李俊燁：ya.yehyehee.05", "陳庭毅：ty0726_00", "吉祥物：bemature_777"]
+        }
+      ],
+      "note": "歡迎私訊正副隊長了解更多，若想直接加入也可以加入群組，並在練球時出現"
+    }
+  },
+
+  "basketball-women": {
+    "name": "女籃",
+    "photo": "basketball-women/1.jpg",
+    "ballIcon": "basketball-women/ball.png",
+    "aboutImg": null,
+    "intro": [
+      "大家好，我們是 交大電機女籃！成員由大學部和研究所共同組成。",
+      "不論妳是籃球老手，還是剛踏入球場的新手，只要有熱情、喜歡運動，我們都誠摯歡迎妳加入這個充滿活力的大家庭！",
+      "平時的練習內容豐富有趣，除了能精進球技、鍛鍊體能，更能與隊友們培養絕佳默契，收穫滿滿的友情與笑聲。",
+      "每年我們都會參加大電盃、小梅竹、系際盃等賽事，讓大家有機會在球場上盡情發揮、挑戰自我，感受團隊合作的力量。",
+      "加入電機女籃，妳不只會愛上籃球，更會擁有一段熱血又難忘的青春回憶。快來和我們一起流汗、一起成長吧！"
+    ],
+    "schedule": [
+      { "type": "paragraph", "text": "禮拜一、四晚上9.到11.，在西區籃球場練習。如果沒有要來須事先請假，遲到早退也要說。期中期末週彈性練球。" }
+    ],
+    "activities": [
+      { "id": "beicup", "month": "1月或2月（寒假期間）", "name": "北電盃", "description": "北電盃是北部電機相關科系所舉辦的比賽，大約在寒假期間舉辦。", "image": null },
+      { "id": "xiaomei", "month": "3月", "name": "小梅竹", "description": "與清大電機共同舉辦的友誼賽。", "image": null },
+      { "id": "dacup", "month": "4月~5月", "name": "大電盃", "description": "聚集全台各地電機相關科系進行的籃球比賽。", "image": null },
+      { "id": "xijicup", "month": "5月~6月", "name": "系際盃", "description": "交大各系參與的籃球比賽，會與不同的科系競爭。", "image": null }
+    ],
+    "contact": {
+      "intro": null,
+      "people": [
+        { "header": "隊長：張芝瑜", "lines": ["FB: 張芝瑜", "Email: chih.chang.ee12@nycu.edu.tw"] }
+      ],
+      "note": null
+    }
+  },
+
+  "volleyball-men": {
+    "name": "男排",
+    "photo": "volleyball-men/1.jpg",
+    "ballIcon": "volleyball-women/ball.png",
+    "aboutImg": null,
+    "intro": [
+      "你是否喜歡揮灑汗水、熱愛團隊合作、享受在球場上每一次的飛撲與吶喊？那你絕對不能錯過交大電機系排！",
+      "隊員們個個對排球懷抱滿腔熱血，不論你是資深球員還是剛接觸排球的新手，在這裡都能找到屬於你的舞台！球隊平時有固定練球，強度適中、氣氛融洽，既能增進球技，也能認識一群志同道合的好夥伴。我們誠摯歡迎所有對排球有熱誠的同學加入這個有溫度、有幹勁的大家庭！",
+      "不管你有沒有基礎，排球？打就對了！！"
+    ],
+    "schedule": [
+      { "type": "subheader", "text": "系隊練球" },
+      { "type": "list", "items": ["週三、週五下午 15:30～17:30 室外排球場"] },
+      { "type": "subheader", "text": "對牆練習" },
+      { "type": "list", "items": ["週二、週四中午 12:00～13:00 體育館"] }
+    ],
+    "activities": [
+      { "id": "beicup", "month": "12月~1月", "name": "北電盃", "description": "北部學校的電機類科系聯賽，作為新學年第一個正式比賽，在與各路高手切磋的同時也可以驗收平時練習的成果。", "image": null },
+      { "id": "dacup", "month": "12月~1月", "name": "大電盃", "description": "全國電機類科系聯賽，強度通常比北電還高，適合想要挑戰自我、精進球技的排球人。", "image": null },
+      { "id": "xiaomei", "month": "5月", "name": "小梅竹", "description": "與清大電機的交流賽，延續梅竹賽的熱血，靠自己的球技為本系爭光。", "image": null },
+      { "id": "watermelon", "month": "7月~8月", "name": "西瓜盃", "description": "由系隊舉辦的與本系校友的聯賽，在炎炎夏日一邊打球一邊吃著沁涼的西瓜，還能與學長姐交流敘舊，是不能錯過的精采活動。", "image": null }
+    ],
+    "contact": {
+      "intro": null,
+      "people": [
+        { "header": "隊長：陳柏勳", "lines": [] },
+        { "header": "副隊長：廖富亮", "lines": [] }
+      ],
+      "note": "加入交大電機系排 FB 社團，每週都會固定更新練球資訊！"
+    }
+  },
+
+  "volleyball-women": {
+    "name": "女排",
+    "photo": "volleyball-women/1.jpg",
+    "ballIcon": "volleyball-women/ball.png",
+    "aboutImg": null,
+    "intro": [
+      "大家好，我們是交大電機系女排！系女排是一個友善的大家庭，成員包括很多大學部以及研究所的學姊妹們。還有厲害的教練（學長），大家不用擔心自己可能會把球接噴或是跟不上，跟我們一起練球就可以變厲害變的很帥！",
+      "練球的內容包括一點點體能，各種基本動作，還有場上會用到的觀念與技巧，會一步一步帶大家，最後就可以快樂打play。",
+      "一年之中也會有大大小小的比賽可以參加，像是北電盃、大電盃、小梅竹、系際盃、還有超多場的聯賽，可以享受排球比賽的熱血沸騰並展現自己的練習成果！"
+    ],
+    "schedule": [
+      { "type": "paragraph", "text": "每個禮拜會有兩天下午在室外球場與一天中午在室內球場練習，在每個學期的一開始會投票選擇最多人有空的時間。" },
+      { "type": "paragraph", "text": "這學期的練習時間：" },
+      { "type": "list", "items": ["星期三中午 室內球場", "星期四下午 17:30~20:00 室外球場", "星期三與五隔週下午 17:30~20:00 室外球場"] }
+    ],
+    "activities": [
+      { "id": "beicup", "month": "12月~1月", "name": "北電盃", "description": "北電盃是會聚集北部電機相關科系所舉辦的比賽，大約會在寒假舉辦，場地每年皆不相同。", "image": "volleyball-women/2.jpg" },
+      { "id": "dacup", "month": "3月", "name": "大電盃", "description": "大電盃是聚集全台各地電機相關科系進行的排球比賽，會到各個縣市比賽，每年舉辦地皆不相同。", "image": "volleyball-women/1.jpg" },
+      { "id": "xijicup", "month": "4月~5月", "name": "系際盃", "description": "系際盃是交大各系參與的排球比賽，會與不同的科系競爭，是一個認識其他系的機會。", "image": null },
+      { "id": "xiaomei", "month": "4月~5月", "name": "小梅竹", "description": "小梅竹是與清大電機共同舉辦的友誼賽，通常會選在梅竹賽後的某個假日或平日晚上。", "image": null }
+    ],
+    "contact": {
+      "intro": null,
+      "people": [
+        { "header": "隊長：洪子耘", "lines": ["instagram: @__.htyunn.__", "facebook: 洪子耘"] },
+        { "header": "副隊長：張婷媚", "lines": ["instagram:", "facebook:"] }
+      ],
+      "note": "請私訊隊長或副隊長，會將妳拉入臉書社團！請注意若只有申請臉書社團沒有事先告知將不會通過申請～"
+    }
+  },
+
+  "badminton": {
+    "name": "羽球",
+    "photo": "badminton/1.png",
+    "ballIcon": null,
+    "aboutImg": null,
+    "intro": ["待填"],
+    "schedule": [{ "type": "paragraph", "text": "待填" }],
+    "activities": [
+      { "id": "placeholder", "month": "待填", "name": "待填", "description": "待填", "image": null }
+    ],
+    "contact": {
+      "intro": null,
+      "people": [],
+      "note": "待填"
+    }
+  },
+
+  "table-tennis": {
+    "name": "桌球",
+    "photo": "table-tennis/1.jpg",
+    "ballIcon": null,
+    "aboutImg": null,
+    "intro": ["待填"],
+    "schedule": [{ "type": "paragraph", "text": "待填" }],
+    "activities": [
+      { "id": "placeholder", "month": "待填", "name": "待填", "description": "待填", "image": null }
+    ],
+    "contact": {
+      "intro": null,
+      "people": [],
+      "note": "待填"
+    }
+  },
+
+  "baseball": {
+    "name": "棒球",
+    "photo": "baseball/1.png",
+    "ballIcon": null,
+    "aboutImg": null,
+    "intro": ["待填"],
+    "schedule": [{ "type": "paragraph", "text": "待填" }],
+    "activities": [
+      { "id": "placeholder", "month": "待填", "name": "待填", "description": "待填", "image": null }
+    ],
+    "contact": {
+      "intro": null,
+      "people": [],
+      "note": "待填"
+    }
+  },
+
+  "tennis": {
+    "name": "網球",
+    "photo": "tennis/1.png",
+    "ballIcon": null,
+    "aboutImg": null,
+    "intro": ["待填"],
+    "schedule": [{ "type": "paragraph", "text": "待填" }],
+    "activities": [
+      { "id": "placeholder", "month": "待填", "name": "待填", "description": "待填", "image": null }
+    ],
+    "contact": {
+      "intro": null,
+      "people": [],
+      "note": "待填"
+    }
+  },
+
+  "soccer": {
+    "name": "足球",
+    "photo": "soccer/1.jpg",
+    "ballIcon": null,
+    "aboutImg": null,
+    "intro": ["待填"],
+    "schedule": [{ "type": "paragraph", "text": "待填" }],
+    "activities": [
+      { "id": "placeholder", "month": "待填", "name": "待填", "description": "待填", "image": null }
+    ],
+    "contact": {
+      "intro": null,
+      "people": [],
+      "note": "待填"
+    }
+  }
+}

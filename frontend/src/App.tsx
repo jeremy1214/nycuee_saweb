@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
-import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
+import { Navigate, Outlet, Route, Routes, useLocation, useParams } from "react-router-dom";
 import { Modal, SiteFooter, SiteHeader } from "./components/SiteChrome";
 import { SearchDialog } from "./components/SearchDialog";
 import ActivitiesPage from "./features/activities";
 import ResourcePage from "./features/resources";
+import TeamPage, { TeamDetailPage } from "./features/teams";
 import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
+import SectionPage from "./pages/SectionPage";
+import { sectionPages } from "./data/navigation";
+import EesaSection, { EesaIntro, Department, DepartmentActivities, Activity, DepartmentSkills, DepartmentExperiences } from "./features/eesa";
 
 export interface AppOutletContext {
   openPlaceholder: (title: string) => void;
@@ -28,10 +32,15 @@ function AppShell() {
       <SiteFooter />
       <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} />
       <Modal open={placeholderTitle !== null} title={placeholderTitle ?? "建置中"} onClose={() => setPlaceholderTitle(null)}>
-        <p className="dialog-copy">這個入口已保留在網站架構中，正式內容完成後即可接入。目前可先使用「學習資源」查看修課、獎助、交換與研究所資訊。</p>
+        <p className="dialog-copy">相關資訊準備中，歡迎透過導覽列探索系學會、系上活動、系隊與學習資料。</p>
       </Modal>
     </div>
   );
+}
+
+function LegacyEesaRedirect() {
+  const { "*": path = "" } = useParams();
+  return <Navigate to={path === "eesa-intro" || !path ? "/eesa" : `/eesa/${path}`} replace />;
 }
 
 export default function App() {
@@ -39,8 +48,21 @@ export default function App() {
     <Routes>
       <Route element={<AppShell />}>
         <Route index element={<HomePage />} />
-        <Route path="activities" element={<ActivitiesPage />} />
-        <Route path="resources" element={<Navigate to="/resources/courses" replace />} />
+        <Route path="eesa" element={<EesaSection />}>
+          <Route index element={<EesaIntro />} />
+          <Route path=":slug" element={<Department />} />
+          <Route path=":slug/activities" element={<DepartmentActivities />} />
+          <Route path=":slug/activities/:activitySlug" element={<Activity />} />
+          <Route path=":slug/skills" element={<DepartmentSkills />} />
+          <Route path=":slug/experiences/:expId" element={<DepartmentExperiences />} />
+        </Route>
+        <Route path="intro/*" element={<LegacyEesaRedirect />} />
+        <Route path="team" element={<TeamPage />} />
+        <Route path="team/:teamKey" element={<TeamDetailPage />} />
+        {sectionPages.filter((section) => section.to !== "/eesa" && section.to !== "/team").map((section) => (
+          <Route key={section.to} path={section.to.slice(1)} element={<SectionPage section={section} />} />
+        ))}
+        <Route path="activities/overview" element={<ActivitiesPage />} />
         <Route path="resources/:category" element={<ResourcePage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>

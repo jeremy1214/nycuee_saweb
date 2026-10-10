@@ -1,8 +1,7 @@
-export type ActivityCategory = "電機營" | "系露營" | "電機週" | "光舞" | "其他活動";
-
 export interface ActivityDetailImage {
   src: string;
   alt: string;
+  objectPosition?: string;
 }
 
 export interface ActivityDetailSection {
@@ -25,7 +24,8 @@ export interface ActivityItem {
   id: string;
   title: string;
   date: string;
-  category: ActivityCategory;
+  categoryId: string;
+  category: string;
   summary: string;
   details: string;
   location: string;
@@ -33,6 +33,8 @@ export interface ActivityItem {
 }
 
 export interface ActivityCategoryOption {
-  label: ActivityCategory;
+  id: string;
+  label: string;
   shortLabel: string;
+  featuredActivityId?: string;
 }

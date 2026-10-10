@@ -1,0 +1,46 @@
+{
+  "$schema": "../activity.schema.json",
+  "id": "smart-ee-camp",
+  "status": "published",
+  "title": "智慧電機探索營：從電路到未來應用",
+  "date": "2026-10-14",
+  "categoryId": "ee-camp",
+  "summary": "透過主題講解與動手實作，認識電機領域如何連結生活中的智慧科技。",
+  "details": "活動包含系所導覽、基礎電路實作與學長姐交流，讓參與者從觀察、設計到測試，體驗完整的工程思考過程。",
+  "location": "工程四館 101 講堂",
+  "detail": {
+    "eyebrow": "EE CAMP · LEARN BY MAKING",
+    "intro": [
+      "電機營以高中生為主要對象，透過系所介紹、課程體驗與學長姐交流，帶參與者從生活中的科技開始認識電機領域。",
+      "第一版內容聚焦硬體與軟體兩條實作路線，讓抽象概念能透過動手操作被看見，也保留團隊合作與提問交流的空間。"
+    ],
+    "heroImages": [
+      { "src": "/intro/activities/one-day-camp.png", "alt": "電機營課程與學員活動紀錄" },
+      { "src": "/intro/activities/one-day-camp-2.png", "alt": "電機營學員團體合照" }
+    ],
+    "sections": [
+      {
+        "id": "hardware-course",
+        "navLabel": "硬體課程",
+        "eyebrow": "HARDWARE LAB",
+        "title": "從元件與電路開始，把原理做成作品",
+        "paragraphs": [
+          "硬體課程從基本電子元件與電路觀念出發，帶領學員閱讀簡單線路、在麵包板上完成接線，並觀察輸入與輸出的變化。",
+          "課程會以可實際操作的小型作品作為目標；正式材料、難度與成品將依當屆課程設計調整。"
+        ],
+        "image": { "src": "/intro/activities/hardware-course.jpg", "alt": "硬體課程中的電路實作" }
+      },
+      {
+        "id": "software-course",
+        "navLabel": "軟體課程",
+        "eyebrow": "SOFTWARE LAB",
+        "title": "用程式拆解問題，完成第一次小實作",
+        "paragraphs": [
+          "軟體課程從基礎語法與邏輯思考開始，透過循序示範與練習，讓沒有程式經驗的學員也能跟上操作。",
+          "學員將把課堂概念組合成一個小實作，體驗從需求、嘗試到修正的工程思考過程。"
+        ],
+        "image": { "src": "/intro/activities/software-course.jpg", "alt": "軟體課程中的程式實作" }
+      }
+    ]
+  }
+}

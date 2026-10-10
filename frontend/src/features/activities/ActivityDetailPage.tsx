@@ -35,7 +35,7 @@ export default function ActivityDetailPage() {
           <div className="activity-detail-collage" aria-label={`${activity.category}活動照片`}>
             {detail.heroImages.map((image, index) => (
               <figure className={`activity-detail-photo activity-detail-photo-${index + 1}`} key={image.src}>
-                <img src={image.src} alt={image.alt} />
+                <img src={image.src} alt={image.alt} style={{ objectPosition: image.objectPosition }} />
               </figure>
             ))}
           </div>
@@ -64,7 +64,11 @@ export default function ActivityDetailPage() {
           {detail.sections.map((section, index) => (
             <section id={section.id} className="activity-detail-section" key={section.id} aria-labelledby={`${section.id}-title`}>
               <figure className="activity-detail-section-image">
-                <img src={section.image.src} alt={section.image.alt} />
+                <img
+                  src={section.image.src}
+                  alt={section.image.alt}
+                  style={{ objectPosition: section.image.objectPosition }}
+                />
                 <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
               </figure>
               <div className="activity-detail-section-copy">

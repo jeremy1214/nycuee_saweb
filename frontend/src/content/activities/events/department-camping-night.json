@@ -1,0 +1,57 @@
+{
+  "$schema": "../activity.schema.json",
+  "id": "department-camping-night",
+  "status": "published",
+  "title": "秋季系露營：在星光下認識彼此",
+  "date": "2026-10-18",
+  "categoryId": "department-camping",
+  "summary": "以小隊合作與戶外體驗拉近同學距離，在課堂之外建立共同回憶。",
+  "details": "規劃團隊任務、營火交流與戶外體驗，活動內容將依天候與場地狀況調整，完整行前資訊另行通知。",
+  "location": "校外活動場地",
+  "detail": {
+    "eyebrow": "EE CAMPING · GROW TOGETHER",
+    "intro": [
+      "系露營以小隊合作與戶外體驗為主軸，讓同學在課堂之外認識彼此，透過共同任務建立默契與回憶。",
+      "第一版先呈現預計包含的小隊活動、晚間交流與行前準備；實際流程仍會依場地、天候與當屆規劃調整。"
+    ],
+    "heroImages": [
+      { "src": "/intro/activities/experience_3-1.png", "alt": "學生在戶外進行晚間交流活動" },
+      { "src": "/intro/activities/experience_3-2.png", "alt": "學生團體交流合照" }
+    ],
+    "sections": [
+      {
+        "id": "team-challenges",
+        "navLabel": "小隊任務",
+        "eyebrow": "TEAM CHALLENGES",
+        "title": "從破冰到合作，在任務中找到彼此的節奏",
+        "paragraphs": [
+          "活動以小隊為單位安排破冰與合作任務，讓不同年級、不同背景的同學能自然展開對話。",
+          "任務內容將兼顧參與感與安全性，正式關卡、分組方式及所需裝備會在行前通知中說明。"
+        ],
+        "image": { "src": "/intro/activities/experience_5-1.png", "alt": "學生分組進行團隊交流" }
+      },
+      {
+        "id": "campfire-night",
+        "navLabel": "晚間交流",
+        "eyebrow": "CAMPFIRE NIGHT",
+        "title": "在夜色與笑聲裡，留下課堂之外的共同片段",
+        "paragraphs": [
+          "晚間時段預計安排團體交流與輕鬆活動，讓白天累積的默契延續，也讓每位參與者有更多認識彼此的機會。",
+          "是否能進行營火或戶外活動，將以場地規範、天候與安全評估為準。"
+        ],
+        "image": { "src": "/intro/activities/experience_3-1.png", "alt": "學生在戶外手持仙女棒交流" }
+      },
+      {
+        "id": "camping-notes",
+        "navLabel": "行前資訊",
+        "eyebrow": "BEFORE YOU GO",
+        "title": "把交通、住宿與裝備一次整理清楚",
+        "paragraphs": [
+          "正式報名後將統一提供集合方式、交通安排、住宿資訊、攜帶物品與緊急聯絡方式，方便參與者提前準備。",
+          "本頁目前不列出尚未確認的日期與地點；請以系學會後續公告及行前通知為準。"
+        ],
+        "image": { "src": "/intro/activities/experience_3-2.png", "alt": "參與學生留下團體合照" }
+      }
+    ]
+  }
+}

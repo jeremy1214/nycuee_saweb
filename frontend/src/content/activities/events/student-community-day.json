@@ -1,0 +1,11 @@
+{
+  "$schema": "../activity.schema.json",
+  "id": "student-community-day",
+  "status": "published",
+  "title": "電機生活交流日：社團、系隊與學習資源",
+  "date": "2026-11-05",
+  "categoryId": "other",
+  "summary": "一次認識系上社群與學生資源，找到課業之外也能投入的活動。",
+  "details": "由不同學生團隊介紹年度活動、參與方式與可使用的系上資源，現場也保留自由交流與提問時間。",
+  "location": "工程四館中庭"
+}

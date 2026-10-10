@@ -1,0 +1,57 @@
+{
+  "$schema": "../activity.schema.json",
+  "id": "ee-week-showcase",
+  "status": "published",
+  "title": "電機週：把日常好奇變成互動作品",
+  "date": "2026-10-22",
+  "categoryId": "ee-week",
+  "summary": "集結學生創作、知識展區與互動體驗，從不同角度看見電機的可能性。",
+  "details": "現場以主題展區呈現學生作品與電機知識，並安排短講及互動體驗，適合想認識系上學習內容的師生參加。",
+  "location": "浩然圖書館前廣場",
+  "detail": {
+    "eyebrow": "EE WEEK · IDEAS ON DISPLAY",
+    "intro": [
+      "電機週把學生作品、系上特色與生活中的科技帶到校園公共空間，透過展覽與互動，讓更多人看見電機不只存在於課本與實驗室。",
+      "第一版以主題展區、互動體驗及設計成果為內容主軸；各年度主題與展出項目將依當屆企劃更新。"
+    ],
+    "heroImages": [
+      { "src": "/intro/activities/design.png", "alt": "電機週設計成果展示" },
+      { "src": "/intro/activities/shirt_114.png", "alt": "電機系服設計作品" }
+    ],
+    "sections": [
+      {
+        "id": "themed-exhibits",
+        "navLabel": "主題展區",
+        "eyebrow": "THEMED EXHIBITS",
+        "title": "把專業知識轉成容易靠近的校園展覽",
+        "paragraphs": [
+          "主題展區以學生作品、電機知識與系上生活為素材，透過圖像、實物或短講整理成容易理解的內容。",
+          "展出主題會依當年度企劃調整，正式項目與開放時段請以活動公告為準。"
+        ],
+        "image": { "src": "/intro/activities/social-posts.png", "alt": "學生製作的活動主題視覺" }
+      },
+      {
+        "id": "interactive-experience",
+        "navLabel": "互動體驗",
+        "eyebrow": "TRY IT YOURSELF",
+        "title": "不只觀看，也能親手操作與提問",
+        "paragraphs": [
+          "互動體驗希望降低接觸技術的門檻，讓參觀者透過簡單操作觀察作品如何回應，並與現場同學交流背後的想法。",
+          "實際體驗內容、參加方式與是否需要預約，將在當屆活動資訊確認後更新。"
+        ],
+        "image": { "src": "/intro/activities/photography.png", "alt": "學生記錄與參與校園活動" }
+      },
+      {
+        "id": "visual-design",
+        "navLabel": "設計成果",
+        "eyebrow": "VISUAL IDENTITY",
+        "title": "從主視覺到系服，讓每一屆留下自己的樣子",
+        "paragraphs": [
+          "電機週的視覺不只用來宣傳，也會延伸到系服與活動小物，從概念發想、繪圖到實際製作，凝聚當屆活動的個性。",
+          "頁面目前展示網站既有的設計素材；正式販售資訊、款式與尺寸將另行公告。"
+        ],
+        "image": { "src": "/intro/activities/shirt_114.png", "alt": "電機系服正反面設計展示" }
+      }
+    ]
+  }
+}

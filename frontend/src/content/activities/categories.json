@@ -1,0 +1,33 @@
+{
+  "$schema": "./categories.schema.json",
+  "categories": [
+    {
+      "id": "ee-camp",
+      "label": "電機營",
+      "shortLabel": "EE CAMP",
+      "featuredActivityId": "smart-ee-camp"
+    },
+    {
+      "id": "department-camping",
+      "label": "系露營",
+      "shortLabel": "CAMPING",
+      "featuredActivityId": "department-camping-night"
+    },
+    {
+      "id": "ee-week",
+      "label": "電機週",
+      "shortLabel": "EE WEEK",
+      "featuredActivityId": "ee-week-showcase"
+    },
+    {
+      "id": "light-dance",
+      "label": "光舞",
+      "shortLabel": "LIGHT DANCE"
+    },
+    {
+      "id": "other",
+      "label": "其他活動",
+      "shortLabel": "MORE"
+    }
+  ]
+}

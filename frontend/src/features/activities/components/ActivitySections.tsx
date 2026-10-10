@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
 import { activities, activityCategories } from "../data/activities";
-import type { ActivityCategory, ActivityItem } from "../activityTypes";
+import type { ActivityItem } from "../activityTypes";
 
 interface ActivityOverviewProps {
-  selectedCategory: ActivityCategory | null;
-  onCategoryChange: (category: ActivityCategory | null) => void;
+  selectedCategory: string | null;
+  onCategoryChange: (categoryId: string | null) => void;
 }
 
 export function ActivityOverview({ selectedCategory, onCategoryChange }: ActivityOverviewProps) {
@@ -27,13 +27,13 @@ export function ActivityOverview({ selectedCategory, onCategoryChange }: Activit
 
       <div className="activity-category-cloud" role="group" aria-label="依活動分類篩選">
         {activityCategories.map((category, index) => {
-          const isSelected = category.label === selectedCategory;
+          const isSelected = category.id === selectedCategory;
           const filterLabel = category.label.endsWith("活動")
             ? `篩選${category.label}`
             : `篩選${category.label}活動`;
-          const detailActivity = activities.find(
-            (activity) => activity.category === category.label && activity.detail,
-          );
+          const detailActivity = category.featuredActivityId
+            ? activities.find((activity) => activity.id === category.featuredActivityId)
+            : undefined;
           const categoryContent = (
             <>
               <span>{category.label}</span>
@@ -44,7 +44,7 @@ export function ActivityOverview({ selectedCategory, onCategoryChange }: Activit
           return detailActivity ? (
             <Link
               className={`activity-category-bubble activity-category-bubble-${index + 1}`}
-              key={category.label}
+              key={category.id}
               to={`/activities/${detailActivity.id}`}
               aria-label={`${category.label}，查看活動詳細頁`}
             >
@@ -54,10 +54,10 @@ export function ActivityOverview({ selectedCategory, onCategoryChange }: Activit
             <button
               className={`activity-category-bubble activity-category-bubble-${index + 1}`}
               type="button"
-              key={category.label}
+              key={category.id}
               aria-label={filterLabel}
               aria-pressed={isSelected}
-              onClick={() => onCategoryChange(isSelected ? null : category.label)}
+              onClick={() => onCategoryChange(isSelected ? null : category.id)}
             >
               {categoryContent}
             </button>
@@ -69,15 +69,16 @@ export function ActivityOverview({ selectedCategory, onCategoryChange }: Activit
 }
 
 interface RecentActivitiesProps {
-  selectedCategory: ActivityCategory | null;
+  selectedCategory: string | null;
   onActivitySelect: (activity: ActivityItem) => void;
 }
 
 export function RecentActivities({ selectedCategory, onActivitySelect }: RecentActivitiesProps) {
   const upcomingActivities = [...activities].sort((first, second) => first.date.localeCompare(second.date));
   const visibleActivities = selectedCategory
-    ? upcomingActivities.filter((activity) => activity.category === selectedCategory)
+    ? upcomingActivities.filter((activity) => activity.categoryId === selectedCategory)
     : upcomingActivities;
+  const selectedCategoryLabel = activityCategories.find((category) => category.id === selectedCategory)?.label;
 
   return (
     <section className="recent-activities" aria-labelledby="recent-activities-title">
@@ -87,7 +88,7 @@ export function RecentActivities({ selectedCategory, onActivitySelect }: RecentA
           <h2 id="recent-activities-title">近期活動</h2>
         </div>
         <p className="activity-filter-status" aria-live="polite">
-          {selectedCategory ? `目前顯示：${selectedCategory}` : "目前顯示：全部活動"}
+          {selectedCategoryLabel ? `目前顯示：${selectedCategoryLabel}` : "目前顯示：全部活動"}
           <span>{visibleActivities.length} 項</span>
         </p>
       </div>

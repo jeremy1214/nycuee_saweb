@@ -21,6 +21,8 @@
 
 系隊模組與資料說明請見 [frontend/src/features/teams/README.md](frontend/src/features/teams/README.md)。
 
+活動卡片、詳細頁、照片與新增活動的維護方式請見 [frontend/src/features/activities/README.md](frontend/src/features/activities/README.md)。
+
 ## 目前功能
 
 - 首頁焦點輪播、系上新訊、快捷入口與互動式行事曆
@@ -136,13 +138,16 @@ nycuee_saweb/
 │  │  │  └─ SiteChrome.tsx        # Header、Footer、Modal 等共用元件
 │  │  ├─ data/
 │  │  │  └─ home.ts               # 首頁輪播、焦點與月曆資料
+│  │  ├─ content/
+│  │  │  └─ activities/           # JSON 活動內容、分類與 JSON Schema
 │  │  ├─ features/
 │  │  │  ├─ activities/           # 系上活動功能模組
 │  │  │  │  ├─ components/        # 活動總覽、分類泡泡與近期活動列表
-│  │  │  │  ├─ data/              # 活動分類及五筆示意活動
+│  │  │  │  ├─ data/              # JSON 自動載入、驗證與資料來源介面
 │  │  │  │  ├─ ActivitiesPage.tsx # 活動總覽入口與互動狀態
 │  │  │  │  ├─ ActivityDetailPage.tsx # 共用活動詳細頁
 │  │  │  │  ├─ activityTypes.ts   # 活動分類與資料型別
+│  │  │  │  ├─ README.md          # 活動、照片與詳細頁維護指南
 │  │  │  │  └─ activities.css     # 活動頁桌面及響應式樣式
 │  │  │  └─ resources/            # 完整的學習資源功能模組
 │  │  │     ├─ components/        # 資源頁區塊元件
@@ -174,19 +179,20 @@ nycuee_saweb/
 1. `main.tsx` 建立 React 應用程式並啟用 Hash Router。
 2. `App.tsx` 根據網址載入首頁、系學會、活動、系隊、學習資源、聯絡或 404 頁面。
 3. 首頁內容由 `data/home.ts` 提供，再交給 `HomeSections.tsx` 呈現。
-4. Activities Page 使用本地示意資料提供活動分類篩選；有 `detail` 資料的活動會進入獨立詳細頁，其餘活動開啟詳情視窗。
+4. Activities Page 透過資料來源介面讀取 `content/activities/events/*.json`；有 `detail` 資料的活動會進入獨立詳細頁，其餘活動開啟詳情視窗。
 5. Resource Page 從網址取得目前分類，讀取 `features/resources/data/resources.ts` 的對應資料。
 6. `ContactPage.tsx` 驗證表單後，將資料送往環境變數指定的 API；未設定時顯示寄信備援。
 7. 共用 Header、Footer、搜尋及 Modal 由 `SiteChrome.tsx` 等共用元件負責。
 
 ## 活動資料格式
 
-活動頁目前使用 `frontend/src/features/activities/data/activities.ts` 中的本地資料。每筆活動包含：
+活動頁內容位於 `frontend/src/content/activities/`，一個活動使用一個 JSON；新增檔案後會自動載入。每筆活動包含：
 
 - `id`：活動的唯一識別值
 - `title`：活動標題
 - `date`：`YYYY-MM-DD` 格式日期；頁面會依日期由近到遠排列
-- `category`：五個既定分類之一
+- `status`：`draft`、`published` 或 `archived`；只有 `published` 會顯示
+- `categoryId`：對應 `categories.json` 的穩定分類識別值
 - `summary`：顯示於近期活動列表的摘要
 - `details`：顯示於活動詳情視窗的完整介紹
 - `location`：活動地點
@@ -198,7 +204,7 @@ nycuee_saweb/
 
 - 修改首頁文字、輪播或月曆資料：`frontend/src/data/home.ts`
 - 修改首頁區塊與快捷連結：`frontend/src/components/HomeSections.tsx`
-- 修改活動內容與分類：`frontend/src/features/activities/data/activities.ts`
+- 修改活動內容與分類：`frontend/src/content/activities/`
 - 修改活動頁版面：`frontend/src/features/activities/components/ActivitySections.tsx`
 - 修改活動頁響應式樣式：`frontend/src/features/activities/activities.css`
 - 修改學習資源文字與官方連結：`frontend/src/features/resources/data/resources.ts`
@@ -210,7 +216,7 @@ nycuee_saweb/
 - 設定聯絡表單接收端：複製 `frontend/.env.example` 為 `frontend/.env.local`
 - 修改全站或首頁樣式：`frontend/src/styles.css`
 
-Resource Page 的詳細分工請參考 [`frontend/src/features/resources/README.md`](frontend/src/features/resources/README.md)。活動頁的篩選與詳情測試位於 `frontend/src/features/activities/ActivitiesPage.test.tsx`；全站導覽、聯絡表單備援與其他整合測試位於 `frontend/src/test/App.test.tsx`。
+Resource Page 的詳細分工請參考 [`frontend/src/features/resources/README.md`](frontend/src/features/resources/README.md)。活動維護方式請參考 [`frontend/src/features/activities/README.md`](frontend/src/features/activities/README.md)；活動資料、篩選與詳情測試位於 `frontend/src/features/activities/`，全站導覽、聯絡表單備援與其他整合測試位於 `frontend/src/test/App.test.tsx`。
 
 共同編輯完成後，提交前至少執行：
 

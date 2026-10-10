@@ -1,0 +1,11 @@
+{
+  "$schema": "../activity.schema.json",
+  "id": "light-dance-workshop",
+  "status": "published",
+  "title": "光舞工作坊：用程式點亮舞台",
+  "date": "2026-10-28",
+  "categoryId": "light-dance",
+  "summary": "結合燈光控制、程式設計與舞台表演，共同完成一段可被看見的創作。",
+  "details": "從燈條控制基礎開始，分組設計燈光節奏並進行舞台整合。無相關經驗也可參加，器材與教學由活動團隊準備。",
+  "location": "活動中心二樓展演空間"
+}

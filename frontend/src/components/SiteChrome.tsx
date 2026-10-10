@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, type MouseEvent, type ReactNode } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { sectionPages } from "../data/navigation";
+import { primaryNavigation } from "../data/navigation";
 
 interface SiteHeaderProps {
   onSearch: () => void;
@@ -14,7 +14,7 @@ export function SiteHeader({ onSearch, onPlaceholder }: SiteHeaderProps) {
         <Brand />
         <nav className="primary-nav" aria-label="主要導覽">
           <NavLink to="/" end>首頁</NavLink>
-          {sectionPages.map((page) => (
+          {primaryNavigation.map((page) => (
             <NavLink key={page.to} to={page.to}>{page.title}</NavLink>
           ))}
         </nav>
@@ -79,7 +79,7 @@ export function SiteFooter() {
           </div>
           <div className="footer-column">
             <h2>網站導覽</h2>
-            {sectionPages.map((page) => <Link key={page.to} to={page.to}>{page.title}</Link>)}
+            {primaryNavigation.map((page) => <Link key={page.to} to={page.to}>{page.title}</Link>)}
           </div>
         </div>
         <div className="footer-bottom">

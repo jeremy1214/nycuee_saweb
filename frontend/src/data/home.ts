@@ -1,5 +1,5 @@
 import type { CalendarEvent, NewsItem, Slide } from "../types";
-import { sectionPages } from "./navigation";
+import { contactPage, sectionPages } from "./navigation";
 import { teams } from "../features/teams/data";
 import { departments, departmentCards } from "../features/eesa/data";
 
@@ -81,6 +81,7 @@ export const calendarEvents: CalendarEvent[] = [
 
 export const searchItems = [
   ...sectionPages.map((page) => ({ label: page.title, description: page.description, to: page.to })),
+  { label: contactPage.title, description: contactPage.description, to: contactPage.to },
   ...teams.map((team) => ({ label: `系隊｜${team.name}`, description: team.intro.join(" "), to: `/team/${team.key}` })),
   ...departmentCards.map((card) => ({ label: card.name, description: card.description, to: card.link })),
   ...Object.entries(departments).flatMap(([slug, department]) => [

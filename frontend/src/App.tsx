@@ -7,6 +7,7 @@ import ResourcePage from "./features/resources";
 import TeamPage, { TeamDetailPage } from "./features/teams";
 import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
+import ContactPage from "./pages/ContactPage";
 import EesaSection, { EesaIntro, Department, DepartmentActivities, Activity, DepartmentSkills, DepartmentExperiences } from "./features/eesa";
 
 export interface AppOutletContext {
@@ -61,6 +62,7 @@ export default function App() {
         <Route path="activities/overview" element={<ActivitiesPage />} />
         <Route path="resources" element={<Navigate to="/resources/courses" replace />} />
         <Route path="resources/:category" element={<ResourcePage />} />
+        <Route path="contact" element={<ContactPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

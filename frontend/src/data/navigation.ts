@@ -5,4 +5,13 @@ export const sectionPages = [
   { title: "學習資料", to: "/resources", icon: "↗", eyebrow: "LEARNING RESOURCES", description: "課程與學習相關資料將在這裡與你見面。" },
 ] as const;
 
+export const contactPage = {
+  title: "聯絡我們",
+  to: "/contact",
+  eyebrow: "CONTACT US",
+  description: "提交問題或建議，讓系學會協助你找到合適的資訊與窗口。",
+} as const;
+
+export const primaryNavigation = [...sectionPages, contactPage] as const;
+
 export type SectionPage = (typeof sectionPages)[number];

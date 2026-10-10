@@ -1,8 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { calendarEvents, newsItems, slides } from "../data/home";
+import { sectionPages } from "../data/navigation";
+import { departmentCards } from "../features/eesa/data";
+import { activityCategories } from "../features/activities/data/activities";
+import { resourceCategories, resourceOrder } from "../features/resources/data/resources";
+import { teams } from "../features/teams/data";
 import type { CalendarEvent, NewsItem } from "../types";
 import { SectionHeading } from "./SiteChrome";
+import CalendarImport from "./CalendarImport";
 
 export function HeroCarousel() {
   const [current, setCurrent] = useState(0);
@@ -76,12 +82,12 @@ export function HeroCarousel() {
       onTouchEnd={handleTouchEnd}
       onTouchCancel={() => { touchStartX.current = null; }}
     >
-      <HeroArtwork />
+      <img className="hero-art" src={slide.image} alt="" style={{ objectPosition: slide.imagePosition }} />
       <div className="hero-copy" key={current} aria-live={isPaused ? "polite" : "off"}>
         <span className="eyebrow">{slide.eyebrow}</span>
         <h1>{slide.title}</h1>
         <p>{slide.description.map((line) => <span key={line}>{line}<br /></span>)}</p>
-        <Link className="hero-link" to="/resources/courses">探索學習資源 <span aria-hidden="true">↗</span></Link>
+        <Link className="hero-link" to="/eesa">探索交大電機 <span aria-hidden="true">↗</span></Link>
       </div>
       <button className="hero-arrow hero-prev" type="button" onClick={() => showSlide(current - 1)} aria-label="上一張">‹</button>
       <button className="hero-arrow hero-next" type="button" onClick={() => showSlide(current + 1)} aria-label="下一張">›</button>
@@ -105,48 +111,12 @@ export function HeroCarousel() {
   );
 }
 
-function HeroArtwork() {
-  return (
-    <svg className="hero-art" viewBox="0 0 1160 330" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      <defs>
-        <linearGradient id="hero-bg" x1="0" y1="1" x2="1" y2="0"><stop stopColor="#102c43" /><stop offset="1" stopColor="#125963" /></linearGradient>
-        <linearGradient id="hero-chip" x1="0" x2="1" y2="1"><stop stopColor="#155e6c" /><stop offset="1" stopColor="#092a41" /></linearGradient>
-        <pattern id="hero-grid" width="27" height="27" patternUnits="userSpaceOnUse"><path d="M27 0H0V27" fill="none" stroke="#94d8cc" strokeOpacity=".1" /></pattern>
-        <filter id="hero-glow"><feGaussianBlur stdDeviation="3" /></filter>
-      </defs>
-      <rect width="1160" height="330" fill="url(#hero-bg)" />
-      <rect width="1160" height="330" fill="url(#hero-grid)" />
-      <circle cx="875" cy="170" r="145" fill="#62e4cf" opacity=".04" />
-      <circle cx="875" cy="170" r="115" fill="none" stroke="#79dcca" opacity=".17" />
-      <g fill="none" stroke="#75d9c6" strokeWidth="1.3" opacity=".5">
-        <path d="M680 90H755L785 120H820M650 165H770L805 145H820" />
-        <path d="M715 245H760L807 198H820M882 105V62L925 19" />
-        <path d="M935 132H992L1044 80H1160M935 160H1080L1120 120H1160" />
-        <path d="M935 187H1020L1080 247H1160M880 220V270L923 313" />
-        <path d="M855 105V82L824 51H732M855 220V248L814 289H703" />
-      </g>
-      <g fill="#a7ead5"><circle cx="680" cy="90" r="3" /><circle cx="650" cy="165" r="3" /><circle cx="715" cy="245" r="3" /><circle cx="732" cy="51" r="3" /><circle cx="1044" cy="80" r="3" /><circle cx="1080" cy="247" r="3" /></g>
-      <rect x="818" y="104" width="120" height="120" rx="7" fill="#0a2437" stroke="#85daca" strokeWidth="2" />
-      <rect x="829" y="115" width="98" height="98" rx="3" fill="url(#hero-chip)" stroke="#8ed8ca" strokeOpacity=".35" />
-      <path d="M846 185V144H862V163H891V144H907V185H891V173H862V185Z" fill="#bcebdc" opacity=".85" />
-      <g stroke="#a2dccb" strokeWidth="3" opacity=".5">
-        <path d="M838 97V104M853 97V104M868 97V104M883 97V104M898 97V104M913 97V104" />
-        <path d="M838 224V231M853 224V231M868 224V231M883 224V231M898 224V231M913 224V231" />
-        <path d="M811 124H818M811 139H818M811 154H818M811 169H818M811 184H818M811 199H818" />
-        <path d="M938 124H945M938 139H945M938 154H945M938 169H945M938 184H945M938 199H945" />
-      </g>
-      <path d="M935 132H992L1044 80H1120" fill="none" stroke="#b4ffe1" strokeWidth="3" filter="url(#hero-glow)" opacity=".45" />
-      <text x="1015" y="292" fill="#bcebdc" opacity=".28" fontSize="11" fontFamily="monospace" letterSpacing="4">IDEAS → IMPACT</text>
-    </svg>
-  );
-}
-
 export function NewsSection({ onPlaceholder }: { onPlaceholder: (title: string) => void }) {
   return (
     <section className="home-section" id="news">
       <SectionHeading
         eyebrow="WHAT'S NEW"
-        title="系上活動"
+        title="系所新訊"
         action={<a className="section-more" href="https://dee.nycu.edu.tw/news.php?locale=tw" target="_blank" rel="noreferrer">查看最新消息 <span aria-hidden="true">↗</span></a>}
       />
       <div className="news-grid">
@@ -154,7 +124,7 @@ export function NewsSection({ onPlaceholder }: { onPlaceholder: (title: string) 
           <button className="news-card" type="button" key={item.title} onClick={() => onPlaceholder(item.title)}>
             <NewsArtwork item={item} />
             <span className="news-body">
-              <time className="news-date" dateTime={item.date}>{item.date.replaceAll("-", ".")}</time>
+              <time className="news-date" dateTime={item.date}>{item.date.replaceAll("-", ".")} · 示意消息</time>
               <strong>{item.title}</strong>
               <span className="news-summary">{item.summary}</span>
               <span className="news-card-bottom">了解更多 <b aria-hidden="true">↗</b></span>
@@ -167,52 +137,140 @@ export function NewsSection({ onPlaceholder }: { onPlaceholder: (title: string) 
 }
 
 function NewsArtwork({ item }: { item: NewsItem }) {
-  const artworkLabel = {
-    research: "EXCHANGE",
-    campus: "SEMINAR",
-    student: "SHOWCASE",
-  }[item.artwork];
+  const artwork = {
+    research: (<svg viewBox="0 0 360 145" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <rect width="360" height="145" fill="#e2eeea"/>
+            <g fill="none" stroke="#79a99b">
+              <circle cx="245" cy="78" r="62"/><circle cx="245" cy="78" r="43"/>
+              <circle cx="245" cy="78" r="23"/>
+              <path d="M0 28H143L177 62H222M0 94H150L180 78H222M270 78H360"/>
+            </g>
+            <g fill="#087f80"><circle cx="245" cy="78" r="8"/>
+              <circle cx="143" cy="28" r="3"/><circle cx="150" cy="94" r="3"/></g>
+            <text x="24" y="38" fill="#437e70" fontSize="11"
+              fontFamily="monospace" letterSpacing="3">RESEARCH</text>
+          </svg>),
+    campus: (<svg viewBox="0 0 360 145" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <rect width="360" height="145" fill="#e5ecf1"/>
+            <path d="M68 145V68L179 25L294 68V145" fill="#b5c7d3"/>
+            <path d="M91 145V77H271V145" fill="#d7e1e7"/>
+            <path d="M165 145V98H199V145" fill="#5b7a91"/>
+            <g fill="#7392a6">
+              <path d="M107 88H124V106H107ZM139 88H156V106H139ZM209 88H226V106H209ZM241 88H258V106H241Z"/>
+              <path d="M107 117H124V135H107ZM139 117H156V135H139ZM209 117H226V135H209ZM241 117H258V135H241Z"/>
+            </g>
+            <path d="M50 69L179 18L313 69" fill="none" stroke="#638399" strokeWidth="3"/>
+            <text x="24" y="30" fill="#59798d" fontSize="11"
+              fontFamily="monospace" letterSpacing="3">ADMISSIONS</text>
+          </svg>),
+    student: (<svg viewBox="0 0 360 145" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <rect width="360" height="145" fill="#f0eadb"/>
+            <g transform="translate(187 17)">
+              <rect width="99" height="85" rx="4" fill="#cbbb98"/>
+              <rect x="7" y="7" width="85" height="63" rx="2" fill="#f8f5ec"/>
+              <path d="M18 46L32 46L40 23L49 56L59 36L69 46H81"
+                stroke="#91805a" strokeWidth="2" fill="none"/>
+              <path d="M43 85V106M24 106H75" stroke="#9e8c66" strokeWidth="5"/>
+            </g>
+            <circle cx="147" cy="103" r="13" fill="#dfcfaa"/>
+            <path d="M128 145V126Q147 110 167 126V145" fill="#af9972"/>
+            <text x="24" y="30" fill="#9c8660" fontSize="11"
+              fontFamily="monospace" letterSpacing="3">STUDENT LIFE</text>
+          </svg>),
+  };
 
   return (
     <span className={`news-art news-art-${item.artwork}`}>
-      <span className="art-label" aria-hidden="true">{artworkLabel}</span>
-      {item.artwork === "research" && <span className="circuit-orbit" aria-hidden="true"><i /><i /><i /></span>}
-      {item.artwork === "campus" && <span className="campus-building" aria-hidden="true"><i /><i /><i /><i /></span>}
-      {item.artwork === "student" && <span className="student-screen" aria-hidden="true"><i /></span>}
+      {artwork[item.artwork]}
       <span className="news-badge">{item.category}</span>
     </span>
   );
 }
 
-interface QuickGroup {
-  icon: string;
-  title: string;
-  items: { label: string; to?: string; href?: string; external?: boolean }[];
-}
+export function QuickLinks() {
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [showAllTeams, setShowAllTeams] = useState(false);
+  const menus: Record<string, { label: string; to: string }[]> = {
+    "/eesa": [
+      { label: "系學會介紹", to: "/eesa" },
+      ...departmentCards.filter((department) => department.link).map((department) => ({
+        label: department.name,
+        to: department.link,
+      })),
+    ],
+    "/activities": [
+      { label: "活動總覽", to: "/activities/overview" },
+      ...activityCategories.map((category) => ({
+        label: category.label,
+        to: `/activities/overview?category=${encodeURIComponent(category.label)}`,
+      })),
+    ],
+    "/team": teams.map((team) => ({ label: team.name, to: `/team/${team.key}` })),
+    "/resources": resourceOrder.map((slug) => ({
+      label: resourceCategories[slug].tabLabel,
+      to: `/resources/${slug}`,
+    })),
+  };
 
-const quickGroups: QuickGroup[] = [
-  { icon: "◎", title: "系上活動", items: [{ label: "活動首頁", to: "/activities" }, { label: "活動日曆", href: "#calendar" }, { label: "最新消息", href: "https://dee.nycu.edu.tw/news.php?locale=tw", external: true }] },
-  { icon: "⌘", title: "系隊", items: [{ label: "系隊介紹" }, { label: "招募資訊" }, { label: "聯絡方式" }] },
-  { icon: "▤", title: "系學會", items: [{ label: "系學會介紹" }, { label: "學生消息" }, { label: "活動資訊" }] },
-  { icon: "↗", title: "學習資料", items: [{ label: "關於修課", to: "/resources/courses" }, { label: "獎助學金", to: "/resources/scholarships" }, { label: "交換資訊", to: "/resources/exchange" }, { label: "研究所", to: "/resources/graduate" }] },
-];
-
-export function QuickLinks({ onPlaceholder }: { onPlaceholder: (title: string) => void }) {
   return (
-    <section className="quick-grid" aria-label="常用資訊">
-      {quickGroups.map((group) => (
-        <details className="quick-item" key={group.title}>
-          <summary><span className="quick-icon" aria-hidden="true">{group.icon}</span>{group.title}<span className="quick-plus" aria-hidden="true">＋</span></summary>
-          <div className="quick-panel">
-            {group.items.map((item) => item.to ? (
-              <Link key={item.label} to={item.to}>{item.label}<span aria-hidden="true">↗</span></Link>
-            ) : item.href ? (
-              <a key={item.label} href={item.href} target={item.external ? "_blank" : undefined} rel={item.external ? "noreferrer" : undefined}>{item.label}<span aria-hidden="true">↗</span></a>
-            ) : (
-              <button key={item.label} type="button" onClick={() => onPlaceholder(item.label)}>{item.label}<span aria-hidden="true">↗</span></button>
-            ))}
+    <section className="quick-grid" aria-label="網站導覽">
+      {sectionPages.map((page) => (
+        <div
+          className={`quick-item${openMenu === page.to ? " is-open" : ""}`}
+          key={page.to}
+          onMouseLeave={() => {
+            setOpenMenu(null);
+            setShowAllTeams(false);
+          }}
+          onBlur={(event) => {
+            if (!event.currentTarget.contains(event.relatedTarget)) {
+              setOpenMenu(null);
+              setShowAllTeams(false);
+            }
+          }}
+          onKeyDown={(event) => {
+            if (event.key === "Escape") {
+              setOpenMenu(null);
+              setShowAllTeams(false);
+            }
+          }}
+        >
+          <div className="quick-link">
+            <Link className="quick-main-link" to={page.to}>
+              <span className="quick-icon" aria-hidden="true">{page.icon}</span>
+              <span>{page.title}</span>
+            </Link>
+            <button
+              className="quick-plus"
+              type="button"
+              aria-label={`展開${page.title}選單`}
+              aria-expanded={openMenu === page.to}
+              onClick={() => setOpenMenu(openMenu === page.to ? null : page.to)}
+            >
+              <span aria-hidden="true">＋</span>
+            </button>
           </div>
-        </details>
+          <nav className="quick-menu" aria-label={`${page.title}內容連結`}>
+            {(page.to === "/team" && !showAllTeams ? menus[page.to].slice(0, 5) : menus[page.to]).map((item) => (
+              <Link key={item.to} to={item.to} onClick={() => {
+                setOpenMenu(null);
+                setShowAllTeams(false);
+              }}>
+                {item.label}<span aria-hidden="true">↗</span>
+              </Link>
+            ))}
+            {page.to === "/team" && !showAllTeams && menus[page.to].length > 5 && (
+              <button
+                className="quick-menu-more"
+                type="button"
+                style={{ appearance: "none", display: "flex", width: "100%", border: 0, borderRadius: 3, background: "#eef7f5", color: "#096869", padding: "11px 13px", alignItems: "center", justifyContent: "space-between", font: "inherit", fontSize: ".78rem", fontWeight: 700, cursor: "pointer" }}
+                onClick={() => setShowAllTeams(true)}
+              >
+                顯示更多系隊 <span className="quick-menu-more-icon" aria-hidden="true">⌄</span>
+              </button>
+            )}
+          </nav>
+        </div>
       ))}
     </section>
   );
@@ -230,7 +288,12 @@ export function EventCalendar({ onEvent }: { onEvent: (event: CalendarEvent) => 
 
   return (
     <section className="calendar-section" id="calendar">
-      <SectionHeading eyebrow="UPCOMING EVENTS" title="電機行事曆" action={<span className="calendar-note">示意活動 · 正式資訊請見系網</span>} />
+      <SectionHeading eyebrow="UPCOMING EVENTS" title="電機行事曆" action={
+        <div className="calendar-header-actions">
+          <span className="calendar-note">示意活動 · 正式資訊請見系網</span>
+          <CalendarImport events={calendarEvents} />
+        </div>
+      } />
       <div className="calendar">
         <div className="calendar-toolbar">
           <div className="month-controls">

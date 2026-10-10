@@ -1,5 +1,6 @@
-import { useEffect, useRef, type MouseEvent, type ReactNode } from "react";
+import { useEffect, useId, useRef, type MouseEvent, type ReactNode } from "react";
 import { Link, NavLink } from "react-router-dom";
+import { sectionPages } from "../data/navigation";
 
 interface SiteHeaderProps {
   onSearch: () => void;
@@ -13,10 +14,9 @@ export function SiteHeader({ onSearch, onPlaceholder }: SiteHeaderProps) {
         <Brand />
         <nav className="primary-nav" aria-label="主要導覽">
           <NavLink to="/" end>首頁</NavLink>
-          <NavLink to="/activities">系上活動</NavLink>
-          <button type="button" onClick={() => onPlaceholder("關於本系")}>關於本系</button>
-          <button type="button" onClick={() => onPlaceholder("師資與研究")}>師資與研究</button>
-          <NavLink to="/resources/courses">學習資源</NavLink>
+          {sectionPages.map((page) => (
+            <NavLink key={page.to} to={page.to}>{page.title}</NavLink>
+          ))}
           <a href="#contact">聯絡我們</a>
         </nav>
         <div className="header-tools">
@@ -54,11 +54,33 @@ export function SiteFooter() {
             <h2>聯絡資訊</h2>
             <p>國立陽明交通大學電機工程學系</p>
             <a href="https://dee.nycu.edu.tw/" target="_blank" rel="noreferrer">前往系所官方網站 ↗</a>
+            <div className="footer-social-links" aria-label="交大電機社群平台">
+              <a href="https://www.instagram.com/nycu_eesa/" target="_blank" rel="noreferrer">
+                <svg className="footer-social-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                  <rect x="3" y="3" width="18" height="18" rx="5" />
+                  <circle cx="12" cy="12" r="4" />
+                  <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+                </svg>
+                <span className="footer-social-label">系學會 Instagram</span><span className="footer-social-arrow" aria-hidden="true">↗</span>
+              </a>
+              <a href="https://www.facebook.com/nycuEEStudentAssociation" target="_blank" rel="noreferrer">
+                <svg className="footer-social-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M14.5 8H16V5.5h-2.2c-2.4 0-3.5 1.3-3.5 3.6V11H8v2.7h2.3V20h2.9v-6.3h2.4L16 11h-2.8V9.3c0-.8.2-1.3 1.3-1.3Z" />
+                </svg>
+                <span className="footer-social-label">系學會 Facebook</span><span className="footer-social-arrow" aria-hidden="true">↗</span>
+              </a>
+              <a href="https://www.youtube.com/channel/UCXoZlWJ63YQ6-ifXSxuC2wA" target="_blank" rel="noreferrer">
+                <svg className="footer-social-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                  <rect x="2.5" y="5" width="19" height="14" rx="4" />
+                  <path d="m10 9 5 3-5 3Z" fill="currentColor" stroke="none" />
+                </svg>
+                <span className="footer-social-label">電機系 YouTube</span><span className="footer-social-arrow" aria-hidden="true">↗</span>
+              </a>
+            </div>
           </div>
           <div className="footer-column">
-            <h2>學習資源</h2>
-            <Link to="/resources/courses">修課規劃</Link>
-            <Link to="/resources/exchange">交換資訊</Link>
+            <h2>網站導覽</h2>
+            {sectionPages.map((page) => <Link key={page.to} to={page.to}>{page.title}</Link>)}
           </div>
         </div>
         <div className="footer-bottom">
@@ -114,6 +136,7 @@ export function Modal({
   children: ReactNode;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -135,11 +158,11 @@ export function Modal({
         onClose();
       }}
       onClick={handleBackdropClick}
-      aria-labelledby="dialog-title"
+      aria-labelledby={titleId}
     >
       <div className="dialog-panel">
         <div className="dialog-heading">
-          <h2 id="dialog-title">{title}</h2>
+          <h2 id={titleId}>{title}</h2>
           <button type="button" className="dialog-x" onClick={onClose} aria-label="關閉視窗">×</button>
         </div>
         {children}

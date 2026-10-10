@@ -1,12 +1,20 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Modal, PageContainer } from "../../components/SiteChrome";
 import type { ActivityCategory, ActivityItem } from "./activityTypes";
 import { ActivityOverview, RecentActivities } from "./components/ActivitySections";
+import { activityCategories } from "./data/activities";
 import "./activities.css";
 
 export default function ActivitiesPage() {
-  const [selectedCategory, setSelectedCategory] = useState<ActivityCategory | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const categoryParam = searchParams.get("category");
+  const selectedCategory = activityCategories.find((category) => category.label === categoryParam)?.label ?? null;
   const [selectedActivity, setSelectedActivity] = useState<ActivityItem | null>(null);
+
+  function setSelectedCategory(category: ActivityCategory | null) {
+    setSearchParams(category ? { category } : {});
+  }
 
   return (
     <>

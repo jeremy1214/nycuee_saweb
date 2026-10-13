@@ -1,12 +1,17 @@
 import { useEffect, useRef, useState, type FocusEvent, type KeyboardEvent, type TouchEvent } from "react";
 
-export function useCarousel(count: number, interval = 5000) {
+interface CarouselOptions {
+  pauseOnHover?: boolean;
+  autoplayEnabled?: boolean;
+}
+
+export function useCarousel(count: number, interval = 5000, { pauseOnHover = true, autoplayEnabled = true }: CarouselOptions = {}) {
   const [current, setCurrent] = useState(0);
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(() => typeof window !== "undefined" && (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false));
   const touchStart = useRef<number | null>(null);
-  const isPaused = hovered || focused || reducedMotion;
+  const isPaused = !autoplayEnabled || (pauseOnHover && hovered) || focused || reducedMotion;
 
   function goTo(index: number) {
     if (count > 0) setCurrent((index + count) % count);
@@ -25,8 +30,8 @@ export function useCarousel(count: number, interval = 5000) {
   }, [current, count, interval, isPaused]);
 
   const handlers = {
-    onMouseEnter: () => setHovered(true),
-    onMouseLeave: () => setHovered(false),
+    onMouseEnter: () => { if (pauseOnHover) setHovered(true); },
+    onMouseLeave: () => { if (pauseOnHover) setHovered(false); },
     onFocus: () => setFocused(true),
     onBlur: (event: FocusEvent<HTMLElement>) => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); },
     onKeyDown: (event: KeyboardEvent<HTMLElement>) => {

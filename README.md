@@ -47,6 +47,22 @@ npm run dev
 
 活動內容由 `frontend/src/content/activities/events/` 的 JSON 管理，照片放在 `frontend/public/activities/`。新增或更新內容後需重新建置與部署。
 
+### 電機營
+
+電機營使用「活動介紹、各組介紹、共練介紹」三個獨立分頁，導覽位於標題下方，並標示目前所在分頁。每次只顯示該分頁內容；桌機圖文交錯排列，手機改為上下排列。
+
+| 分頁 | 網址 | 內容 |
+| --- | --- | --- |
+| 活動介紹 | `/#/activities/smart-ee-camp/intro` | 營隊特色、活動與課程概述、籌備過程及兩張介紹照片 |
+| 各組介紹 | `/#/activities/smart-ee-camp/groups` | 招生、活動、課程、場器、美宣、生活 |
+| 共練介紹 | `/#/activities/smart-ee-camp/practice` | 火球、火棍、香扇、小旗、蛇舞 |
+
+原本 `/#/activities/smart-ee-camp` 會自動導向「活動介紹」。三頁皆支援直接開啟、重新整理、瀏覽器返回與前進，切換時回到頁首；不存在的分頁顯示 404。
+
+內容修改 `frontend/src/content/activities/events/smart-ee-camp.json`，照片位於 `frontend/public/activities/smart-ee-camp/`。文字與照片參考舊網站電機營頁，未加入歷屆限定資訊。共 13 張 JPG，總大小約 2.76 MB，長邊最多 1600px；舊網站原圖保留。
+
+### 電機週
+
 電機週每頁依序顯示共用簡介、三個分頁按鈕與該頁內容，保留本站青綠色導覽及圖文版型：
 
 | 分頁 | 網址 | 內容 |
@@ -61,7 +77,7 @@ npm run dev
 - 電機週使用 `introMode: "shared"`，每頁顯示共用簡介，導覽只列三個內容分頁。
 - 章節 `image` 可省略，缺照片時顯示單欄文字，不留下圖片框。
 - 電機週照片位於 `frontend/public/activities/ee-week/`，14 張 WebP 總大小約 1.67 MB，長邊最多 1600px、品質 82。
-- 電機營維持 `intro`、`groups`、`practice` 三頁；未設定分頁的活動使用單頁章節導覽。
+- 未設定分頁的活動使用單頁章節導覽。
 
 欄位格式、內容來源與圖片維護方式請見[系上活動維護指南](frontend/src/features/activities/README.md)。
 

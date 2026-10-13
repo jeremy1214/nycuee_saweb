@@ -137,7 +137,23 @@ JSON 最上方的 `$schema` 會讓支援 JSON Schema 的編輯器提示欄位及
 - `tabs` 必須非空，分頁 `id` 不可重複，且不可使用保留的 `intro`；每頁 `sections` 必須非空，章節格式與原本相同，章節 `id` 在同一分頁內不可重複。
 - 沒有 `tabs` 的活動維持原本的單頁章節捲動方式；不存在的分頁顯示 404。
 
-電機營目前使用 `intro`、`groups`、`practice` 三個分頁，包含六組介紹及五項共練介紹。照片存放於 `public/activities/smart-ee-camp/`，文字與照片參考舊網站電機營頁，未加入歷屆限定資訊。
+### 電機營內容維護
+
+電機營使用預設的獨立介紹模式，導覽依序為活動介紹、各組介紹、共練介紹，位於標題下方並標示目前所在分頁。
+
+| 分頁 | 實際網址 | 內容來源 |
+| --- | --- | --- |
+| 活動介紹 | `/#/activities/smart-ee-camp/intro` | `detail.intro`、`detail.heroImages` |
+| 各組介紹 | `/#/activities/smart-ee-camp/groups` | `detail.tabs` 中 `id: "groups"` 的 `sections`：招生、活動、課程、場器、美宣、生活 |
+| 共練介紹 | `/#/activities/smart-ee-camp/practice` | `detail.tabs` 中 `id: "practice"` 的 `sections`：火球、火棍、香扇、小旗、蛇舞 |
+
+- 修改文字時編輯 `src/content/activities/events/smart-ee-camp.json`，`detail.sections` 保持 `[]`，各組與共練放入對應分頁的 `sections`。
+- 基本網址 `/#/activities/smart-ee-camp` 自動導向 `intro`；不存在的分頁顯示 404。每次只顯示該分頁內容，支援直接開啟、重新整理、返回／前進及切換回到頁首。
+- 照片位於 `public/activities/smart-ee-camp/`：`intro-01.jpg`、`intro-02.jpg` 為介紹照片；`group-*.jpg` 為六組代表照片；`practice-*.jpg` 為五項共練代表照片。
+- 文字參考舊網站 `D:/Coding/eesa-web/frontend/src/page/activities/EEcampNew.jsx`，照片取自同目錄的 `imgae/eeCampPic/`，未加入歷屆限定資訊。
+- 共 13 張 JPG，總大小約 2.76 MB，長邊最多 1600px、品質 84，不放大小圖；舊網站原圖保留。更換照片時更新 JSON 的 `image.src` 或 `heroImages`，並提供符合實際畫面的 `alt`。
+
+版面沿用本站配色及膠囊導覽，活動介紹搭配雙照片，各組與共練在桌機交錯排列、手機上下排列。
 
 ### 共用簡介與無照片章節
 

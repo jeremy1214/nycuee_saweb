@@ -23,7 +23,12 @@ export function QuickLinks() {
           key={page.to}
           onMouseEnter={() => goTo(sectionPages.findIndex((item) => item.to === page.to))}
           onMouseLeave={(event) => {
-            if (openMenu === page.to && !event.currentTarget.contains(document.activeElement)) {
+            if (openMenu === page.to && !(event.relatedTarget instanceof Node && event.currentTarget.contains(event.relatedTarget))) {
+              // A clicked button keeps :focus-within active after the pointer leaves.
+              const focusedElement = document.activeElement;
+              if (focusedElement instanceof HTMLElement && event.currentTarget.contains(focusedElement)) {
+                focusedElement.blur();
+              }
               setOpenMenu(null);
               setShowAllTeams(false);
             }

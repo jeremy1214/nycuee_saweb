@@ -23,15 +23,40 @@ describe("home team menu", () => {
     expect(toggle).toHaveAttribute("aria-expanded", "true");
     expect(opener).toHaveAttribute("aria-expanded", "true");
 
-    // Expanding changes the dropdown's geometry beneath the desktop pointer.
-    fireEvent.mouseLeave(opener.closest(".quick-item")!);
-    expect(within(menu).getAllByRole("link")).toHaveLength(9);
-    expect(opener).toHaveAttribute("aria-expanded", "true");
-
     await user.click(within(menu).getByRole("button", { name: /收合系隊/ }));
     expect(within(menu).getAllByRole("link")).toHaveLength(5);
     expect(toggle).toHaveFocus();
     expect(toggle).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("closes and restores the five-team menu when the pointer leaves after expansion", async () => {
+    const user = userEvent.setup();
+    renderQuickLinks();
+    const opener = screen.getByRole("button", { name: "展開系隊選單" });
+    const card = opener.closest(".quick-item")!;
+    await user.click(opener);
+    const menu = screen.getByRole("navigation", { name: "系隊內容連結" });
+    const toggle = within(menu).getByRole("button", { name: /顯示更多系隊/ });
+    await user.click(toggle);
+    expect(within(menu).getAllByRole("link")).toHaveLength(9);
+    expect(toggle).toHaveFocus();
+
+    // Moving between links inside the dropdown must not dismiss it.
+    const soccerLink = within(menu).getByRole("link", { name: /足球/ });
+    fireEvent.mouseOut(toggle, { relatedTarget: soccerLink });
+    expect(opener).toHaveAttribute("aria-expanded", "true");
+    fireEvent.mouseOut(soccerLink, { relatedTarget: document.body });
+    expect(opener).toHaveAttribute("aria-expanded", "false");
+    expect(card).not.toHaveClass("is-open");
+    expect(toggle).not.toHaveFocus();
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    expect(within(menu).getAllByRole("link")).toHaveLength(5);
+    expect(within(menu).getByRole("button", { name: /顯示更多系隊/ })).toBeInTheDocument();
+
+    await user.click(opener);
+    expect(within(menu).getAllByRole("link")).toHaveLength(5);
+    await user.click(toggle);
+    expect(within(menu).getAllByRole("link")).toHaveLength(9);
   });
 
   it("supports keyboard expansion and resets after leaving the menu", async () => {

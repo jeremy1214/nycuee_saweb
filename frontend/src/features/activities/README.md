@@ -155,6 +155,20 @@ JSON 最上方的 `$schema` 會讓支援 JSON Schema 的編輯器提示欄位及
 
 版面沿用本站配色及膠囊導覽，活動介紹搭配雙照片，各組與共練在桌機交錯排列、手機上下排列。
 
+### 系露營內容維護
+
+系露營使用獨立介紹模式，導覽依序為活動介紹、各組介紹，沿用本站膠囊導覽、雙照片簡介與各組圖文交錯版型；手機版改為上下排列。
+
+| 分頁 | 實際網址 | 內容來源 |
+| --- | --- | --- |
+| 活動介紹 | `/#/activities/department-camping-night/intro` | `detail.intro`、`detail.heroImages`：大一共同籌辦營隊、與學長姐交流的介紹 |
+| 各組介紹 | `/#/activities/department-camping-night/groups` | `detail.tabs` 中 `id: "groups"` 的 `sections`：活動組、場美組、美公組 |
+
+- 修改文字時編輯 `src/content/activities/events/department-camping-night.json`；`detail.sections` 保持 `[]`，三組放在 `groups` 分頁。
+- 基本網址 `/#/activities/department-camping-night` 自動導向 `intro`；各頁可直接開啟、重新整理及返回／前進，切換時回到頁首。不支援的分頁顯示 404。
+- 文字參考舊網站 `D:/Coding/eesa-web/frontend/src/page/activities/SiloCamp.jsx`；照片取自同目錄的 `imgae/siloPic/`，保存於 `public/activities/department-camping/`。
+- 五張 WebP 的長邊最多 1600px、品質 82，不放大小圖：`intro-01.webp`、`intro-02.webp` 對應原本兩張活動介紹照片；`group-activity.webp` 對應 `活動照片_1.jpg`；`group-scenography.webp` 對應 `場美照片_1.jpg`；`group-public-relations.webp` 對應 `美公照片_2.jpg`。替代文字描述實際畫面。
+
 ### 共用簡介與無照片章節
 
 - `detail.introMode` 選填，可使用 `tab` 或 `shared`；未設定時維持既有行為。

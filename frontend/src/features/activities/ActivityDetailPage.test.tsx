@@ -31,28 +31,54 @@ function renderDetailPage(path: string) {
 }
 
 describe("ActivityDetailPage", () => {
-  it.each([
-    ["/activities/department-camping-night", "系露營", "小隊任務", "晚間交流"],
-  ])("renders the activity and its expandable sections", (path, title, firstSection, lastSection) => {
-    renderDetailPage(path);
+  it("redirects the existing department camping URL to its introduction", () => {
+    renderDetailPage("/activities/department-camping-night");
 
-    expect(screen.getByRole("heading", { level: 1, name: title })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: firstSection })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: lastSection })).toBeInTheDocument();
+    expect(screen.getByTestId("pathname")).toHaveTextContent("/activities/department-camping-night/intro");
+    expect(screen.getByRole("heading", { level: 1, name: "系露營" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "活動介紹" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByText(/本頁為第一版內容草稿/)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /回到活動總覽/ })).toHaveAttribute("href", "/activities/overview");
   });
 
-  it("scrolls to a selected section", async () => {
-    const user = userEvent.setup();
-    renderDetailPage("/activities/department-camping-night");
-
-    const section = document.getElementById("team-challenges");
-    const scrollIntoView = vi.spyOn(section!, "scrollIntoView");
-    await user.click(screen.getByRole("button", { name: "小隊任務" }));
-
-    expect(scrollIntoView).toHaveBeenCalledWith({ behavior: "smooth", block: "start" });
+  it.each(["intro", "groups"])("opens the department camping %s page directly with only its content", (tabId) => {
+    renderDetailPage(`/activities/department-camping-night/${tabId}`);
+    const navigation = screen.getByRole("navigation", { name: "活動內容分頁" });
+    expect(within(navigation).getAllByRole("link").map((link) => link.textContent)).toEqual(["活動介紹", "各組介紹"]);
+    expect(within(navigation).getByRole("link", { name: tabId === "intro" ? "活動介紹" : "各組介紹" })).toHaveAttribute("aria-current", "page");
+    expect(document.getElementById("activity-intro") !== null).toBe(tabId === "intro");
+    ["小隊任務", "晚間交流", "行前資訊"].forEach((label) => {
+      expect(screen.queryByRole("button", { name: label })).not.toBeInTheDocument();
+      expect(screen.queryByRole("link", { name: label })).not.toBeInTheDocument();
+    });
+    if (tabId === "intro") {
+      expect(screen.getByLabelText("系露營活動照片").querySelectorAll("img")).toHaveLength(2);
+      expect(screen.queryByRole("heading", { name: "活動組" })).not.toBeInTheDocument();
+    } else {
+      expect(screen.getByRole("heading", { level: 2, name: "各組介紹" })).toBeInTheDocument();
+      expect(screen.getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent)).toEqual(["活動組", "場美組", "美公組"]);
+      expect(screen.getAllByRole("img").filter((image) => image.closest(".activity-detail-section"))).toHaveLength(3);
+    }
   });
+
+  it("navigates between department camping pages with history and scroll reset", async () => {
+    const user = userEvent.setup();
+    renderDetailPage("/activities/department-camping-night/intro");
+    vi.mocked(window.scrollTo).mockClear();
+
+    await user.click(screen.getByRole("link", { name: "各組介紹" }));
+    expect(screen.getByTestId("pathname")).toHaveTextContent("/activities/department-camping-night/groups");
+    expect(screen.getByRole("heading", { name: "活動組" })).toBeInTheDocument();
+    expect(window.scrollTo).toHaveBeenLastCalledWith({ top: 0, behavior: "auto" });
+
+    await user.click(screen.getByRole("link", { name: "活動介紹" }));
+    expect(document.getElementById("activity-intro")).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "活動組" })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "上一頁" }));
+    expect(screen.getByRole("link", { name: "各組介紹" })).toHaveAttribute("aria-current", "page");
+    await user.click(screen.getByRole("button", { name: "下一頁" }));
+    expect(screen.getByRole("link", { name: "活動介紹" })).toHaveAttribute("aria-current", "page");
+  }, 15000);
 
   it("redirects the existing camp URL to the introduction", () => {
     renderDetailPage("/activities/smart-ee-camp");
@@ -171,7 +197,10 @@ describe("ActivityDetailPage", () => {
     "/activities/unknown/intro",
     "/activities/smart-ee-camp/unknown",
     "/activities/smart-ee-camp/hardware-course",
-    "/activities/department-camping-night/intro",
+    "/activities/department-camping-night/unknown",
+    "/activities/department-camping-night/team-challenges",
+    "/activities/department-camping-night/campfire-night",
+    "/activities/department-camping-night/camping-notes",
     "/activities/ee-week-showcase/unknown",
   ])("shows the not-found page for unsupported activity or tab %s", (path) => {
     renderDetailPage(path);

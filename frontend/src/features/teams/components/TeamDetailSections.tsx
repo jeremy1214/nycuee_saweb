@@ -22,7 +22,7 @@ export function TeamDetails({ team, teamKey }: { team: TeamData; teamKey: string
       <PageContainer>
         <Breadcrumb className="teams-breadcrumb" items={[{ label: "首頁", to: "/" }, { label: "系隊", to: "/team" }, { label: team.name }]} />
         <div className="teams-detail-heading">
-          <div><span className="eyebrow">DEPARTMENT TEAMS</span><h1>電機{team.name}</h1></div>
+          <div><span className="eyebrow">DEPARTMENT TEAMS</span><h1>{team.name}</h1></div>
           <Link className="teams-back-link" to="/team">所有系隊 <span aria-hidden="true">↗</span></Link>
         </div>
         <div className="teams-detail-photo"><img src={getTeamImage(team.photo)} alt={`${team.name}隊伍合照`} /></div>

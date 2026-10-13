@@ -58,9 +58,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visibl
 
 .brand { display: flex; align-items: center; gap: 13px; flex: 0 0 auto; }
 
-.brand-mark { position: relative; display: grid; place-items: center; width: 54px; height: 54px; border: 1px solid currentColor; border-radius: 50%; color: var(--teal); font-size: 1.18rem; font-weight: 800; letter-spacing: -.08em; }
+.brand-mark { display: block; width: 54px; height: 54px; flex: 0 0 auto; border-radius: 50%; object-fit: contain; }
 
-.brand-mark::after { content: ""; position: absolute; inset: 5px; border: 1px solid currentColor; border-radius: 50%; opacity: .35; }
 
 .brand strong { display: block; font-size: 1.42rem; letter-spacing: .12em; }
 

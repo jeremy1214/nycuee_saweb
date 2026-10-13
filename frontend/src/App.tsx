@@ -32,6 +32,7 @@ export default function App() {
         <Route path="activities" element={<Navigate to="/activities/overview" replace />} />
         <Route path="activities/overview" element={<ActivitiesPage />} />
         <Route path="activities/:activityId" element={<ActivityDetailPage />} />
+        <Route path="activities/:activityId/:tabId" element={<ActivityDetailPage />} />
         <Route path="resources" element={<Navigate to="/resources/courses" replace />} />
         <Route path="resources/:category" element={<ResourcePage />} />
         <Route path="contact" element={<ContactPage />} />

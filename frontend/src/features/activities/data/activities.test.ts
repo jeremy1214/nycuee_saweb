@@ -1,6 +1,10 @@
 import { activities, activityCategories } from "./activities";
 
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const publicImagePaths = new Set(
+  Object.keys(import.meta.glob("../../../../public/**/*.{jpg,jpeg,png,webp,svg}"))
+    .map((path) => path.replace("../../../../public", "")),
+);
 
 describe("activity data", () => {
   it("uses unique, URL-safe activity ids and valid categories", () => {
@@ -30,14 +34,18 @@ describe("activity data", () => {
   it("keeps detail sections unique and every image accessible", () => {
     activities.filter((activity) => activity.detail).forEach((activity) => {
       const detail = activity.detail!;
-      const sectionIds = detail.sections.map((section) => section.id);
+      const sectionCollections = [detail.sections, ...(detail.tabs?.map((tab) => tab.sections) ?? [])];
+      const sections = sectionCollections.flat();
       const images = [
         ...detail.heroImages,
-        ...detail.sections.map((section) => section.image),
+        ...sections.map((section) => section.image),
       ];
 
-      expect(new Set(sectionIds).size).toBe(sectionIds.length);
-      detail.sections.forEach((section) => {
+      sectionCollections.forEach((collection) => {
+        const sectionIds = collection.map((section) => section.id);
+        expect(new Set(sectionIds).size).toBe(sectionIds.length);
+      });
+      sections.forEach((section) => {
         expect(section.id).toMatch(slugPattern);
         expect(section.navLabel.trim()).not.toBe("");
         expect(section.title.trim()).not.toBe("");
@@ -46,7 +54,27 @@ describe("activity data", () => {
       images.forEach((image) => {
         expect(image.src).toMatch(/^\//);
         expect(image.alt.trim()).not.toBe("");
+        expect(publicImagePaths.has(image.src), `Missing public image: ${image.src}`).toBe(true);
       });
+      if (detail.tabs) {
+        const tabIds = detail.tabs.map((tab) => tab.id);
+        expect(new Set(tabIds).size).toBe(tabIds.length);
+        expect(tabIds).not.toContain("intro");
+        detail.tabs.forEach((tab) => {
+          expect(tab.id).toMatch(slugPattern);
+          expect(tab.navLabel.trim()).not.toBe("");
+          expect(tab.sections.length).toBeGreaterThan(0);
+        });
+      }
     });
+  });
+
+  it("provides six groups and five practices for the camp", () => {
+    const camp = activities.find((activity) => activity.id === "smart-ee-camp")!;
+    expect(camp.detail?.tabs?.map((tab) => [tab.id, tab.sections.length])).toEqual([
+      ["groups", 6],
+      ["practice", 5],
+    ]);
+    expect(camp.detail?.sections).toEqual([]);
   });
 });

@@ -4,6 +4,7 @@ import type {
   ActivityDetail,
   ActivityDetailImage,
   ActivityDetailSection,
+  ActivityDetailTab,
   ActivityItem,
 } from "../activityTypes";
 
@@ -75,9 +76,22 @@ function parseSection(value: unknown, source: string): ActivityDetailSection {
   };
 }
 
+function parseTab(value: unknown, source: string): ActivityDetailTab {
+  const tab = record(value, source);
+  onlyKeys(tab, ["id", "navLabel", "sections"], source);
+  const id = slug(tab.id, `${source}.id`);
+  if (id === "intro") fail(`${source}.id`, "intro is reserved for the activity introduction");
+  if (!Array.isArray(tab.sections) || tab.sections.length === 0) {
+    fail(`${source}.sections`, "must be a non-empty array");
+  }
+  const sections = tab.sections.map((section, index) => parseSection(section, `${source}.sections[${index}]`));
+  unique(sections.map((section) => section.id), `${source}.sections[].id`);
+  return { id, navLabel: string(tab.navLabel, `${source}.navLabel`), sections };
+}
+
 function parseDetail(value: unknown, source: string): ActivityDetail {
   const detail = record(value, source);
-  onlyKeys(detail, ["eyebrow", "intro", "heroImages", "sections"], source);
+  onlyKeys(detail, ["eyebrow", "intro", "heroImages", "sections", "tabs"], source);
   if (!Array.isArray(detail.heroImages) || detail.heroImages.length !== 2) {
     fail(`${source}.heroImages`, "must contain exactly two images");
   }
@@ -90,11 +104,20 @@ function parseDetail(value: unknown, source: string): ActivityDetail {
     parseSection(section, `${source}.sections[${index}]`),
   );
   unique(sections.map((section) => section.id), `${source}.sections[].id`);
+  let tabs: ActivityDetailTab[] | undefined;
+  if (detail.tabs !== undefined) {
+    if (!Array.isArray(detail.tabs) || detail.tabs.length === 0) {
+      fail(`${source}.tabs`, "must be a non-empty array");
+    }
+    tabs = detail.tabs.map((tab, index) => parseTab(tab, `${source}.tabs[${index}]`));
+    unique(tabs.map((tab) => tab.id), `${source}.tabs[].id`);
+  }
   return {
     eyebrow: string(detail.eyebrow, `${source}.eyebrow`),
     intro: stringArray(detail.intro, `${source}.intro`),
     heroImages,
     sections,
+    ...(tabs === undefined ? {} : { tabs }),
   };
 }
 

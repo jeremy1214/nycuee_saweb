@@ -18,6 +18,13 @@ export interface ActivityDetail {
   intro: string[];
   heroImages: [ActivityDetailImage, ActivityDetailImage];
   sections: ActivityDetailSection[];
+  tabs?: ActivityDetailTab[];
+}
+
+export interface ActivityDetailTab {
+  id: string;
+  navLabel: string;
+  sections: ActivityDetailSection[];
 }
 
 export interface ActivityItem {

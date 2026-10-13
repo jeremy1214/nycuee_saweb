@@ -103,6 +103,40 @@ JSON 最上方的 `$schema` 會讓支援 JSON Schema 的編輯器提示欄位及
 - 每個 section 的 `id` 在同一活動內不可重複。
 - `objectPosition` 選填，可調整照片在裁切框中的焦點，例如 `center top` 或 `50% 35%`。
 
+### 獨立分頁
+
+若介紹內容需要分頁，可在 `detail` 加入選填的 `tabs`。活動介紹使用既有 `intro` 與 `heroImages`，網址固定為 `/activities/<activity-id>/intro`；`detail.sections` 則作為介紹頁下方的補充章節，不需要時填入 `[]`。
+
+```json
+"tabs": [
+  {
+    "id": "groups",
+    "navLabel": "各組介紹",
+    "sections": [
+      {
+        "id": "recruitment",
+        "navLabel": "招生",
+        "eyebrow": "RECRUITMENT",
+        "title": "招生",
+        "paragraphs": ["招生組的工作介紹。"],
+        "image": {
+          "src": "/activities/example-event/group-recruitment.jpg",
+          "alt": "招生組活動照片"
+        }
+      }
+    ]
+  }
+]
+```
+
+- `tabs` 依陣列順序顯示在活動介紹按鈕之後；每頁只顯示自己的內容。
+- 分頁網址為 `/activities/<activity-id>/<tab-id>`，可直接分享與重新整理，支援瀏覽器返回及前進；網站使用 HashRouter，實際網址帶有 `#/` 前綴。
+- 有 `tabs` 時，原本 `/activities/<activity-id>` 會自動導向 `intro`，切換分頁時回到頁首。
+- `tabs` 必須非空，分頁 `id` 不可重複，且不可使用保留的 `intro`；每頁 `sections` 必須非空，章節格式與原本相同，章節 `id` 在同一分頁內不可重複。
+- 沒有 `tabs` 的活動維持原本的單頁章節捲動方式；不存在的分頁顯示 404。
+
+電機營目前使用 `intro`、`groups`、`practice` 三個分頁，包含六組介紹及五項共練介紹。照片存放於 `public/activities/smart-ee-camp/`，文字與照片參考舊網站電機營頁，未加入歷屆限定資訊。
+
 若要讓總覽的大型分類圓形直接連到這個詳細頁，請在 `categories.json` 的對應分類設定：
 
 ```json
@@ -150,6 +184,6 @@ npm test
 npm run build
 ```
 
-載入器會在測試及建置時檢查：重複或不合法的 id、日期格式、未知分類、圖片路徑與替代文字、重複章節，以及錯誤的 `featuredActivityId`。錯誤訊息會指出 JSON 檔案與欄位位置。
+載入器會在測試及建置時檢查：重複或不合法的 id、日期格式、未知分類、圖片路徑與替代文字、重複章節、分頁資料，以及錯誤的 `featuredActivityId`。內容測試也會確認詳細頁圖片存在於 `public`。錯誤訊息會指出 JSON 檔案與欄位位置。
 
 JSON 會被打包到前端，更新內容後仍需重新建置與部署。若未來改接 CMS 或 API，只要讓新的資料來源輸出相同的 `ActivityItem` 格式，React 頁面可保持不變；`activityRepository.ts` 就是預留的資料來源邊界。

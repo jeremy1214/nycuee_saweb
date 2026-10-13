@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, Navigate, NavLink, useParams } from "react-router-dom";
 import { Breadcrumb, PageContainer } from "../../shared/components/index";
 import NotFoundPage from "../../shared/pages/NotFoundPage";
 import { activities } from "./data/activities";
@@ -9,15 +9,26 @@ function scrollToSection(sectionId: string) {
 }
 
 export default function ActivityDetailPage() {
-  const { activityId } = useParams();
+  const { activityId, tabId } = useParams();
   const activity = activities.find((item) => item.id === activityId && item.detail);
 
   if (!activity?.detail) return <NotFoundPage />;
 
   const { detail } = activity;
+  const selectedTab = detail.tabs?.find((tab) => tab.id === tabId);
+
+  if (detail.tabs && !tabId) {
+    return <Navigate to={`/activities/${activity.id}/intro`} replace />;
+  }
+  if (tabId && (!detail.tabs || (tabId !== "intro" && !selectedTab))) {
+    return <NotFoundPage />;
+  }
+
+  const showIntro = !detail.tabs || tabId === "intro";
+  const sections = selectedTab?.sections ?? detail.sections;
 
   return (
-    <main className="activity-detail-page">
+    <main className={`activity-detail-page${detail.tabs ? " activity-detail-tabbed" : ""}`}>
       <PageContainer>
         <Breadcrumb className="activity-detail-breadcrumb" items={[{ label: "系上活動", to: "/activities/overview" }, { label: activity.category }]} />
 
@@ -27,54 +38,77 @@ export default function ActivityDetailPage() {
           <p>{activity.title}</p>
         </header>
 
-        <section id="activity-intro" className="activity-detail-hero" aria-labelledby="activity-intro-title">
-          <div className="activity-detail-collage" aria-label={`${activity.category}活動照片`}>
-            {detail.heroImages.map((image, index) => (
-              <figure className={`activity-detail-photo activity-detail-photo-${index + 1}`} key={image.src}>
-                <img src={image.src} alt={image.alt} style={{ objectPosition: image.objectPosition }} />
-              </figure>
+        {detail.tabs && (
+          <nav className="activity-detail-section-nav activity-detail-tab-nav" aria-label="活動內容分頁">
+            <NavLink to={`/activities/${activity.id}/intro`} end>活動介紹</NavLink>
+            {detail.tabs.map((tab) => (
+              <NavLink to={`/activities/${activity.id}/${tab.id}`} key={tab.id} end>
+                {tab.navLabel}
+              </NavLink>
+            ))}
+          </nav>
+        )}
+
+        {showIntro && (
+          <section id="activity-intro" className="activity-detail-hero" aria-labelledby="activity-intro-title">
+            <div className="activity-detail-collage" aria-label={`${activity.category}活動照片`}>
+              {detail.heroImages.map((image, index) => (
+                <figure className={`activity-detail-photo activity-detail-photo-${index + 1}`} key={image.src}>
+                  <img src={image.src} alt={image.alt} style={{ objectPosition: image.objectPosition }} />
+                </figure>
+              ))}
+            </div>
+
+            <div className="activity-detail-intro">
+              <span className="activity-detail-label">活動介紹</span>
+              <h2 id="activity-intro-title">從活動認識電機人的另一種日常</h2>
+              {detail.intro.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+              <p className="activity-detail-draft-note">
+                <span aria-hidden="true">●</span>
+                本頁為第一版內容草稿，正式時間、地點、流程與照片說明請以系學會公告為準。
+              </p>
+            </div>
+          </section>
+        )}
+
+        {!detail.tabs && (
+          <nav className="activity-detail-section-nav" aria-label="活動內容章節">
+            <button type="button" onClick={() => scrollToSection("activity-intro")}>活動介紹</button>
+            {detail.sections.map((section) => (
+              <button type="button" key={section.id} onClick={() => scrollToSection(section.id)}>
+                {section.navLabel}
+              </button>
+            ))}
+          </nav>
+        )}
+
+        {selectedTab && <h2 className="activity-detail-tab-title">{selectedTab.navLabel}</h2>}
+        {sections.length > 0 && (
+          <div className="activity-detail-sections">
+            {sections.map((section, index) => (
+              <section id={section.id} className="activity-detail-section" key={section.id} aria-labelledby={`${section.id}-title`}>
+                <figure className="activity-detail-section-image">
+                  <img
+                    src={section.image.src}
+                    alt={section.image.alt}
+                    loading={detail.tabs ? "lazy" : undefined}
+                    style={{ objectPosition: section.image.objectPosition }}
+                  />
+                  <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+                </figure>
+                <div className="activity-detail-section-copy">
+                  <span className="eyebrow">{section.eyebrow}</span>
+                  {selectedTab ? (
+                    <h3 id={`${section.id}-title`}>{section.title}</h3>
+                  ) : (
+                    <h2 id={`${section.id}-title`}>{section.title}</h2>
+                  )}
+                  {section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+                </div>
+              </section>
             ))}
           </div>
-
-          <div className="activity-detail-intro">
-            <span className="activity-detail-label">活動介紹</span>
-            <h2 id="activity-intro-title">從活動認識電機人的另一種日常</h2>
-            {detail.intro.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
-            <p className="activity-detail-draft-note">
-              <span aria-hidden="true">●</span>
-              本頁為第一版內容草稿，正式時間、地點、流程與照片說明請以系學會公告為準。
-            </p>
-          </div>
-        </section>
-
-        <nav className="activity-detail-section-nav" aria-label="活動內容章節">
-          <button type="button" onClick={() => scrollToSection("activity-intro")}>活動介紹</button>
-          {detail.sections.map((section) => (
-            <button type="button" key={section.id} onClick={() => scrollToSection(section.id)}>
-              {section.navLabel}
-            </button>
-          ))}
-        </nav>
-
-        <div className="activity-detail-sections">
-          {detail.sections.map((section, index) => (
-            <section id={section.id} className="activity-detail-section" key={section.id} aria-labelledby={`${section.id}-title`}>
-              <figure className="activity-detail-section-image">
-                <img
-                  src={section.image.src}
-                  alt={section.image.alt}
-                  style={{ objectPosition: section.image.objectPosition }}
-                />
-                <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
-              </figure>
-              <div className="activity-detail-section-copy">
-                <span className="eyebrow">{section.eyebrow}</span>
-                <h2 id={`${section.id}-title`}>{section.title}</h2>
-                {section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
-              </div>
-            </section>
-          ))}
-        </div>
+        )}
 
         <div className="activity-detail-back">
           <Link to="/activities/overview"><span aria-hidden="true">←</span> 回到活動總覽</Link>

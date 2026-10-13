@@ -9,37 +9,150 @@
   "details": "活動包含系所導覽、基礎電路實作與學長姐交流，讓參與者從觀察、設計到測試，體驗完整的工程思考過程。",
   "location": "工程四館 101 講堂",
   "detail": {
-    "eyebrow": "EE CAMP · LEARN BY MAKING",
+    "eyebrow": "EE CAMP · CREATE TOGETHER",
     "intro": [
-      "電機營以高中生為主要對象，透過系所介紹、課程體驗與學長姐交流，帶參與者從生活中的科技開始認識電機領域。",
-      "第一版內容聚焦硬體與軟體兩條實作路線，讓抽象概念能透過動手操作被看見，也保留團隊合作與提問交流的空間。"
+      "電機營是電機系的重要活動之一，結合豐富的團隊活動、共練表演與為高中生設計的入門課程，讓參與者從不同角度認識電機系。從 RPG、大地遊戲到程式設計、Arduino、邏輯設計與小專題製作，動手實作與互動交流都是營隊的一部分。",
+      "籌備營隊的過程，也是和志同道合的夥伴一起成長的過程。各組分工合作，從活動設計、課程準備到場地與生活安排，將想法一步步變成完整的營隊體驗。",
+      "共練則讓大家透過反覆練習，培養默契與舞台表現。在一起努力、朝同一個目標前進的日子裡，收穫的不只是友誼，還有從無到有打造營隊的成就感。"
     ],
     "heroImages": [
-      { "src": "/intro/activities/one-day-camp.png", "alt": "電機營課程與學員活動紀錄" },
-      { "src": "/intro/activities/one-day-camp-2.png", "alt": "電機營學員團體合照" }
+      { "src": "/activities/smart-ee-camp/intro-01.jpg", "alt": "電機營參與者在校園建築前的大合照" },
+      { "src": "/activities/smart-ee-camp/intro-02.jpg", "alt": "電機營營服上的程式設計與電子元件圖案" }
     ],
-    "sections": [
+    "sections": [],
+    "tabs": [
       {
-        "id": "hardware-course",
-        "navLabel": "硬體課程",
-        "eyebrow": "HARDWARE LAB",
-        "title": "從元件與電路開始，把原理做成作品",
-        "paragraphs": [
-          "硬體課程從基本電子元件與電路觀念出發，帶領學員閱讀簡單線路、在麵包板上完成接線，並觀察輸入與輸出的變化。",
-          "課程會以可實際操作的小型作品作為目標；正式材料、難度與成品將依當屆課程設計調整。"
-        ],
-        "image": { "src": "/intro/activities/hardware-course.jpg", "alt": "硬體課程中的電路實作" }
+        "id": "groups",
+        "navLabel": "各組介紹",
+        "sections": [
+          {
+            "id": "recruitment",
+            "navLabel": "招生",
+            "eyebrow": "RECRUITMENT · CONNECT & CARE",
+            "title": "招生",
+            "paragraphs": [
+              "招生組在營期間帶領小隊、活絡氣氛，照顧小隊員的大小事，並與隨輔夥伴一起合作，打造屬於小隊的共同回憶。",
+              "如果你充滿活力、喜歡與人互動交流，這裡能讓你陪伴學員探索營隊，也在相處中建立深厚的情誼。"
+            ],
+            "image": { "src": "/activities/smart-ee-camp/group-recruitment.jpg", "alt": "電機營招生組成員在戶外手持小隊道具合照" }
+          },
+          {
+            "id": "activity",
+            "navLabel": "活動",
+            "eyebrow": "ACTIVITIES · IMAGINE & HOST",
+            "title": "活動",
+            "paragraphs": [
+              "活動組把天馬行空的創意變成有趣的遊戲與活動，從籌期的企劃設計，到營期的主持與現場帶領，讓每個環節都充滿活力。",
+              "適合創意滿滿、喜歡帶動氣氛的你，和夥伴一起讓大家投入活動，享受每個當下。"
+            ],
+            "image": { "src": "/activities/smart-ee-camp/group-activity.jpg", "alt": "電機營活動組活動紀錄" }
+          },
+          {
+            "id": "course",
+            "navLabel": "課程",
+            "eyebrow": "COURSES · LEARN & TEACH",
+            "title": "課程",
+            "paragraphs": [
+              "課程組透過程式設計、Arduino 與邏輯設計等入門內容，帶領高中生認識電機領域，將抽象的原理轉化成可以理解、可以動手操作的體驗。",
+              "如果你有教學熱忱，喜歡分享知識，看著學員從提問到理解、完成自己的作品，會是一份特別的成就感。"
+            ],
+            "image": { "src": "/activities/smart-ee-camp/group-course.jpg", "alt": "電機營課程組教學活動紀錄" }
+          },
+          {
+            "id": "equipment",
+            "navLabel": "場器",
+            "eyebrow": "EQUIPMENT · BUILD & SUPPORT",
+            "title": "場器",
+            "paragraphs": [
+              "場器組是電機營的幕後支援，負責活動架場、音控與燈光，並處理各種場地及設備問題，讓現場流程順利進行。",
+              "適合應變能力強、喜歡實際操作的你。看著大家在自己布置的場地裡盡情參與，就是幕後工作最直接的回饋。"
+            ],
+            "image": { "src": "/activities/smart-ee-camp/group-equipment.jpg", "alt": "電機營場器組工作紀錄" }
+          },
+          {
+            "id": "design",
+            "navLabel": "美宣",
+            "eyebrow": "DESIGN · DRAW & MAKE",
+            "title": "美宣",
+            "paragraphs": [
+              "美宣組負責營服、海報、大字報與各種活動道具，把營隊的主題與想像化成看得見的設計，為活動建立鮮明的視覺印象。",
+              "主要任務集中在籌備期間，適合喜歡手作、設計且有耐心的你。從草稿到成品，每件作品都是團隊一起留下的成果。"
+            ],
+            "image": { "src": "/activities/smart-ee-camp/group-design.jpg", "alt": "電機營美宣組活動紀錄" }
+          },
+          {
+            "id": "logistics",
+            "navLabel": "生活",
+            "eyebrow": "LOGISTICS · FOOD & CARE",
+            "title": "生活",
+            "paragraphs": [
+              "生活組在籌期與營期準備餐點、安排飲食，與店家接洽，讓夥伴和學員在忙碌的活動之間也能好好吃飯、補充能量。",
+              "如果你對食物有想法，也善於協調與溝通，生活組能讓你的細心化成大家每天都期待的用餐時刻。"
+            ],
+            "image": { "src": "/activities/smart-ee-camp/group-logistics.jpg", "alt": "電機營生活組活動紀錄" }
+          }
+        ]
       },
       {
-        "id": "software-course",
-        "navLabel": "軟體課程",
-        "eyebrow": "SOFTWARE LAB",
-        "title": "用程式拆解問題，完成第一次小實作",
-        "paragraphs": [
-          "軟體課程從基礎語法與邏輯思考開始，透過循序示範與練習，讓沒有程式經驗的學員也能跟上操作。",
-          "學員將把課堂概念組合成一個小實作，體驗從需求、嘗試到修正的工程思考過程。"
-        ],
-        "image": { "src": "/intro/activities/software-course.jpg", "alt": "軟體課程中的程式實作" }
+        "id": "practice",
+        "navLabel": "共練介紹",
+        "sections": [
+          {
+            "id": "fire-poi",
+            "navLabel": "火球",
+            "eyebrow": "FIRE POI · FLOW & RHYTHM",
+            "title": "火球",
+            "paragraphs": [
+              "火球以繩索帶動球體旋轉，結合豐富的招式與節奏變化，在表演中畫出環繞身體的光軌，展現流暢而有張力的舞台效果。",
+              "透過持續共練，逐步掌握動作與隊形的默契，適合想挑戰火舞、探索多樣招式的你。"
+            ],
+            "image": { "src": "/activities/smart-ee-camp/practice-fire-poi.jpg", "alt": "電機營火球共練表演紀錄" }
+          },
+          {
+            "id": "fire-staff",
+            "navLabel": "火棍",
+            "eyebrow": "FIRE STAFF · SPIN & CONTROL",
+            "title": "火棍",
+            "paragraphs": [
+              "火棍透過旋轉、轉向與身體動作的配合，將棍體的軌跡串成俐落的表演。火光隨著節奏移動，帶來鮮明的視覺效果。",
+              "從基本動作開始累積控制能力，再和夥伴一起練習整齊的編排，適合喜歡旋轉技巧與舞台表現的你。"
+            ],
+            "image": { "src": "/activities/smart-ee-camp/practice-fire-staff.jpg", "alt": "電機營火棍共練表演紀錄" }
+          },
+          {
+            "id": "incense-fan",
+            "navLabel": "香扇",
+            "eyebrow": "INCENSE FAN · OPEN & DANCE",
+            "title": "香扇",
+            "paragraphs": [
+              "香扇結合扇子的開合、整齊的節奏與舞蹈動作，讓開扇聲和流動的光影成為舞台上的亮點。",
+              "在共練中磨合動作與隊形，將個人的節奏融入團隊，適合喜歡跟著音樂起舞、享受整齊編排的你。"
+            ],
+            "image": { "src": "/activities/smart-ee-camp/practice-incense-fan.jpg", "alt": "電機營香扇共練表演紀錄" }
+          },
+          {
+            "id": "flag",
+            "navLabel": "小旗",
+            "eyebrow": "FLAG DANCE · WAVE & MOVE",
+            "title": "小旗",
+            "paragraphs": [
+              "小旗隨著音樂揮舞，搭配舞蹈與隊形變化，透過整齊的旗面動作呈現明亮、活潑的舞台氛圍。",
+              "從每個拍點到整體走位，都需要夥伴間的配合，適合喜歡跳舞、樂於一起練出團隊默契的你。"
+            ],
+            "image": { "src": "/activities/smart-ee-camp/practice-flag.jpg", "alt": "電機營小旗共練表演紀錄" }
+          },
+          {
+            "id": "snake-dance",
+            "navLabel": "蛇舞",
+            "eyebrow": "SNAKE DANCE · POWER & TEAMWORK",
+            "title": "蛇舞",
+            "paragraphs": [
+              "蛇舞融合地板動作與充滿力量的編排，透過身體控制、節奏與團隊合作，帶來熱血而有爆發力的表演。",
+              "在共練中逐步培養體能與動作默契，適合喜歡挑戰自己、對地板動作與舞台演出有興趣的你。"
+            ],
+            "image": { "src": "/activities/smart-ee-camp/practice-snake-dance.jpg", "alt": "電機營蛇舞共練表演紀錄" }
+          }
+        ]
       }
     ]
   }

@@ -1,0 +1,80 @@
+{
+  "id": "publicity",
+  "order": 2,
+  "nameEn": "PUBLICITY",
+  "cardImage": "/intro/publicity.webp",
+  "cardDescription": "負責宣傳、設計與社群經營，提升學會能見度。",
+  "title": "行銷部",
+  "bannerImage": "/intro/publicity-banner.jpg",
+  "groupPhotoImage": "/intro/publicity-group-photo.jpg",
+  "introParagraphs": [
+    "行銷部如同系學會的創意部門，主要負責社群帳號的經營管理、貼文製作、攝影紀錄，系服與尊榮小物也是出自行銷部。",
+    "我們透過不同宣傳方式，讓電機系的特色及活動被更多系上同學看見。"
+  ],
+  "memberDescription": "致力於服務系上同學，舉辦各項活動並促進師生交流。組織包含會長與四大部門",
+  "extraSidebarItems": [
+    {
+      "label": "學習能力",
+      "to": "/eesa/publicity/skills"
+    }
+  ],
+  "skills": {
+    "mainTitle": "加入行銷部 學到的能力 & 工作 Loading",
+    "subTitle": "下滑以了解更多",
+    "items": [
+      {
+        "title": "使用美編、剪輯軟體的能力",
+        "content": "行銷部每月都會有一次部聚，每次部聚都會安排不同的教學主題，例如基礎攝影、後期調色、影片剪輯等，教學內容還會介紹各個軟體的實際應用，如 Ps、Lr、Pr，讓部員能在輕鬆的氛圍中學習新技能。"
+      },
+      {
+        "title": "鍛鍊設計美感",
+        "content": "透過宣傳貼文製作、系服設計，培養部員美感、創意發想與繪圖、設計的能力。"
+      },
+      {
+        "title": "能力需求 & 工作 Loading",
+        "content": "有美感、會設計、會畫畫、會拍照、會攝影、會剪輯，或是什麼都不會，但想培養以上能力的人!!"
+      }
+    ]
+  },
+  "activities": [
+    {
+      "slug": "photography",
+      "name": "活動攝影",
+      "image": "/intro/activities/photography.png",
+      "detailImages": [
+        "/intro/activities/photography.png",
+        "/intro/activities/photo_1.png"
+      ],
+      "description": [
+        "行銷部負責系學會各項活動的攝影工作，將每個精彩的瞬間記錄下來，讓系上同學留下回憶紀念。",
+        "在部內，部員能累積豐富的拍攝經驗，即使未接觸過相機，也能透過部聚課程和學長姐的分享來學習基本技巧。"
+      ]
+    },
+    {
+      "slug": "design",
+      "name": "設計",
+      "image": "/intro/activities/design.png",
+      "detailImages": [
+        "/intro/activities/design.png",
+        "/intro/activities/shirt_114.png"
+      ],
+      "description": [
+        "行銷部同時負責系服與各式系上小物的設計，從發想、繪圖到成品訂製，每一件作品都有機會被製作出來，讓個人創意與系上特色被大家看見。",
+        "(圖片是113電機週衣服和114系服）",
+        "*114系服（左圖下）設計理念：深藍三色系服，正面印 NYCU EE，背面是趴桌睡覺的 Q 版學生與 1% 電池符號，幽默呈現電機系熬夜日常。"
+      ]
+    },
+    {
+      "slug": "social-posts",
+      "name": "宣傳貼文",
+      "image": "/intro/activities/social-posts.png",
+      "detailImages": [
+        "/intro/activities/social-posts.png",
+        "/intro/activities/social-posts_2.png"
+      ],
+      "description": [
+        "系學會社群帳號的貼文皆由行銷部部員設計，將活動公告透過有趣、創意或富有設計感的方式，吸引系上同學的目光，同時達到宣傳的效果，讓更多人參與活動。"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "id": "basketball-women",
+  "order": 1,
+  "name": "女籃",
+  "photo": "basketball-women/1.jpg",
+  "ballIcon": "basketball-women/ball.png",
+  "aboutImg": null,
+  "intro": [
+    "大家好，我們是 交大電機女籃！成員由大學部和研究所共同組成。",
+    "不論妳是籃球老手，還是剛踏入球場的新手，只要有熱情、喜歡運動，我們都誠摯歡迎妳加入這個充滿活力的大家庭！",
+    "平時的練習內容豐富有趣，除了能精進球技、鍛鍊體能，更能與隊友們培養絕佳默契，收穫滿滿的友情與笑聲。",
+    "每年我們都會參加大電盃、小梅竹、系際盃等賽事，讓大家有機會在球場上盡情發揮、挑戰自我，感受團隊合作的力量。",
+    "加入電機女籃，妳不只會愛上籃球，更會擁有一段熱血又難忘的青春回憶。快來和我們一起流汗、一起成長吧！"
+  ],
+  "schedule": [
+    {
+      "type": "paragraph",
+      "text": "禮拜一、四晚上9.到11.，在西區籃球場練習。如果沒有要來須事先請假，遲到早退也要說。期中期末週彈性練球。"
+    }
+  ],
+  "activities": [
+    {
+      "id": "beicup",
+      "month": "1月或2月（寒假期間）",
+      "name": "北電盃",
+      "description": "北電盃是北部電機相關科系所舉辦的比賽，大約在寒假期間舉辦。",
+      "image": null
+    },
+    {
+      "id": "xiaomei",
+      "month": "3月",
+      "name": "小梅竹",
+      "description": "與清大電機共同舉辦的友誼賽。",
+      "image": null
+    },
+    {
+      "id": "dacup",
+      "month": "4月~5月",
+      "name": "大電盃",
+      "description": "聚集全台各地電機相關科系進行的籃球比賽。",
+      "image": null
+    },
+    {
+      "id": "xijicup",
+      "month": "5月~6月",
+      "name": "系際盃",
+      "description": "交大各系參與的籃球比賽，會與不同的科系競爭。",
+      "image": null
+    }
+  ],
+  "contact": {
+    "intro": null,
+    "people": [
+      {
+        "header": "隊長：張芝瑜",
+        "lines": [
+          "FB: 張芝瑜",
+          "Email: chih.chang.ee12@nycu.edu.tw"
+        ]
+      }
+    ],
+    "note": null
+  }
+}

@@ -1,42 +1,12 @@
-import { useEffect, useState } from "react";
-import { Navigate, Outlet, Route, Routes, useLocation, useParams } from "react-router-dom";
-import { Modal, SiteFooter, SiteHeader } from "./components/SiteChrome";
-import { SearchDialog } from "./components/SearchDialog";
-import ActivitiesPage from "./features/activities";
-import ActivityDetailPage from "./features/activities/ActivityDetailPage";
-import ResourcePage from "./features/resources";
-import TeamPage, { TeamDetailPage } from "./features/teams";
-import HomePage from "./pages/HomePage";
-import NotFoundPage from "./pages/NotFoundPage";
-import ContactPage from "./pages/ContactPage";
-import EesaSection, { EesaIntro, Department, DepartmentActivities, Activity, DepartmentSkills, DepartmentExperiences } from "./features/eesa";
-
-export interface AppOutletContext {
-  openPlaceholder: (title: string) => void;
-}
-
-function AppShell() {
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [placeholderTitle, setPlaceholderTitle] = useState<string | null>(null);
-  const location = useLocation();
-
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "auto" });
-  }, [location.pathname]);
-
-  return (
-    <div className="app-shell">
-      <a className="skip-link" href="#main-content">跳至主要內容</a>
-      <SiteHeader onSearch={() => setSearchOpen(true)} onPlaceholder={setPlaceholderTitle} />
-      <div id="main-content"><Outlet context={{ openPlaceholder: setPlaceholderTitle } satisfies AppOutletContext} /></div>
-      <SiteFooter />
-      <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} />
-      <Modal open={placeholderTitle !== null} title={placeholderTitle ?? "建置中"} onClose={() => setPlaceholderTitle(null)}>
-        <p className="dialog-copy">相關資訊準備中，歡迎透過導覽列探索系學會、系上活動、系隊與學習資料。</p>
-      </Modal>
-    </div>
-  );
-}
+import { Navigate, Route, Routes, useParams } from "react-router-dom";
+import AppShell from "./shared/components/layout/AppShell";
+import HomePage from "./features/home/index";
+import ContactPage from "./features/contact/index";
+import ActivitiesPage, { ActivityDetailPage } from "./features/activities/index";
+import ResourcePage from "./features/resources/index";
+import TeamPage, { TeamDetailPage } from "./features/teams/index";
+import EesaLayout, { EesaPage, DepartmentPage, DepartmentActivitiesPage, DepartmentActivityPage, DepartmentSkillsPage, DepartmentExperiencePage } from "./features/eesa/index";
+import NotFoundPage from "./shared/pages/NotFoundPage";
 
 function LegacyEesaRedirect() {
   const { "*": path = "" } = useParams();
@@ -48,13 +18,13 @@ export default function App() {
     <Routes>
       <Route element={<AppShell />}>
         <Route index element={<HomePage />} />
-        <Route path="eesa" element={<EesaSection />}>
-          <Route index element={<EesaIntro />} />
-          <Route path=":slug" element={<Department />} />
-          <Route path=":slug/activities" element={<DepartmentActivities />} />
-          <Route path=":slug/activities/:activitySlug" element={<Activity />} />
-          <Route path=":slug/skills" element={<DepartmentSkills />} />
-          <Route path=":slug/experiences/:expId" element={<DepartmentExperiences />} />
+        <Route path="eesa" element={<EesaLayout />}>
+          <Route index element={<EesaPage />} />
+          <Route path=":slug" element={<DepartmentPage />} />
+          <Route path=":slug/activities" element={<DepartmentActivitiesPage />} />
+          <Route path=":slug/activities/:activitySlug" element={<DepartmentActivityPage />} />
+          <Route path=":slug/skills" element={<DepartmentSkillsPage />} />
+          <Route path=":slug/experiences/:expId" element={<DepartmentExperiencePage />} />
         </Route>
         <Route path="intro/*" element={<LegacyEesaRedirect />} />
         <Route path="team" element={<TeamPage />} />

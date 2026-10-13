@@ -1,0 +1,16 @@
+{
+  "id": "activities",
+  "order": 0,
+  "nameEn": "ACTIVITIES",
+  "cardImage": "/intro/activities.webp",
+  "cardDescription": "主辦聯誼、娛樂等活動，促進同學間交流。",
+  "title": "活企部",
+  "bannerImage": "/intro/activities.webp",
+  "groupPhotoImage": "",
+  "introParagraphs": [
+    "主辦聯誼、娛樂等活動，促進同學間交流。"
+  ],
+  "memberDescription": "",
+  "extraSidebarItems": [],
+  "activities": []
+}

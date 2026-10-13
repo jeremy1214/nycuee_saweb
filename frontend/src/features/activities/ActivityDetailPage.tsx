@@ -1,6 +1,6 @@
 import { Link, useParams } from "react-router-dom";
-import { PageContainer } from "../../components/SiteChrome";
-import NotFoundPage from "../../pages/NotFoundPage";
+import { Breadcrumb, PageContainer } from "../../shared/components/index";
+import NotFoundPage from "../../shared/pages/NotFoundPage";
 import { activities } from "./data/activities";
 import "./activities.css";
 
@@ -19,11 +19,7 @@ export default function ActivityDetailPage() {
   return (
     <main className="activity-detail-page">
       <PageContainer>
-        <nav className="activity-detail-breadcrumb" aria-label="麵包屑">
-          <Link to="/activities/overview">系上活動</Link>
-          <span aria-hidden="true">/</span>
-          <span aria-current="page">{activity.category}</span>
-        </nav>
+        <Breadcrumb className="activity-detail-breadcrumb" items={[{ label: "系上活動", to: "/activities/overview" }, { label: activity.category }]} />
 
         <header className="activity-detail-titlebar">
           <span className="eyebrow">{detail.eyebrow}</span>

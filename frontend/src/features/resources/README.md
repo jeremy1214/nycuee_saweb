@@ -19,4 +19,4 @@
 - `/#/resources/exchange`
 - `/#/resources/graduate`
 
-共同編輯時，若只更新文字或連結，請修改 `data/resources.ts`；若調整共用頁首或頁尾，才需要修改模組外的 `src/components/SiteChrome.tsx`。
+共同編輯時，若只更新文字或連結，請修改 `data/resources.ts`；若調整共用頁首或頁尾，才需要修改模組外的 `src/shared/components/layout/SiteHeader.tsx 與 SiteFooter.tsx`。

@@ -1,0 +1,31 @@
+{
+  "id": "table-tennis",
+  "order": 5,
+  "name": "桌球",
+  "photo": "table-tennis/1.jpg",
+  "ballIcon": null,
+  "aboutImg": null,
+  "intro": [
+    "待填"
+  ],
+  "schedule": [
+    {
+      "type": "paragraph",
+      "text": "待填"
+    }
+  ],
+  "activities": [
+    {
+      "id": "placeholder",
+      "month": "待填",
+      "name": "待填",
+      "description": "待填",
+      "image": null
+    }
+  ],
+  "contact": {
+    "intro": null,
+    "people": [],
+    "note": "待填"
+  }
+}

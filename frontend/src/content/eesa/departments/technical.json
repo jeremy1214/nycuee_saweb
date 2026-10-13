@@ -1,0 +1,69 @@
+{
+  "id": "technical",
+  "order": 1,
+  "nameEn": "TECHNICAL",
+  "cardImage": "/intro/technical.webp",
+  "cardDescription": "負責規劃並推動學術活動，協助同學學習與成長。",
+  "title": "學術部",
+  "bannerImage": "/intro/technical-banner.jpg",
+  "groupPhotoImage": "/intro/technical-group-photo.jpg",
+  "introParagraphs": [
+    "大家好，我們是系學會的學術部，主要由大三以及大二的同學組成，平常主要會協助系學會偏學術性質的活動。",
+    "我們很希望可以透過自己幫助到系上的同學們，如果有你認為我們可以協助的內容，歡迎到下方的email與我們聯繫，最後祝大家考試順利杜絕爆卷從你我做起"
+  ],
+  "memberDescription": "致力於服務系上同學，舉辦各項活動並促進師生交流。組織包含會長與四大部門",
+  "extraSidebarItems": [],
+  "activities": [
+    {
+      "slug": "eesa-web",
+      "name": "系學會網頁",
+      "image": "/intro/activities/department-website.jpg",
+      "description": [
+        "負責系學會各類網站的前後端開發與維護，致力於運用軟體技術，清楚呈現系上資源與活動，作為學生、教授與各界間的資訊橋樑。另外也整合歷屆學術部的整理的實驗室資料，提供同學們專題教授的資訊。"
+      ]
+    },
+    {
+      "slug": "high-school-visit",
+      "name": "高中生參訪",
+      "image": "/intro/activities/high-school-visit.png",
+      "description": [
+        "協助高中生交大電機系參訪活動，由學術部帶領同學，從電路原理認識、電子元件認識到最後焊接我們設計的PCB電路板，透過實際動手實作一份電機微專題，激發來參訪的高中生對電機領域的學習興趣。"
+      ]
+    },
+    {
+      "slug": "hardware-course",
+      "name": "一日營硬體課程",
+      "image": "/intro/activities/hardware-course.jpg",
+      "description": [
+        "在寒假的時候會在北中南的學校舉行一日營，而硬體組負責硬體電路相關的課程。",
+        "從接麵包板設計電路再到pcb實作，做出一個有趣的小電路給高中生實作並且到他們學校教他們電路實作。"
+      ]
+    },
+    {
+      "slug": "software-course",
+      "name": "一日營軟體課程",
+      "image": "/intro/activities/software-course.jpg",
+      "description": [
+        "在寒假的時候會在北中南的學校舉行一日營，而軟體組負責有關程式的課程，並且擔任講師。",
+        "上課內容主要是從頭教導程式的語法並設計一個小實作給高中生們實作。"
+      ]
+    },
+    {
+      "slug": "singles-day",
+      "name": "光棍",
+      "image": "/intro/activities/singles-day.jpg",
+      "description": [
+        "自行研發並製作光棍，滿足電機系內迎新、宿營、高中生營隊等活動的表演要求。",
+        "不僅節省活動器材租借開銷，未來還可租借給外系，為系學會創造收入，將創意轉化為資源。"
+      ]
+    },
+    {
+      "slug": "course-selection",
+      "name": "選課大會",
+      "image": "/intro/activities/course-selection.jpg",
+      "description": [
+        "學長姐將分享下半學期各必選修課程的教學內容與教授風格，幫助同學在選課時更了解課程特色、找到最適合自己的課。"
+      ]
+    }
+  ]
+}

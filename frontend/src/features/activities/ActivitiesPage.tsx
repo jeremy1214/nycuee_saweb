@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Modal, PageContainer } from "../../components/SiteChrome";
+import { Modal, PageContainer } from "../../shared/components/index";
 import type { ActivityItem } from "./activityTypes";
 import { ActivityOverview, RecentActivities } from "./components/ActivitySections";
 import { activityCategories } from "./data/activities";

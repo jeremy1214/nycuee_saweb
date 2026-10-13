@@ -1,5 +1,5 @@
 import { Navigate, useParams } from "react-router-dom";
-import { PageContainer } from "../../components/SiteChrome";
+import { PageContainer } from "../../shared/components/index";
 import { Checklist, InfoCardGrid, OfficialLinks, ProcessTimeline, ResourceOverview, ResourceTabs } from "./components/ResourceSections";
 import { isResourceSlug, resourceCategories } from "./data/resources";
 import "./resources.css";

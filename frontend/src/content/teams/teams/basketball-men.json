@@ -1,0 +1,83 @@
+{
+  "id": "basketball-men",
+  "order": 0,
+  "name": "男籃",
+  "photo": "basketball-men/1.jpg",
+  "ballIcon": "basketball-men/ball.png",
+  "aboutImg": "basketball-men/about.jpg",
+  "intro": [
+    "提供以下服務",
+    "1. 假裝暗戀你去班上給你送吃的或是喝的（食物需自費）200/次",
+    "2. 假裝搭訕要哀居並被你毫不留情拒絕400/次",
+    "3. 在學校裡大喊你長得很像彭于晏/郭雪芙（名字可自己想）200/次",
+    "4. 假裝你的前任在走廊大喊我還愛你 被你霸氣轉頭離開400/次，打巴掌叫我離開800/次",
+    "5. 假裝你是超級富二代 在你朋友旁邊大喊 公子今天要開保時捷還是法拉利 200/次",
+    "6. 在操場高舉紅布條 大喊我愛XXX（含激烈歡呼500/次 紅布條需自備",
+    "7. 假裝你就是傳說校園人物 在你吃飯的時候小聲對同桌說對.就是那個人180/次（附一次神秘表情",
+    "8. 加入電機系籃，保你一生榮華富貴，開心打球打比賽，交到一群可以一起打球的好朋友 666666/次"
+  ],
+  "schedule": [
+    {
+      "type": "paragraph",
+      "text": "主要禮拜三下午1600"
+    }
+  ],
+  "activities": [
+    {
+      "id": "xiaolian",
+      "month": "整年",
+      "name": "小聯賽",
+      "description": "每個禮拜都有比賽，打球打到爽",
+      "image": null
+    },
+    {
+      "id": "beicup",
+      "month": "寒假前後",
+      "name": "北電盃",
+      "description": "跟北台灣系籃比看誰比較電",
+      "image": null
+    },
+    {
+      "id": "dalian",
+      "month": "下學期",
+      "name": "大聯賽",
+      "description": "跟全校菁英單挑",
+      "image": null
+    },
+    {
+      "id": "dacup",
+      "month": "3月",
+      "name": "大電盃",
+      "description": "跟全台灣電類科系發起挑戰",
+      "image": null
+    },
+    {
+      "id": "xiaomei",
+      "month": "3月",
+      "name": "小梅竹",
+      "description": "跟清大電機進行的兩系之間激烈戰爭",
+      "image": null
+    },
+    {
+      "id": "xijicup",
+      "month": "4月",
+      "name": "系際盃",
+      "description": "交大校內最激烈、最熱的盃賽",
+      "image": null
+    }
+  ],
+  "contact": {
+    "intro": "衷居私訊正副隊長獲取更多資訊",
+    "people": [
+      {
+        "header": null,
+        "lines": [
+          "李俊燁：ya.yehyehee.05",
+          "陳庭毅：ty0726_00",
+          "吉祥物：bemature_777"
+        ]
+      }
+    ],
+    "note": "歡迎私訊正副隊長了解更多，若想直接加入也可以加入群組，並在練球時出現"
+  }
+}

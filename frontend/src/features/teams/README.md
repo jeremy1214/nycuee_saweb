@@ -1,14 +1,24 @@
-# 系隊頁面
+# 系隊模組
 
-資料原封複製自 `/home/yoei/workspace/eesa-web/frontend/src/data/teams.json`，全部照片搬入 `frontend/public/team/`。
+採用和活動模組一致的「內容 JSON → 資料載入 → 頁面元件」分工。
 
-- `TeamPage.tsx`：依使用者草圖製作，上方系隊照片輪播，下方三欄三列的九個系隊連結；共用首頁的頁首、頁尾、深藍／青綠配色與字體。
-- 輪播收錄原系隊總覽照片與九支隊伍合照，支援左右按鈕、頁點、鍵盤、觸控及自動播放；滑鼠停留或鍵盤聚焦時暫停，減少動態偏好時停用自動播放。
-- `TeamDetailPage.tsx`：呈現原始隊伍介紹、練習時間、活動、聯絡與入隊資訊，提供上一支／下一支導覽。
-- `teams.json`：九支隊伍的原始文字與相對圖片路徑。
-- `data.ts`：型別、照片網址、輪播項目與隊伍清單。
-- `teams.css`：依首頁風格重做的頁面樣式，桌面三欄、手機兩欄。
+```text
+features/teams/
+├─ TeamPage.tsx                        # 總覽入口
+├─ TeamDetailPage.tsx                  # 依網址選擇隊伍
+├─ components/
+│  ├─ TeamSections.tsx                 # 系隊照片輪播、九隊入口
+│  └─ TeamDetailSections.tsx           # 介紹、練習、活動、聯絡、上一隊／下一隊
+├─ data/
+│  ├─ teamRepository.ts                # 自動收集 JSON 並按 order 排序
+│  └─ teams.ts                         # 資料出口、圖片網址、輪播項目
+├─ teamTypes.ts                        # 資料型別
+├─ teams.css                           # 總覽與詳情樣式
+└─ index.ts                            # 模組出口
+```
 
-入口為 `/#/team`，詳情為 `/#/team/{teamKey}`。羽球、桌球、棒球、網球與足球的原始文字尚為「待填」，此處照原資料保留。
+內容放在 `src/content/teams/teams/<id>.json`，一支隊伍一個檔案。`id` 控制 `/team/<id>` 網址；`order` 控制入口、輪播及上一支／下一支順序。其餘 `name`、`intro`、`schedule`、`activities`、`contact` 與圖片欄位沿用原專案資料。
+照片位置維持 `public/team/`，JSON 的圖片路徑仍相對於該目錄。
 
-依使用者指示，本次未執行測試、建置或瀏覽器驗證。
+輪播互動使用全站 `shared/hooks/useCarousel.ts`，與首頁共用自動播放、暫停、鍵盤、觸控及減少動態偏好；不同頁面的照片與版面各自管理。
+羽球、桌球、棒球、網球及足球的「待填」內容照原資料保留。

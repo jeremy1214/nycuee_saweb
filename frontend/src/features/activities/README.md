@@ -12,6 +12,7 @@ src/content/activities/
 └─ events/                         # 一個活動一個 JSON
    ├─ smart-ee-camp.json
    ├─ department-camping-night.json
+   ├─ ee-week-showcase.json
    └─ ...
 
 src/features/activities/
@@ -100,12 +101,13 @@ JSON 最上方的 `$schema` 會讓支援 JSON Schema 的編輯器提示欄位及
 
 - `heroImages` 固定兩張。
 - `sections` 可自由增減、排序；導覽按鈕、圖文順序與編號會自動更新。
-- 每個 section 的 `id` 在同一活動內不可重複。
+- 每個 section 的 `id` 在同一組 `sections` 內不可重複；不同分頁可使用相同 id。
+- 章節 `image` 選填，省略時顯示單欄文字；`heroImages` 仍須提供兩張圖片。
 - `objectPosition` 選填，可調整照片在裁切框中的焦點，例如 `center top` 或 `50% 35%`。
 
 ### 獨立分頁
 
-若介紹內容需要分頁，可在 `detail` 加入選填的 `tabs`。活動介紹使用既有 `intro` 與 `heroImages`，網址固定為 `/activities/<activity-id>/intro`；`detail.sections` 則作為介紹頁下方的補充章節，不需要時填入 `[]`。
+若介紹內容需要分頁，可在 `detail` 加入選填的 `tabs`。預設模式（`introMode` 省略或設為 `tab`）的活動介紹使用既有 `intro` 與 `heroImages`，網址為 `/activities/<activity-id>/intro`；`detail.sections` 則作為介紹頁下方的補充章節，不需要時填入 `[]`。每頁共用簡介的 `shared` 模式見下一節。
 
 ```json
 "tabs": [
@@ -129,9 +131,9 @@ JSON 最上方的 `$schema` 會讓支援 JSON Schema 的編輯器提示欄位及
 ]
 ```
 
-- `tabs` 依陣列順序顯示在活動介紹按鈕之後；每頁只顯示自己的內容。
+- 預設模式的 `tabs` 依陣列順序顯示在活動介紹按鈕之後；每頁只顯示自己的內容。
 - 分頁網址為 `/activities/<activity-id>/<tab-id>`，可直接分享與重新整理，支援瀏覽器返回及前進；網站使用 HashRouter，實際網址帶有 `#/` 前綴。
-- 有 `tabs` 時，原本 `/activities/<activity-id>` 會自動導向 `intro`，切換分頁時回到頁首。
+- 預設模式有 `tabs` 時，原本 `/activities/<activity-id>` 會自動導向 `intro`。兩種模式切換分頁時都會回到頁首。
 - `tabs` 必須非空，分頁 `id` 不可重複，且不可使用保留的 `intro`；每頁 `sections` 必須非空，章節格式與原本相同，章節 `id` 在同一分頁內不可重複。
 - 沒有 `tabs` 的活動維持原本的單頁章節捲動方式；不存在的分頁顯示 404。
 
@@ -145,6 +147,16 @@ JSON 最上方的 `$schema` 會讓支援 JSON Schema 的編輯器提示欄位及
 - 章節 `image` 可省略，省略時使用單欄文字版型，不產生圖片框。若提供圖片，仍須包含有效的 `src` 和 `alt`。
 
 電機週使用 `introMode: "shared"`，分頁依序為 `groups`（各組介紹，六組）、`events`（細項活動，八項）及 `performances`（電夜表演，六項）。文字參考舊網站 `EEweek_2.jsx`、`EEweek.jsx` 與 `EEweek_1.jsx`，移除年度限定條件；照片取自 `imgae/eeWeek`，使用每項一張對應照片，簡介共用 Open Lab 與光舞照片。圖片存於 `public/activities/ee-week/`，轉為 WebP，長邊最多 1600px、品質 82；無對應照片的活動只顯示文字。
+
+| 分頁 | 實際網址 | 章節 |
+| --- | --- | --- |
+| 各組介紹 | `/#/activities/ee-week-showcase/groups` | 公關部、宣傳部、課學部、活動部、場器部、Open Lab |
+| 細項活動 | `/#/activities/ee-week-showcase/events` | 擺攤、圓桌分享、Open Lab、企業參訪、麻將大賽、電競比賽、人氣王、養樂多大賽 |
+| 電夜表演 | `/#/activities/ee-week-showcase/performances` | 儀隊、光球、光棍、光舞、樂團、長劇 |
+
+維護電機週時修改 `events/ee-week-showcase.json`；保持 `tabs` 順序即可維持「各組介紹」為預設入口。共用簡介使用 `intro` 與 `heroImages`，`detail.sections` 保持 `[]`，各頁章節分別放在對應的 `tabs[].sections`。
+
+### 分類入口
 
 若要讓總覽的大型分類圓形直接連到這個詳細頁，請在 `categories.json` 的對應分類設定：
 
@@ -164,7 +176,7 @@ public/activities/<activity-id>/hero-02.webp
 public/activities/<activity-id>/section-01.webp
 ```
 
-JSON 路徑從 `/activities/` 開始，不包含 `public`。建議使用至少 1600 × 1000 px 的橫式 WebP 或 JPG；每張圖都要有描述畫面內容的 `alt`，檔名只使用英文小寫、數字及連字號。
+JSON 路徑從 `/activities/` 開始，不包含 `public`。建議使用橫式 WebP 或 JPG，保留比例並壓縮至合適尺寸；電機週採長邊最多 1600px、WebP 品質 82，不放大較小的原圖。每張圖都要有描述實際畫面內容的 `alt`，例如團隊合照、器材或練習場景；檔名只使用英文小寫、數字及連字號。
 
 ## 新增或調整分類
 
@@ -193,6 +205,10 @@ npm test
 npm run build
 ```
 
-載入器會在測試及建置時檢查：重複或不合法的 id、日期格式、未知分類、圖片路徑與替代文字、重複章節、分頁資料，以及錯誤的 `featuredActivityId`。內容測試也會確認詳細頁圖片存在於 `public`。錯誤訊息會指出 JSON 檔案與欄位位置。
+載入器會在測試及建置時檢查：重複或不合法的 id、日期格式、未知分類、圖片路徑與替代文字、重複章節、分頁資料、`introMode` 合法值與 `shared` 必須搭配分頁，以及錯誤的 `featuredActivityId`。內容測試也會確認所有已提供的詳細頁圖片存在於 `public`。錯誤訊息會指出 JSON 檔案與欄位位置。
+
+分頁變更還需確認預設入口與 `/intro` 轉址、直接開啟及重新整理、目前分頁標示、返回／前進、切換回到頁首、各頁內容隔離，以及未知分頁的 404。桌面與手機皆應檢查圖片裁切、無照片章節與導覽是否正常。
+
+若完整測試平行執行時因資源競爭逾時，可改用 `npm test -- --maxWorkers=1`。
 
 JSON 會被打包到前端，更新內容後仍需重新建置與部署。若未來改接 CMS 或 API，只要讓新的資料來源輸出相同的 `ActivityItem` 格式，React 頁面可保持不變；`activityRepository.ts` 就是預留的資料來源邊界。

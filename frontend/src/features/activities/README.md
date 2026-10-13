@@ -137,6 +137,15 @@ JSON 最上方的 `$schema` 會讓支援 JSON Schema 的編輯器提示欄位及
 
 電機營目前使用 `intro`、`groups`、`practice` 三個分頁，包含六組介紹及五項共練介紹。照片存放於 `public/activities/smart-ee-camp/`，文字與照片參考舊網站電機營頁，未加入歷屆限定資訊。
 
+### 共用簡介與無照片章節
+
+- `detail.introMode` 選填，可使用 `tab` 或 `shared`；未設定時維持既有行為。
+- `shared` 必須搭配非空的 `tabs`。每頁依序呈現共用簡介、分頁導覽及該頁章節，導覽只列 `tabs`，不另設「活動介紹」分頁。
+- 共用簡介模式的活動基本網址及 `/intro` 會導向 `tabs` 的第一頁；不支援的分頁維持 404。
+- 章節 `image` 可省略，省略時使用單欄文字版型，不產生圖片框。若提供圖片，仍須包含有效的 `src` 和 `alt`。
+
+電機週使用 `introMode: "shared"`，分頁依序為 `groups`（各組介紹，六組）、`events`（細項活動，八項）及 `performances`（電夜表演，六項）。文字參考舊網站 `EEweek_2.jsx`、`EEweek.jsx` 與 `EEweek_1.jsx`，移除年度限定條件；照片取自 `imgae/eeWeek`，使用每項一張對應照片，簡介共用 Open Lab 與光舞照片。圖片存於 `public/activities/ee-week/`，轉為 WebP，長邊最多 1600px、品質 82；無對應照片的活動只顯示文字。
+
 若要讓總覽的大型分類圓形直接連到這個詳細頁，請在 `categories.json` 的對應分類設定：
 
 ```json

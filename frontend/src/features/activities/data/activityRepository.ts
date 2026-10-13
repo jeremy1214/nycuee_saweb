@@ -72,7 +72,7 @@ function parseSection(value: unknown, source: string): ActivityDetailSection {
     eyebrow: string(section.eyebrow, `${source}.eyebrow`),
     title: string(section.title, `${source}.title`),
     paragraphs: stringArray(section.paragraphs, `${source}.paragraphs`),
-    image: parseImage(section.image, `${source}.image`),
+    ...(section.image === undefined ? {} : { image: parseImage(section.image, `${source}.image`) }),
   };
 }
 
@@ -91,7 +91,11 @@ function parseTab(value: unknown, source: string): ActivityDetailTab {
 
 function parseDetail(value: unknown, source: string): ActivityDetail {
   const detail = record(value, source);
-  onlyKeys(detail, ["eyebrow", "intro", "heroImages", "sections", "tabs"], source);
+  onlyKeys(detail, ["eyebrow", "intro", "heroImages", "sections", "tabs", "introMode"], source);
+  const introMode = detail.introMode;
+  if (introMode !== undefined && introMode !== "tab" && introMode !== "shared") {
+    fail(`${source}.introMode`, "must be tab or shared");
+  }
   if (!Array.isArray(detail.heroImages) || detail.heroImages.length !== 2) {
     fail(`${source}.heroImages`, "must contain exactly two images");
   }
@@ -112,12 +116,16 @@ function parseDetail(value: unknown, source: string): ActivityDetail {
     tabs = detail.tabs.map((tab, index) => parseTab(tab, `${source}.tabs[${index}]`));
     unique(tabs.map((tab) => tab.id), `${source}.tabs[].id`);
   }
+  if (introMode === "shared" && !tabs) {
+    fail(`${source}.introMode`, "shared requires tabs");
+  }
   return {
     eyebrow: string(detail.eyebrow, `${source}.eyebrow`),
     intro: stringArray(detail.intro, `${source}.intro`),
     heroImages,
     sections,
     ...(tabs === undefined ? {} : { tabs }),
+    ...(introMode === undefined ? {} : { introMode }),
   };
 }
 

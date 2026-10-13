@@ -2,55 +2,294 @@
   "$schema": "../activity.schema.json",
   "id": "ee-week-showcase",
   "status": "published",
-  "title": "電機週：把日常好奇變成互動作品",
+  "title": "電機週：系上交流與電機之夜",
   "date": "2026-10-22",
   "categoryId": "ee-week",
-  "summary": "集結學生創作、知識展區與互動體驗，從不同角度看見電機的可能性。",
-  "details": "現場以主題展區呈現學生作品與電機知識，並安排短講及互動體驗，適合想認識系上學習內容的師生參加。",
+  "summary": "從各組籌備、實驗室交流到舞台表演，一起參與屬於電機人的校園慶典。",
+  "details": "電機週結合擺攤、圓桌分享、Open Lab、企業參訪與趣味競賽，並以電機之夜的多元演出凝聚系上回憶。",
   "location": "浩然圖書館前廣場",
   "detail": {
-    "eyebrow": "EE WEEK · IDEAS ON DISPLAY",
+    "eyebrow": "EE WEEK · COMMUNITY & CELEBRATION",
+    "introMode": "shared",
     "intro": [
-      "電機週把學生作品、系上特色與生活中的科技帶到校園公共空間，透過展覽與互動，讓更多人看見電機不只存在於課本與實驗室。",
-      "第一版以主題展區、互動體驗及設計成果為內容主軸；各年度主題與展出項目將依當屆企劃更新。"
+      "電機週是由系學會策劃、系上同學共同參與的校園慶典，結合專業交流、趣味活動與舞台創作，讓大家從課堂之外認識電機的多元面貌。",
+      "透過 Open Lab、圓桌分享與企業參訪，同學能接觸研究與職涯經驗；擺攤和競賽則讓彼此在輕鬆的互動中建立連結。電機週最後以電機之夜匯集儀隊、光球、光棍、光舞、樂團與長劇，留下共同的回憶。",
+      "以下介紹籌備團隊、細項活動與電夜表演；各屆實際安排請以系學會公告為準。"
     ],
     "heroImages": [
-      { "src": "/intro/activities/design.png", "alt": "電機週設計成果展示" },
-      { "src": "/intro/activities/shirt_114.png", "alt": "電機系服設計作品" }
+      {
+        "src": "/activities/ee-week/open-lab.webp",
+        "alt": "電機週 Open Lab 團隊合照"
+      },
+      {
+        "src": "/activities/ee-week/light-dance.webp",
+        "alt": "電機之夜光舞團隊合照"
+      }
     ],
-    "sections": [
+    "sections": [],
+    "tabs": [
       {
-        "id": "themed-exhibits",
-        "navLabel": "主題展區",
-        "eyebrow": "THEMED EXHIBITS",
-        "title": "把專業知識轉成容易靠近的校園展覽",
-        "paragraphs": [
-          "主題展區以學生作品、電機知識與系上生活為素材，透過圖像、實物或短講整理成容易理解的內容。",
-          "展出主題會依當年度企劃調整，正式項目與開放時段請以活動公告為準。"
-        ],
-        "image": { "src": "/intro/activities/social-posts.png", "alt": "學生製作的活動主題視覺" }
+        "id": "groups",
+        "navLabel": "各組介紹",
+        "sections": [
+          {
+            "id": "public-relations",
+            "navLabel": "公關部",
+            "eyebrow": "PUBLIC RELATIONS",
+            "title": "公關部",
+            "paragraphs": [
+              "公關部負責聯繫品牌與企業，為電機週爭取贊助及合作資源，讓活動、競賽與抽獎有更豐富的內容。",
+              "從整理合作需求、撰寫公關信件到追蹤聯繫進度，成員需要把活動價值與雙方需求說清楚。這裡適合對企業溝通、合作提案與資源整合有興趣的同學。"
+            ],
+            "image": {
+              "src": "/activities/ee-week/public-relations.webp",
+              "alt": "電機週公關部團隊合照"
+            }
+          },
+          {
+            "id": "publicity",
+            "navLabel": "宣傳部",
+            "eyebrow": "PUBLICITY & DESIGN",
+            "title": "宣傳部",
+            "paragraphs": [
+              "宣傳部將電機週的想法轉化成主視覺、海報、社群貼文與影音，讓活動資訊更容易被看見與理解。",
+              "成員一起討論活動調性、發想視覺、撰寫文案、排版與拍攝剪輯，並與其他部門協作。喜歡設計、文字或影像創作的同學，可以在這裡把創意變成實際作品。"
+            ],
+            "image": {
+              "src": "/activities/ee-week/publicity.webp",
+              "alt": "電機週宣傳部團隊合照"
+            }
+          },
+          {
+            "id": "academic",
+            "navLabel": "課學部",
+            "eyebrow": "ACADEMIC PROGRAMS",
+            "title": "課學部",
+            "paragraphs": [
+              "課學部規劃電機週的知識交流內容，從同學感興趣的主題出發，安排講者與活動，讓專業學習也能親切有趣。",
+              "工作包含主題企劃、講者聯繫、活動介紹與流程協調，也需要把技術內容整理成容易理解的資訊。成員能練習企劃與表達，接觸不同研究領域及業界經驗。"
+            ],
+            "image": {
+              "src": "/activities/ee-week/academic.webp",
+              "alt": "電機週課學部團隊合照"
+            }
+          },
+          {
+            "id": "activity-team",
+            "navLabel": "活動部",
+            "eyebrow": "EVENT PLANNING",
+            "title": "活動部",
+            "paragraphs": [
+              "活動部把點子變成實際的活動，從趣味競賽、攤位互動到舞台流程，讓電機週的每個環節串連起來。",
+              "成員規劃活動形式、規則、時間與人力，協調場地、物資和宣傳，並在現場控管流程、處理突發狀況。喜歡帶動氣氛或安排活動的同學，能在這裡累積企劃與臨場應變經驗。"
+            ],
+            "image": {
+              "src": "/activities/ee-week/activity-team.webp",
+              "alt": "電機週活動部團隊合照"
+            }
+          },
+          {
+            "id": "equipment",
+            "navLabel": "場器部",
+            "eyebrow": "VENUE & EQUIPMENT",
+            "title": "場器部",
+            "paragraphs": [
+              "場器部負責場地與器材，從桌椅、帳篷、電源到音響、麥克風與燈光，為每場活動準備能順利運作的環境。",
+              "活動前需要盤點需求、安排佈置、搬運與測試設備；活動中則隨時留意器材狀況並協助排除問題。適合喜歡動手、注重細節，或想了解活動幕後運作的同學。"
+            ],
+            "image": {
+              "src": "/activities/ee-week/equipment.webp",
+              "alt": "電機週場器部團隊合照"
+            }
+          },
+          {
+            "id": "open-lab-team",
+            "navLabel": "Open Lab",
+            "eyebrow": "OPEN LAB TEAM",
+            "title": "Open Lab",
+            "paragraphs": [
+              "Open Lab 團隊是同學與實驗室之間的橋樑，協助把研究方向與技術展示整理成容易接觸的交流活動。",
+              "工作包含實驗室聯繫、開放內容確認、動線與導覽安排，以及現場人流協調。成員能接觸系內多元研究，練習跨單位溝通，讓更多同學看見電機研究的樣貌。"
+            ],
+            "image": {
+              "src": "/activities/ee-week/open-lab-team.webp",
+              "alt": "電機週 Open Lab 團隊活動紀錄"
+            }
+          }
+        ]
       },
       {
-        "id": "interactive-experience",
-        "navLabel": "互動體驗",
-        "eyebrow": "TRY IT YOURSELF",
-        "title": "不只觀看，也能親手操作與提問",
-        "paragraphs": [
-          "互動體驗希望降低接觸技術的門檻，讓參觀者透過簡單操作觀察作品如何回應，並與現場同學交流背後的想法。",
-          "實際體驗內容、參加方式與是否需要預約，將在當屆活動資訊確認後更新。"
-        ],
-        "image": { "src": "/intro/activities/photography.png", "alt": "學生記錄與參與校園活動" }
+        "id": "events",
+        "navLabel": "細項活動",
+        "sections": [
+          {
+            "id": "booths",
+            "navLabel": "擺攤",
+            "eyebrow": "CAMPUS BOOTHS",
+            "title": "擺攤",
+            "paragraphs": [
+              "電機週透過校園攤位與大家見面，安排互動項目及抽獎，讓同學和朋友一起參與，感受活動的熱鬧氣氛。"
+            ]
+          },
+          {
+            "id": "roundtable",
+            "navLabel": "圓桌分享",
+            "eyebrow": "ROUNDTABLE SHARING",
+            "title": "圓桌分享",
+            "paragraphs": [
+              "邀請不同領域的學長姐分享大學學習、研究所、求職與職涯經驗，讓同學透過近距離對談認識未來的可能性。",
+              "參考主題涵蓋類比、數位、EDA、電控與生醫等領域；實際講者、主題與交流形式依當屆安排公告。"
+            ]
+          },
+          {
+            "id": "open-lab",
+            "navLabel": "Open Lab",
+            "eyebrow": "EXPLORE THE LABS",
+            "title": "Open Lab",
+            "paragraphs": [
+              "邀請系上不同領域的實驗室介紹研究方向與成果，讓同學透過展示與交流，了解課堂知識如何延伸成實際研究。",
+              "參與者可以與實驗室學長姐互動、提問，探索自己感興趣的領域。開放實驗室與活動方式以當屆公告為準。"
+            ],
+            "image": {
+              "src": "/activities/ee-week/open-lab.webp",
+              "alt": "電機週 Open Lab 團隊合照"
+            }
+          },
+          {
+            "id": "company-visits",
+            "navLabel": "企業參訪",
+            "eyebrow": "COMPANY VISITS",
+            "title": "企業參訪",
+            "paragraphs": [
+              "帶同學走進企業，接觸實際工作環境與產業樣貌，透過參訪和交流認識業界運作及職涯方向。參訪企業、行程與參加方式依當屆活動公告。"
+            ]
+          },
+          {
+            "id": "mahjong",
+            "navLabel": "麻將大賽",
+            "eyebrow": "MAHJONG TOURNAMENT",
+            "title": "麻將大賽",
+            "paragraphs": [
+              "以麻將競賽讓同學交流切磋，在策略與臨場判斷中享受比賽樂趣。賽制、報名方式與獎項以當屆公告為準。"
+            ]
+          },
+          {
+            "id": "esports",
+            "navLabel": "電競比賽",
+            "eyebrow": "ESPORTS TOURNAMENT",
+            "title": "電競比賽",
+            "paragraphs": [
+              "邀請喜歡遊戲的同學組隊切磋，透過團隊合作與競技一起參與電機週。參考活動包含大型團隊遊戲及手機遊戲競賽，實際遊戲項目與賽制依當屆公告。"
+            ]
+          },
+          {
+            "id": "popularity",
+            "navLabel": "人氣王",
+            "eyebrow": "SOCIAL MEDIA SHOWCASE",
+            "title": "人氣王",
+            "paragraphs": [
+              "透過社群上的人像與短影音作品，讓同學展現創意、分享自己的風格。作品主題、參與平台、評選方式與頒獎安排以當屆公告為準。"
+            ]
+          },
+          {
+            "id": "yakult",
+            "navLabel": "養樂多大賽",
+            "eyebrow": "YAKULT CHALLENGE",
+            "title": "養樂多大賽",
+            "paragraphs": [
+              "以養樂多為主題的趣味挑戰，讓同學在輕鬆熱鬧的互動中留下電機週回憶。實際挑戰內容、活動規則與參與方式依當屆公告。"
+            ],
+            "image": {
+              "src": "/activities/ee-week/yakult.webp",
+              "alt": "電機週養樂多大賽活動紀錄"
+            }
+          }
+        ]
       },
       {
-        "id": "visual-design",
-        "navLabel": "設計成果",
-        "eyebrow": "VISUAL IDENTITY",
-        "title": "從主視覺到系服，讓每一屆留下自己的樣子",
-        "paragraphs": [
-          "電機週的視覺不只用來宣傳，也會延伸到系服與活動小物，從概念發想、繪圖到實際製作，凝聚當屆活動的個性。",
-          "頁面目前展示網站既有的設計素材；正式販售資訊、款式與尺寸將另行公告。"
-        ],
-        "image": { "src": "/intro/activities/shirt_114.png", "alt": "電機系服正反面設計展示" }
+        "id": "performances",
+        "navLabel": "電夜表演",
+        "sections": [
+          {
+            "id": "honor-guard",
+            "navLabel": "儀隊",
+            "eyebrow": "HONOR GUARD",
+            "title": "儀隊",
+            "paragraphs": [
+              "儀隊以整齊的步伐、精準的操槍與隊形變化呈現紀律和團隊精神。每個動作都來自反覆訓練，透過節奏與默契展現舞台上的力量。"
+            ],
+            "image": {
+              "src": "/activities/ee-week/honor-guard.webp",
+              "alt": "電機之夜儀隊操槍練習"
+            }
+          },
+          {
+            "id": "light-poi",
+            "navLabel": "光球",
+            "eyebrow": "LIGHT POI",
+            "title": "光球",
+            "paragraphs": [
+              "光球透過旋轉、拋接與色彩變化，在舞台上描繪流動的光軌。表演者將動作與音樂節奏結合，呈現創意、專注與團隊協作的美感。"
+            ],
+            "image": {
+              "src": "/activities/ee-week/light-poi.webp",
+              "alt": "電機之夜光球團隊與發光器材合照"
+            }
+          },
+          {
+            "id": "light-staff",
+            "navLabel": "光棍",
+            "eyebrow": "LIGHT STAFF",
+            "title": "光棍",
+            "paragraphs": [
+              "光棍在黑暗中點亮舞台，表演者將棍技、身體律動與空間走位融入音樂，讓閃爍光軌隨節奏起伏，交織出力與美。"
+            ],
+            "image": {
+              "src": "/activities/ee-week/light-staff.webp",
+              "alt": "電機之夜光棍團隊合照"
+            }
+          },
+          {
+            "id": "light-dance",
+            "navLabel": "光舞",
+            "eyebrow": "LIGHT DANCE",
+            "title": "光舞",
+            "paragraphs": [
+              "光舞結合 LED、光纖、控制技術與舞蹈，讓燈光成為表演的一部分，在黑暗中呈現音樂、動作與色彩的交會。",
+              "團隊透過燈光編輯軟體與控制器，安排光纖的顏色和亮度變化，再配合音樂節拍與舞者動作，將電機實作轉化為舞台創作。"
+            ],
+            "image": {
+              "src": "/activities/ee-week/light-dance.webp",
+              "alt": "電機之夜光舞團隊合照"
+            }
+          },
+          {
+            "id": "band",
+            "navLabel": "樂團",
+            "eyebrow": "LIVE BAND",
+            "title": "樂團",
+            "paragraphs": [
+              "電機系樂團把對音樂的熱情帶上舞台，透過編曲、演奏與合奏展現同學的另一面。旋律與節奏讓參與者在課業之外相聚，也為電機之夜留下共同的聲音記憶。"
+            ],
+            "image": {
+              "src": "/activities/ee-week/band.webp",
+              "alt": "電機之夜樂團成員與樂器合照"
+            }
+          },
+          {
+            "id": "drama",
+            "navLabel": "長劇",
+            "eyebrow": "STAGE DRAMA",
+            "title": "長劇",
+            "paragraphs": [
+              "長劇由系上戲劇夥伴共同創作與演出，題材不限於電機系生活，透過故事、角色和舞台呈現不同想像。邀請大家在繁忙課業之餘，和朋友一起享受戲劇帶來的笑聲與感動。"
+            ],
+            "image": {
+              "src": "/activities/ee-week/drama.webp",
+              "alt": "電機之夜長劇團隊合照"
+            }
+          }
+        ]
       }
     ]
   }

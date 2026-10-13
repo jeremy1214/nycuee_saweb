@@ -15,7 +15,7 @@ export function EventCalendar({ onEvent }: { onEvent: (event: CalendarEvent) => 
   }
 
   return (
-    <section className="calendar-section" id="calendar">
+    <section className="calendar-section" id="calendar" data-home-reveal>
       <SectionHeading eyebrow="UPCOMING EVENTS" title="電機行事曆" action={
         <div className="calendar-header-actions">
           <span className="calendar-note">示意活動 · 正式資訊請見系網</span>

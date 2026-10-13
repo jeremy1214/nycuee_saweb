@@ -21,7 +21,7 @@ export function RecentActivitiesSection() {
     .slice(0, 3);
 
   return (
-    <section className="home-section" id="recent-activities" aria-label="首頁近期活動">
+    <section className="home-section home-activities-section" id="recent-activities" data-home-reveal aria-label="首頁近期活動">
       <SectionHeading
         eyebrow="UPCOMING EVENTS"
         title="近期活動"

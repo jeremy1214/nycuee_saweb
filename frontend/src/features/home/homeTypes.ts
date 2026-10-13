@@ -6,14 +6,6 @@ export interface Slide {
   description: string[];
 }
 
-export interface NewsItem {
-  category: string;
-  date: string;
-  title: string;
-  summary: string;
-  artwork: "research" | "campus" | "student";
-}
-
 export interface CalendarEvent {
   date: string;
   title: string;

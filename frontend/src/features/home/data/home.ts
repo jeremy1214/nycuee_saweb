@@ -1,4 +1,4 @@
-import type { CalendarEvent, NewsItem, Slide } from "../homeTypes";
+import type { CalendarEvent, Slide } from "../homeTypes";
 
 export const slides: Slide[] = [
   {
@@ -45,34 +45,9 @@ export const slides: Slide[] = [
   },
 ];
 
-export const newsItems: NewsItem[] = [
-  {
-    category: "研究交流",
-    date: "2026-10-06",
-    title: "智慧電機與未來科技 研究交流系列活動",
-    summary: "探索研究的更多可能",
-    artwork: "research",
-  },
-  {
-    category: "招生資訊",
-    date: "2026-10-03",
-    title: "走進交大電機 開啟你的工程探索之旅",
-    summary: "認識課程與學習環境",
-    artwork: "campus",
-  },
-  {
-    category: "學生活動",
-    date: "2026-09-28",
-    title: "從課堂走向實作 電機專題成果交流展",
-    summary: "看見學生的創意與實力",
-    artwork: "student",
-  },
-];
-
 export const calendarEvents: CalendarEvent[] = [
   { date: "2026-10-06", title: "新生學習資源導覽", type: "department" },
   { date: "2026-10-14", title: "智慧電機專題講座", type: "academic" },
   { date: "2026-10-22", title: "研究交流分享會", type: "academic" },
   { date: "2026-10-28", title: "學生專題成果展", type: "department" },
 ];
-

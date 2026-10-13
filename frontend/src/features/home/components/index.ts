@@ -1,4 +1,4 @@
 export { HeroCarousel } from "./HeroCarousel";
-export { NewsSection } from "./NewsSection";
+export { RecentActivitiesSection } from "./RecentActivitiesSection";
 export { QuickLinks } from "./QuickLinks";
 export { EventCalendar } from "./EventCalendar";

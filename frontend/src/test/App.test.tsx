@@ -77,13 +77,56 @@ describe("NYCU EE website", () => {
     expect(labels).toEqual(["◎系學會", "⌘系上活動", "▤系隊", "↗學習資料"]);
   });
 
-  it("shows three dated department activity updates", () => {
-    renderApp();
+  it("shows the next three published activities from the Taiwan date", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-10-12T16:00:00.000Z"));
 
-    expect(screen.getByRole("heading", { name: "系所新訊" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /查看最新消息/ })).toBeInTheDocument();
-    expect(screen.getAllByRole("time")).toHaveLength(3);
-    expect(screen.getByText(/2026\.10\.06/)).toBeInTheDocument();
+    try {
+      renderApp();
+      const section = screen.getByRole("region", { name: "首頁近期活動" });
+      expect(within(section).getByRole("heading", { name: "近期活動" })).toBeInTheDocument();
+      expect(within(section).getByRole("link", { name: /查看更多活動/ })).toHaveAttribute("href", "/activities/overview");
+      expect(within(section).getAllByRole("link", { name: /查看活動詳細頁/ }).map((item) => item.getAttribute("href"))).toEqual([
+        "/activities/smart-ee-camp", "/activities/department-camping-night", "/activities/ee-week-showcase",
+      ]);
+      expect(within(section).getAllByRole("time").map((item) => item.getAttribute("dateTime"))).toEqual([
+        "2026-10-14", "2026-10-18", "2026-10-22",
+      ]);
+      expect(within(section).getByText("電機營")).toBeInTheDocument();
+      expect(within(section).getByText("系露營")).toBeInTheDocument();
+      expect(within(section).getByText("電機週")).toBeInTheDocument();
+      expect(within(section).queryByText("智慧電機探索營：從電路到未來應用")).not.toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("shows fewer cards when fewer upcoming activities remain", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-11-04T16:00:00.000Z"));
+
+    try {
+      renderApp();
+      const section = screen.getByRole("region", { name: "首頁近期活動" });
+      expect(within(section).getAllByRole("link", { name: /查看活動詳細頁/ })).toHaveLength(1);
+      expect(within(section).getByRole("link", { name: /電機生活交流日，查看活動詳細頁/ })).toHaveAttribute("href", "/activities/student-community-day");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("shows an empty state after the last activity", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-11-05T16:00:00.000Z"));
+
+    try {
+      renderApp();
+      const section = screen.getByRole("region", { name: "首頁近期活動" });
+      expect(within(section).queryByRole("link", { name: /查看活動詳細頁/ })).not.toBeInTheDocument();
+      expect(within(section).getByText(/目前沒有即將舉行的活動/)).toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("opens the activities page from the global navigation", async () => {

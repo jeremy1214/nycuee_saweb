@@ -1,15 +1,12 @@
 import { useState } from "react";
-import { useOutletContext } from "react-router-dom";
-import { EventCalendar, HeroCarousel, NewsSection, QuickLinks } from "./components/index";
+import { EventCalendar, HeroCarousel, RecentActivitiesSection, QuickLinks } from "./components/index";
 import { Modal, PageContainer } from "../../shared/components/index";
 import { AddToGoogleCalendar } from "./components/CalendarImport";
 import type { CalendarEvent } from "./homeTypes";
-import type { AppOutletContext } from "../../shared/components/layout/AppShell";
 
 import "./home.css";
 
 export default function HomePage() {
-  const { openPlaceholder } = useOutletContext<AppOutletContext>();
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
 
   return (
@@ -17,7 +14,7 @@ export default function HomePage() {
       <main>
         <PageContainer>
           <HeroCarousel />
-          <NewsSection onPlaceholder={openPlaceholder} />
+          <RecentActivitiesSection />
           <QuickLinks />
           <EventCalendar onEvent={setSelectedEvent} />
         </PageContainer>

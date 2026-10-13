@@ -474,6 +474,20 @@
 }
 
 /* Activity detail pages */
+.activity-detail-fallback { padding: 38px 44px; border: 1px solid var(--line); border-radius: 0 0 var(--radius) var(--radius); background: #fff; }
+
+.activity-detail-fallback h2 { margin: 22px 0 16px; color: var(--navy); font-size: clamp(1.65rem, 3vw, 2.25rem); }
+
+.activity-detail-fallback > p:not(.activity-detail-draft-note) { color: var(--muted); font-size: .82rem; line-height: 2; }
+
+.activity-detail-fallback dl { display: flex; flex-wrap: wrap; gap: 16px 36px; margin: 24px 0; }
+
+.activity-detail-fallback dl div { display: flex; gap: 10px; }
+
+.activity-detail-fallback dt { color: var(--teal-dark); font-weight: 700; }
+
+.activity-detail-fallback dd { margin: 0; color: var(--muted); }
+
 .activity-detail-page {
   min-height: 70vh;
   padding: 28px 0 80px;

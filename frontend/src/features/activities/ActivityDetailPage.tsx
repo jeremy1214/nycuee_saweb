@@ -10,9 +10,35 @@ function scrollToSection(sectionId: string) {
 
 export default function ActivityDetailPage() {
   const { activityId, tabId } = useParams();
-  const activity = activities.find((item) => item.id === activityId && item.detail);
+  const activity = activities.find((item) => item.id === activityId);
 
-  if (!activity?.detail) return <NotFoundPage />;
+  if (!activity || (tabId && !activity.detail)) return <NotFoundPage />;
+
+  if (!activity.detail) {
+    return (
+      <main className="activity-detail-page">
+        <PageContainer>
+          <Breadcrumb className="activity-detail-breadcrumb" items={[{ label: "系上活動", to: "/activities/overview" }, { label: activity.category }]} />
+          <header className="activity-detail-titlebar">
+            <span className="eyebrow">UPCOMING EVENT</span>
+            <h1>{activity.category}</h1>
+            <p>{activity.title}</p>
+          </header>
+          <article className="activity-detail-fallback">
+            <span className="activity-detail-label">活動資訊</span>
+            <h2>{activity.title}</h2>
+            <p>{activity.summary}</p>
+            <p>{activity.details}</p>
+            <dl>
+              <div><dt>日期</dt><dd><time dateTime={activity.date}>{activity.date}</time></dd></div>
+              <div><dt>地點</dt><dd>{activity.location}</dd></div>
+            </dl>
+            <p className="activity-detail-draft-note"><span aria-hidden="true">●</span> 本頁為第一版內容草稿，正式時間、地點與報名方式請以系學會公告為準。</p>
+          </article>
+        </PageContainer>
+      </main>
+    );
+  }
 
   const { detail } = activity;
   const sharedIntro = detail.introMode === "shared";

@@ -169,6 +169,14 @@ JSON 最上方的 `$schema` 會讓支援 JSON Schema 的編輯器提示欄位及
 - 文字參考舊網站 `D:/Coding/eesa-web/frontend/src/page/activities/SiloCamp.jsx`；照片取自同目錄的 `imgae/siloPic/`，保存於 `public/activities/department-camping/`。
 - 五張 WebP 的長邊最多 1600px、品質 82，不放大小圖：`intro-01.webp`、`intro-02.webp` 對應原本兩張活動介紹照片；`group-activity.webp` 對應 `活動照片_1.jpg`；`group-scenography.webp` 對應 `場美照片_1.jpg`；`group-public-relations.webp` 對應 `美公照片_2.jpg`。替代文字描述實際畫面。
 
+### 光舞內容維護
+
+光舞使用 `introMode: "tab"`，沿用電機營的獨立介紹與圖文交錯版型，分為「活動介紹」與「各組介紹」。基本網址 `/#/activities/light-dance-workshop` 自動導向 `/intro`；四組介紹位於 `/#/activities/light-dance-workshop/groups`，依序為系統組、軟體組、服裝與表演組、宣傳組。
+
+- 文字編輯 `src/content/activities/events/light-dance-workshop.json`，參考舊網站 `LightDance.jsx`；活動 id 保持不變。標題與摘要採團隊介紹，日期與地點仍為原有示意資料。
+- 六張 JPG 複製自舊站 `imgae/lightDancePic/`，存於 `public/activities/light-dance/`。`intro-01.jpg`、`intro-02.jpg` 對應活動介紹照片 1、2；`group-system.jpg`、`group-software.jpg`、`group-performance.jpg`、`group-publicity.jpg` 分別對應系統、軟體、服裝、宣傳照片 1。宣傳圖片為圖案，替代文字描述實際畫面。
+- 光舞分類的 `featuredActivityId` 指向此活動；分類圓形與近期活動卡片皆連到詳細頁。
+
 ### 共用簡介與無照片章節
 
 - `detail.introMode` 選填，可使用 `tab` 或 `shared`；未設定時維持既有行為。

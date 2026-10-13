@@ -2,10 +2,76 @@
   "$schema": "../activity.schema.json",
   "id": "light-dance-workshop",
   "status": "published",
-  "title": "光舞工作坊：用程式點亮舞台",
+  "title": "光舞：用科技點亮舞台",
   "date": "2026-10-28",
   "categoryId": "light-dance",
-  "summary": "結合燈光控制、程式設計與舞台表演，共同完成一段可被看見的創作。",
-  "details": "從燈條控制基礎開始，分組設計燈光節奏並進行舞台整合。無相關經驗也可參加，器材與教學由活動團隊準備。",
-  "location": "活動中心二樓展演空間"
+  "summary": "結合 LED、光纖、程式控制與舞蹈，讓音樂、動作與燈光一起點亮舞台。",
+  "details": "光舞由系統、軟體、服裝與表演、宣傳四組合作，從硬體電路與燈光編輯軟體，到服裝製作、動作編排與影像紀錄，共同完成科技與表演交織的舞台創作。",
+  "location": "活動中心二樓展演空間",
+  "detail": {
+    "eyebrow": "LIGHT DANCE · CODE & PERFORM",
+    "introMode": "tab",
+    "intro": [
+      "光舞結合 LED 燈、光纖、網頁設計與樹莓派控制技術，讓音樂、動作與燈光在黑暗中交織，呈現科技與舞蹈共同創作的舞台演出。",
+      "團隊透過前後端技術打造燈光編輯軟體，依照音樂的節拍安排燈光變化，再由表演者身上的控制器調整光纖的顏色與亮度。配合舞者的動作，燈光也成為表演的一部分。",
+      "從電路設計、程式開發到服裝製作與動作編排，光舞需要不同專長的夥伴一起合作。系統、軟體、服裝與表演、宣傳四組分工，將幕後的想法與準備化成舞台上看得見的作品。"
+    ],
+    "heroImages": [
+      { "src": "/activities/light-dance/intro-01.jpg", "alt": "光舞表演者穿著發光服裝在黑暗舞台上演出", "objectPosition": "50% 65%" },
+      { "src": "/activities/light-dance/intro-02.jpg", "alt": "光舞團隊與穿戴光纖服裝的表演者在舞台旁合照" }
+    ],
+    "sections": [],
+    "tabs": [
+      {
+        "id": "groups",
+        "navLabel": "各組介紹",
+        "sections": [
+          {
+            "id": "system",
+            "navLabel": "系統組",
+            "eyebrow": "SYSTEM · CIRCUITS & CONTROL",
+            "title": "系統組",
+            "paragraphs": [
+              "系統組負責硬體電路設計與韌體程式開發，將控制器、燈光與服裝上的線路連結起來，讓燈光變化能在舞台上實際呈現。",
+              "從電路到程式，系統組把表演需要的控制功能化成可以運作的硬體，是光舞背後的重要技術支援。"
+            ],
+            "image": { "src": "/activities/light-dance/group-system.jpg", "alt": "光舞控制器的電路板、電子元件與接線" }
+          },
+          {
+            "id": "software",
+            "navLabel": "軟體組",
+            "eyebrow": "SOFTWARE · EDIT & SYNC",
+            "title": "軟體組",
+            "paragraphs": [
+              "軟體組負責光表網頁的 UI 開發、API 與資料庫維護，打造編輯燈光效果的工具，讓團隊能安排顏色、亮度與音樂節拍的搭配。",
+              "透過網頁介面與前後端整合，將舞台上的燈光想像轉化成可以編輯與管理的光表，串起程式設計與表演創作。"
+            ],
+            "image": { "src": "/activities/light-dance/group-software.jpg", "alt": "筆電上的光舞燈光編輯介面，顯示人物配色與音樂時間軸" }
+          },
+          {
+            "id": "performance",
+            "navLabel": "服裝與表演組",
+            "eyebrow": "PERFORMANCE · DESIGN & DANCE",
+            "title": "服裝與表演組",
+            "paragraphs": [
+              "服裝與表演組負責服裝設計製作、動作編排、舞者演出與舞台設計，把光纖與燈光融入服裝，並讓舞蹈動作和視覺效果彼此呼應。",
+              "從服裝細節到舞台上的隊形與動作，將音樂、身體與燈光組合成完整的演出，呈現光舞獨特的舞台風格。"
+            ],
+            "image": { "src": "/activities/light-dance/group-performance.jpg", "alt": "光舞舞者穿著光纖服裝在紅色布幕前進行舞台演出", "objectPosition": "50% 60%" }
+          },
+          {
+            "id": "publicity",
+            "navLabel": "宣傳組",
+            "eyebrow": "PUBLICITY · FILM & SHARE",
+            "title": "宣傳組",
+            "paragraphs": [
+              "宣傳組負責拍攝與剪輯宣傳影片，以及 Instagram 帳號的推廣，透過影像與社群內容讓更多人認識光舞。",
+              "將團隊的創作與演出整理成可以分享的內容，讓舞台上的燈光與幕後的投入被更多人看見。"
+            ],
+            "image": { "src": "/activities/light-dance/group-publicity.jpg", "alt": "光舞宣傳圖案，以淺藍與白色線條描繪人物、筆電及插頭" }
+          }
+        ]
+      }
+    ]
+  }
 }

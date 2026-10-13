@@ -22,7 +22,8 @@
     {
       "id": "light-dance",
       "label": "光舞",
-      "shortLabel": "LIGHT DANCE"
+      "shortLabel": "LIGHT DANCE",
+      "featuredActivityId": "light-dance-workshop"
     },
     {
       "id": "other",

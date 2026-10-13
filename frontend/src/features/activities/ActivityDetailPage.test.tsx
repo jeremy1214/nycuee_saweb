@@ -31,6 +31,55 @@ function renderDetailPage(path: string) {
 }
 
 describe("ActivityDetailPage", () => {
+  it("redirects the existing light dance URL to its introduction", () => {
+    renderDetailPage("/activities/light-dance-workshop");
+
+    expect(screen.getByTestId("pathname")).toHaveTextContent("/activities/light-dance-workshop/intro");
+    expect(screen.getByRole("heading", { level: 1, name: "光舞" })).toBeInTheDocument();
+    expect(screen.getByText("光舞：用科技點亮舞台")).toBeInTheDocument();
+    expect(screen.getByText(/本頁為第一版內容草稿/)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /回到活動總覽/ })).toHaveAttribute("href", "/activities/overview");
+  });
+
+  it.each(["intro", "groups"])("opens the light dance %s page directly with only its content", (tabId) => {
+    renderDetailPage(`/activities/light-dance-workshop/${tabId}`);
+    const navigation = screen.getByRole("navigation", { name: "活動內容分頁" });
+
+    expect(within(navigation).getAllByRole("link").map((link) => link.textContent)).toEqual(["活動介紹", "各組介紹"]);
+    expect(within(navigation).getByRole("link", { name: tabId === "intro" ? "活動介紹" : "各組介紹" })).toHaveAttribute("aria-current", "page");
+    expect(document.getElementById("activity-intro") !== null).toBe(tabId === "intro");
+    if (tabId === "intro") {
+      expect(screen.getByLabelText("光舞活動照片").querySelectorAll("img")).toHaveLength(2);
+      expect(screen.getByText(/樹莓派控制技術/)).toBeInTheDocument();
+      expect(screen.queryByRole("heading", { name: "系統組" })).not.toBeInTheDocument();
+    } else {
+      expect(screen.getByRole("heading", { level: 2, name: "各組介紹" })).toBeInTheDocument();
+      expect(screen.getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent)).toEqual(["系統組", "軟體組", "服裝與表演組", "宣傳組"]);
+      const images = screen.getAllByRole("img").filter((image) => image.closest(".activity-detail-section"));
+      expect(images).toHaveLength(4);
+      images.forEach((image) => expect(image).toHaveAttribute("loading", "lazy"));
+    }
+  });
+
+  it("navigates between light dance pages with history and scroll reset", async () => {
+    const user = userEvent.setup();
+    renderDetailPage("/activities/light-dance-workshop/intro");
+    vi.mocked(window.scrollTo).mockClear();
+
+    await user.click(screen.getByRole("link", { name: "各組介紹" }));
+    expect(screen.getByTestId("pathname")).toHaveTextContent("/activities/light-dance-workshop/groups");
+    expect(screen.getByRole("heading", { name: "系統組" })).toBeInTheDocument();
+    expect(window.scrollTo).toHaveBeenLastCalledWith({ top: 0, behavior: "auto" });
+
+    await user.click(screen.getByRole("link", { name: "活動介紹" }));
+    expect(document.getElementById("activity-intro")).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "系統組" })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "上一頁" }));
+    expect(screen.getByRole("link", { name: "各組介紹" })).toHaveAttribute("aria-current", "page");
+    await user.click(screen.getByRole("button", { name: "下一頁" }));
+    expect(screen.getByRole("link", { name: "活動介紹" })).toHaveAttribute("aria-current", "page");
+  }, 15000);
+
   it("redirects the existing department camping URL to its introduction", () => {
     renderDetailPage("/activities/department-camping-night");
 
@@ -193,7 +242,8 @@ describe("ActivityDetailPage", () => {
   }, 15000);
 
   it.each([
-    "/activities/light-dance-workshop",
+    "/activities/light-dance-workshop/unknown",
+    "/activities/light-dance-workshop/practice",
     "/activities/unknown/intro",
     "/activities/smart-ee-camp/unknown",
     "/activities/smart-ee-camp/hardware-course",

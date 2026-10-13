@@ -28,29 +28,34 @@ describe("ActivitiesPage", () => {
       "href",
       "/activities/ee-week-showcase",
     );
-    expect(screen.getByRole("button", { name: "篩選光舞活動" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "光舞，查看活動詳細頁" })).toHaveAttribute(
+      "href",
+      "/activities/light-dance-workshop",
+    );
     expect(screen.getByRole("button", { name: "篩選其他活動" })).toBeInTheDocument();
     const recentActivities = screen.getByRole("region", { name: "近期活動" });
-    expect(within(recentActivities).getAllByRole("link", { name: /查看活動詳細頁/ })).toHaveLength(3);
-    expect(within(recentActivities).getAllByRole("button", { name: /查看活動詳情/ })).toHaveLength(2);
+    expect(within(recentActivities).getAllByRole("link", { name: /查看活動詳細頁/ })).toHaveLength(4);
+    expect(within(recentActivities).getByRole("link", { name: "光舞：用科技點亮舞台，查看活動詳細頁" })).toHaveAttribute("href", "/activities/light-dance-workshop");
+    expect(within(recentActivities).getAllByRole("button", { name: /查看活動詳情/ })).toHaveLength(1);
 
-    await user.click(screen.getByRole("button", { name: "篩選光舞活動" }));
-    expect(screen.getByText("目前顯示：光舞")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "篩選其他活動" }));
+    expect(screen.getByText("目前顯示：其他活動")).toBeInTheDocument();
     expect(screen.getAllByRole("button", { name: /查看活動詳情/ })).toHaveLength(1);
-    expect(screen.getByText("光舞工作坊：用程式點亮舞台")).toBeInTheDocument();
+    expect(screen.getByText("電機生活交流日：社團、系隊與學習資源")).toBeInTheDocument();
+    expect(within(recentActivities).queryByRole("link", { name: /光舞/ })).not.toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: /顯示全部活動/ }));
-    expect(within(recentActivities).getAllByRole("link", { name: /查看活動詳細頁/ })).toHaveLength(3);
-    expect(within(recentActivities).getAllByRole("button", { name: /查看活動詳情/ })).toHaveLength(2);
+    expect(within(recentActivities).getAllByRole("link", { name: /查看活動詳細頁/ })).toHaveLength(4);
+    expect(within(recentActivities).getAllByRole("button", { name: /查看活動詳情/ })).toHaveLength(1);
   });
 
   it("opens activity details and closes the dialog with Escape", async () => {
     const user = userEvent.setup();
     renderActivitiesPage();
 
-    await user.click(screen.getByRole("button", { name: /光舞工作坊/ }));
+    await user.click(screen.getByRole("button", { name: /電機生活交流日/ }));
     const dialog = screen.getByRole("dialog");
-    expect(within(dialog).getByText("活動中心二樓展演空間")).toBeInTheDocument();
+    expect(within(dialog).getByText("工程四館中庭")).toBeInTheDocument();
     expect(within(dialog).getByText(/正式時間、地點與報名方式/)).toBeInTheDocument();
 
     fireEvent(dialog, new Event("cancel", { bubbles: true, cancelable: true }));

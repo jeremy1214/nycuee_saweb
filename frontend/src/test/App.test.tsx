@@ -109,7 +109,7 @@ describe("NYCU EE website", () => {
       renderApp();
       const section = screen.getByRole("region", { name: "首頁近期活動" });
       expect(within(section).getAllByRole("link", { name: /查看活動詳細頁/ })).toHaveLength(1);
-      expect(within(section).getByRole("link", { name: /電機生活交流日，查看活動詳細頁/ })).toHaveAttribute("href", "/activities/student-community-day");
+      expect(within(section).getByRole("link", { name: /電機生活交流日.*查看活動詳細頁/ })).toHaveAttribute("href", "/activities/student-community-day");
     } finally {
       vi.useRealTimers();
     }
@@ -137,8 +137,8 @@ describe("NYCU EE website", () => {
     await user.click(within(navigation).getByRole("link", { name: "系上活動" }));
     expect(screen.getByRole("heading", { name: "活動總覽" })).toBeInTheDocument();
     const recentActivities = screen.getByRole("region", { name: "近期活動" });
-    expect(within(recentActivities).getAllByRole("link", { name: /查看活動詳細頁/ })).toHaveLength(3);
-    expect(within(recentActivities).getAllByRole("button", { name: /查看活動詳情/ })).toHaveLength(2);
+    expect(within(recentActivities).getAllByRole("link", { name: /查看活動詳細頁/ })).toHaveLength(4);
+    expect(within(recentActivities).getAllByRole("button", { name: /查看活動詳情/ })).toHaveLength(1);
   });
 
   it("opens the default learning resources page from the global navigation", async () => {
@@ -182,7 +182,7 @@ describe("NYCU EE website", () => {
     renderApp();
 
     await user.click(screen.getByRole("button", { name: "展開系上活動選單" }));
-    await user.click(screen.getByRole("link", { name: /活動總覽/ }));
+    await user.click(within(screen.getByRole("navigation", { name: "系上活動內容連結" })).getByRole("link", { name: /活動總覽/ }));
     expect(screen.getByRole("heading", { name: "活動總覽" })).toBeInTheDocument();
   });
 
@@ -190,8 +190,8 @@ describe("NYCU EE website", () => {
     const user = userEvent.setup();
     renderApp();
 
-    await user.click(screen.getByRole("button", { name: /從課堂走向實作 電機專題成果交流展/ }));
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /Sign in/ }));
+    expect(screen.getByRole("dialog", { name: "系統登入" })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "關閉視窗" }));
     await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
   });

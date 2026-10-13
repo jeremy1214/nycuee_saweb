@@ -22,12 +22,14 @@ export function QuickLinks() {
           className={`quick-item${openMenu === page.to ? " is-open" : ""}${sectionPages[current].to === page.to ? " is-featured" : ""}`}
           key={page.to}
           onMouseEnter={() => goTo(sectionPages.findIndex((item) => item.to === page.to))}
-          onMouseLeave={() => {
-            setOpenMenu(null);
-            setShowAllTeams(false);
+          onMouseLeave={(event) => {
+            if (openMenu === page.to && !event.currentTarget.contains(document.activeElement)) {
+              setOpenMenu(null);
+              setShowAllTeams(false);
+            }
           }}
           onBlur={(event) => {
-            if (!event.currentTarget.contains(event.relatedTarget)) {
+            if (openMenu === page.to && !event.currentTarget.contains(event.relatedTarget)) {
               setOpenMenu(null);
               setShowAllTeams(false);
             }
@@ -55,7 +57,7 @@ export function QuickLinks() {
               <span aria-hidden="true">＋</span>
             </button>
           </div>
-          <nav className="quick-menu" aria-label={`${page.title}內容連結`}>
+          <nav className="quick-menu" id={`quick-menu-${page.to.slice(1)}`} aria-label={`${page.title}內容連結`}>
             {(page.to === "/team" && !showAllTeams ? sectionMenus[page.to].slice(0, 5) : sectionMenus[page.to]).map((item) => (
               <Link key={item.to} to={item.to} onClick={() => {
                 setOpenMenu(null);
@@ -64,13 +66,18 @@ export function QuickLinks() {
                 {item.label}<span aria-hidden="true">↗</span>
               </Link>
             ))}
-            {page.to === "/team" && !showAllTeams && sectionMenus[page.to].length > 5 && (
+            {page.to === "/team" && sectionMenus[page.to].length > 5 && (
               <button
                 className="quick-menu-more"
                 type="button"
-                onClick={() => setShowAllTeams(true)}
+                aria-expanded={showAllTeams}
+                aria-controls="quick-menu-team"
+                onClick={() => {
+                  setOpenMenu(page.to);
+                  setShowAllTeams((expanded) => !expanded);
+                }}
               >
-                顯示更多系隊 <span className="quick-menu-more-icon" aria-hidden="true">⌄</span>
+                {showAllTeams ? "收合系隊" : "顯示更多系隊"} <span className="quick-menu-more-icon" aria-hidden="true">{showAllTeams ? "⌃" : "⌄"}</span>
               </button>
             )}
           </nav>

@@ -314,12 +314,14 @@
 .home-department-card strong { font-size: 1.35rem; }
 .home-department-card > span:last-child { position: absolute; right: 24px; bottom: 24px; font-size: 1.3rem; }
 
-.home-page .home-links-section { padding: 95px 0 115px; }
+/* Keep dropdowns above the following reveal sections' transform stacking contexts. */
+.home-page .home-links-section { position: relative; z-index: 1; padding: 95px 0 115px; }
 .home-section-intro { margin-bottom: 58px; }
 .home-section-intro p { max-width: 720px; margin: 0; color: var(--muted); font-size: .94rem; line-height: 1.8; }
 .home-page .quick-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; margin: 0; align-items: stretch; }
 .home-page .quick-item { transition: transform .4s cubic-bezier(.2,.75,.25,1), box-shadow .4s ease; }
 .home-page .quick-item.is-featured { z-index: 4; transform: translateY(-15px) scale(1.025); filter: drop-shadow(0 19px 18px rgb(16 44 67 / 12%)); }
+.home-page .quick-item:is(:hover, :focus-within, .is-open) { z-index: 5; }
 .home-page .quick-link { display: block; min-height: 265px; border: 1px solid var(--line); border-radius: 15px; background: #fff; box-shadow: 0 10px 26px rgb(16 44 67 / 8%); transition: background .3s ease, color .3s ease, border-color .3s ease; }
 .home-page .quick-item.is-featured .quick-link,
 .home-page .quick-item:is(:hover, :focus-within, .is-open) .quick-link { border-color: var(--teal); background: var(--teal); color: #fff; }

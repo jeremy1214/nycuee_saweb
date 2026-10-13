@@ -46,3 +46,23 @@ export interface ActivityCategoryOption {
   shortLabel: string;
   featuredActivityId?: string;
 }
+
+/** Evergreen introductions, separate from the dated upcoming-events feed. */
+export interface OtherActivityImage extends ActivityDetailImage {
+  fit?: "cover" | "contain";
+}
+
+export interface OtherActivity {
+  id: string;
+  title: string;
+  summary: string;
+  intro: string[];
+  cover: OtherActivityImage;
+  photos: OtherActivityImage[];
+  groups?: {
+    id: string;
+    title: string;
+    paragraphs: string[];
+    image: OtherActivityImage;
+  }[];
+}

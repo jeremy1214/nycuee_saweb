@@ -1,0 +1,324 @@
+[
+  {
+    "id": "course-selection",
+    "title": "選課大會",
+    "summary": "從學長姐的經驗出發，找到適合自己的課程。",
+    "intro": [
+      "學長姐分享必選修課程的教學內容與教授風格，幫助同學更了解課程特色，找到適合自己的課。",
+      "從課程安排到學習經驗，透過交流與提問，為大學的選課做好準備。"
+    ],
+    "cover": {
+      "src": "/activities/other/course-selection-01.webp",
+      "alt": "新生選課大會的藍綠色簡報封面",
+      "fit": "contain"
+    },
+    "photos": [
+      {
+        "src": "/activities/other/course-selection-01.webp",
+        "alt": "新生選課大會的藍綠色簡報封面",
+        "fit": "contain"
+      },
+      {
+        "src": "/activities/other/course-selection-02.webp",
+        "alt": "選課大會簡報列出微分方程、電子學與電磁學等介紹順序",
+        "fit": "contain"
+      }
+    ]
+  },
+  {
+    "id": "icebreaker",
+    "title": "破冰大會",
+    "summary": "用遊戲與闖關，讓第一次見面變成新的友誼。",
+    "intro": [
+      "破冰大會是電機系大一新生認識彼此的活動。透過團康遊戲、分組互動與一起闖關，讓原本陌生的同學有機會聊起來。",
+      "從一起完成任務開始，找到能分享課業與生活的夥伴，為大學生活留下第一段共同回憶。"
+    ],
+    "cover": {
+      "src": "/activities/other/icebreaker-02.webp",
+      "alt": "破冰大會參與同學在室內合照"
+    },
+    "photos": [
+      {
+        "src": "/activities/other/icebreaker-01.webp",
+        "alt": "新生在室內走廊進行團康互動"
+      },
+      {
+        "src": "/activities/other/icebreaker-02.webp",
+        "alt": "破冰大會參與同學在室內合照"
+      },
+      {
+        "src": "/activities/other/icebreaker-03.webp",
+        "alt": "同學圍坐地面交流與互動"
+      },
+      {
+        "src": "/activities/other/icebreaker-04.webp",
+        "alt": "破冰大會同學分組坐在室內走廊"
+      }
+    ]
+  },
+  {
+    "id": "mentorship",
+    "title": "分家大會",
+    "summary": "認識直屬學長姐，讓大學生活多一份照應。",
+    "intro": [
+      "剛上大學，對選課系統或教授的教學風格感到陌生嗎？分家大會讓新生認識自己的直屬學長姐，建立能交流課業與生活經驗的連結。",
+      "從選課建議、考試準備到校園生活，有了能一起討論的夥伴，遇到疑問時也多了一個可以請教的方向。"
+    ],
+    "cover": {
+      "src": "/activities/other/mentorship-01.webp",
+      "alt": "分家大會同學坐在階梯教室合照"
+    },
+    "photos": [
+      {
+        "src": "/activities/other/mentorship-01.webp",
+        "alt": "分家大會同學坐在階梯教室合照"
+      },
+      {
+        "src": "/activities/other/mentorship-02.webp",
+        "alt": "分家大會參與者在夜間戶外合照"
+      },
+      {
+        "src": "/activities/other/mentorship-03.webp",
+        "alt": "兩位同學在教室前方分享"
+      },
+      {
+        "src": "/activities/other/mentorship-04.webp",
+        "alt": "同學站在教室黑板前發言"
+      }
+    ]
+  },
+  {
+    "id": "freshman-night",
+    "title": "新生晚會",
+    "summary": "把想像力帶上舞台，留下屬於這一屆的演出。",
+    "intro": [
+      "新生晚會提供新生一個發揮想像力的舞台，讓大家展現表演、創意與合作的可能。",
+      "從排練、角色發想到正式演出，同學們一起把心中的點子變成舞台上的畫面，也在準備過程中認識彼此。"
+    ],
+    "cover": {
+      "src": "/activities/other/freshman-night-04.webp",
+      "alt": "新生晚會全體同學在舞台合照"
+    },
+    "photos": [
+      {
+        "src": "/activities/other/freshman-night-01.webp",
+        "alt": "新生晚會同學在舞台上演出"
+      },
+      {
+        "src": "/activities/other/freshman-night-02.webp",
+        "alt": "同學戴著手作道具進行舞台演出"
+      },
+      {
+        "src": "/activities/other/freshman-night-03.webp",
+        "alt": "新生晚會舞台上的角色互動"
+      },
+      {
+        "src": "/activities/other/freshman-night-04.webp",
+        "alt": "新生晚會全體同學在舞台合照"
+      }
+    ]
+  },
+  {
+    "id": "freshman-camp",
+    "title": "宿營",
+    "summary": "和未來的同學一起冒險，點亮大學生活的第一道火花。",
+    "intro": [
+      "電機系宿營是一場屬於新鮮人的冒險。透過團康、闖關任務、晚會表演與夜間活動，和未來的同學從陌生到熟悉，累積歡笑與共同回憶。",
+      "學長姐設計活動與故事，讓新生在遊戲中認識系上文化。無論個性內向或外向，都能在參與過程中找到夥伴，一起展開大學生活。"
+    ],
+    "cover": {
+      "src": "/activities/other/freshman-camp-intro-01.webp",
+      "alt": "宿營同學在室內伸出手臂參與團體活動"
+    },
+    "photos": [
+      {
+        "src": "/activities/other/freshman-camp-intro-01.webp",
+        "alt": "宿營同學在室內伸出手臂參與團體活動"
+      },
+      {
+        "src": "/activities/other/freshman-camp-intro-02.webp",
+        "alt": "宿營同學圍坐室內地面參與活動"
+      }
+    ],
+    "groups": [
+      {
+        "id": "activity",
+        "title": "活動組",
+        "paragraphs": [
+          "負責營隊活動的故事與關卡設計，並擔任關主，透過演技與創意帶領大家投入活動。"
+        ],
+        "image": {
+          "src": "/activities/other/freshman-camp-activity.webp",
+          "alt": "活動組同學圍在桌旁一起進行任務"
+        }
+      },
+      {
+        "id": "design",
+        "title": "美宣組",
+        "paragraphs": [
+          "負責活動與劇情所需的道具製作，將故事中的構想轉化為實際的視覺與道具。"
+        ],
+        "image": {
+          "src": "/activities/other/freshman-camp-design.webp",
+          "alt": "宿營美宣組同學坐在椅子上合照"
+        }
+      },
+      {
+        "id": "mentors",
+        "title": "公關組",
+        "paragraphs": [
+          "擔任小隊輔，陪伴新生參與營隊、協助帶隊與活動進行，並成為新生認識系上的夥伴。"
+        ],
+        "image": {
+          "src": "/activities/other/freshman-camp-mentors.webp",
+          "alt": "公關組同學在室內帶領互動活動"
+        }
+      },
+      {
+        "id": "stage",
+        "title": "場控組",
+        "paragraphs": [
+          "負責架場、音控、燈光等幕後工作，處理場地與技術需求，讓活動順利進行。"
+        ],
+        "image": {
+          "src": "/activities/other/freshman-camp-stage.webp",
+          "alt": "場控組同學在筆記型電腦旁操作"
+        }
+      },
+      {
+        "id": "logistics",
+        "title": "生活組",
+        "paragraphs": [
+          "負責訂餐、準備食物與餐後整理，照顧營隊中的日常需求。"
+        ],
+        "image": {
+          "src": "/activities/other/freshman-camp-logistics.webp",
+          "alt": "生活組同學在室內穿著黃色圍裙"
+        }
+      }
+    ]
+  },
+  {
+    "id": "department-bbq",
+    "title": "系烤",
+    "summary": "用烤肉、遊戲與聊天，串起不同年級的日常。",
+    "intro": [
+      "系烤讓大家一起準備烤肉、玩遊戲、聊天交朋友。透過輕鬆的氣氛與美食，不同年級的同學能互相認識、分享生活。",
+      "從一起準備食材到圍在烤爐旁聊天，留下歡笑與回憶，感受系上交流的溫度。"
+    ],
+    "cover": {
+      "src": "/activities/other/department-bbq-02.webp",
+      "alt": "系烤同學在夜間戶外合照"
+    },
+    "photos": [
+      {
+        "src": "/activities/other/department-bbq-01.webp",
+        "alt": "系烤參與者在夜間戶外舉手互動"
+      },
+      {
+        "src": "/activities/other/department-bbq-02.webp",
+        "alt": "系烤同學在夜間戶外合照"
+      }
+    ]
+  },
+  {
+    "id": "drama",
+    "title": "抓馬盃",
+    "summary": "從劇本到舞台，把創意與合作化成一場演出。",
+    "intro": [
+      "抓馬盃是讓大一新生投入戲劇創作與演出的競賽活動，也是許多人第一次籌辦演出或登上舞台的契機。電機系學長姐協助學弟妹準備，參與者可以投入劇本創作、表演、燈光音效或美術宣傳。",
+      "從排練到正式演出，大家在合作中認識同屆夥伴、交流創意，並探索表演與舞台設計的興趣，一起感受站上舞台的成就感。"
+    ],
+    "cover": {
+      "src": "/activities/other/drama-intro-02.webp",
+      "alt": "抓馬盃演員在燈光照亮的舞台上演出"
+    },
+    "photos": [
+      {
+        "src": "/activities/other/drama-intro-01.webp",
+        "alt": "抓馬盃團隊在室內合照"
+      },
+      {
+        "src": "/activities/other/drama-intro-02.webp",
+        "alt": "抓馬盃演員在燈光照亮的舞台上演出"
+      }
+    ],
+    "groups": [
+      {
+        "id": "actors",
+        "title": "演員組",
+        "paragraphs": [
+          "負責舞台表演、角色詮釋與台詞練習，展現戲劇張力與舞台魅力。"
+        ],
+        "image": {
+          "src": "/activities/other/drama-actors.webp",
+          "alt": "抓馬盃演員在舞台上排成一列演出"
+        }
+      },
+      {
+        "id": "design",
+        "title": "美宣組",
+        "paragraphs": [
+          "設計主視覺、宣傳文案、道具與妝造，打造舞台整體風格。"
+        ],
+        "image": {
+          "src": "/activities/other/drama-design.webp",
+          "alt": "抓馬盃宣傳展示擺放海報與道具"
+        }
+      },
+      {
+        "id": "writing",
+        "title": "編劇組",
+        "paragraphs": [
+          "構思劇情、撰寫劇本並協調故事方向，掌握全劇節奏與主題精神。"
+        ],
+        "image": {
+          "src": "/activities/other/drama-writing.webp",
+          "alt": "抓馬盃同學與手作欄杆道具合照"
+        }
+      },
+      {
+        "id": "stage",
+        "title": "場控組",
+        "paragraphs": [
+          "負責燈光、音效與後台運作，確保演出流程流暢。"
+        ],
+        "image": {
+          "src": "/activities/other/drama-stage.webp",
+          "alt": "抓馬盃場控組同學與舞台道具在戶外合照"
+        }
+      }
+    ]
+  },
+  {
+    "id": "graduation",
+    "title": "小畢典",
+    "summary": "回顧四年的點滴，留下屬於電機人的最後一張合照。",
+    "intro": [
+      "小畢典是為電機系畢業生準備的溫馨活動，以更貼近系上的方式，一同回顧大學生活的點點滴滴。",
+      "透過典禮、回顧與合照，慶祝成長、感謝一路同行的夥伴，為這段青春留下共同的回憶。"
+    ],
+    "cover": {
+      "src": "/activities/other/graduation-01.webp",
+      "alt": "電機系畢業生與師長在戶外合照"
+    },
+    "photos": [
+      {
+        "src": "/activities/other/graduation-01.webp",
+        "alt": "電機系畢業生與師長在戶外合照"
+      },
+      {
+        "src": "/activities/other/graduation-02.webp",
+        "alt": "小畢典師長為畢業生進行撥穗"
+      },
+      {
+        "src": "/activities/other/graduation-03.webp",
+        "alt": "畢業生在活動背板前合照"
+      },
+      {
+        "src": "/activities/other/graduation-04.webp",
+        "alt": "畢業生穿著學士服在典禮上合照"
+      }
+    ]
+  }
+]

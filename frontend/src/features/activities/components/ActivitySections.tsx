@@ -41,7 +41,16 @@ export function ActivityOverview({ selectedCategory, onCategoryChange }: Activit
             </>
           );
 
-          return detailActivity ? (
+          return category.id === "other" ? (
+            <Link
+              className={`activity-category-bubble activity-category-bubble-${index + 1}`}
+              key={category.id}
+              to="/activities/other"
+              aria-label="其他活動，查看活動相簿"
+            >
+              {categoryContent}
+            </Link>
+          ) : detailActivity ? (
             <Link
               className={`activity-category-bubble activity-category-bubble-${index + 1}`}
               key={category.id}

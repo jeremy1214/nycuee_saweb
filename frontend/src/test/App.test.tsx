@@ -12,6 +12,19 @@ function renderApp(route = "/") {
 }
 
 describe("NYCU EE website", () => {
+  it("opens the other-activities album from the overview and supports direct access", async () => {
+    const user = userEvent.setup();
+    const view = renderApp("/activities/overview");
+    await user.click(screen.getByRole("link", { name: "其他活動，查看活動相簿" }));
+    expect(screen.getByRole("heading", { name: "其他活動" })).toBeInTheDocument();
+    expect(screen.getByRole("article", { name: "選課大會" })).toBeInTheDocument();
+    expect(within(screen.getByRole("navigation", { name: "主要導覽" })).getByRole("link", { name: "系上活動" })).toHaveClass("active");
+    await user.click(screen.getByRole("link", { name: /回到活動總覽/ }));
+    expect(screen.getByRole("heading", { name: "活動總覽" })).toBeInTheDocument();
+    view.unmount();
+    renderApp("/activities/other");
+    expect(screen.getByRole("article", { name: "選課大會" })).toBeInTheDocument();
+  });
   it("renders and advances the hero carousel", async () => {
     const user = userEvent.setup();
     renderApp();
@@ -72,9 +85,10 @@ describe("NYCU EE website", () => {
 
   it("shows the four student link groups in the requested order", () => {
     renderApp();
-    const quickLinks = screen.getByRole("region", { name: "網站導覽" });
-    const labels = Array.from(quickLinks.querySelectorAll(".quick-main-link"), (link) => link.textContent);
-    expect(labels).toEqual(["◎系學會", "⌘系上活動", "▤系隊", "↗學習資料"]);
+    const quickLinks = screen.getByRole("region", { name: "探索交大電機" });
+    const labels = Array.from(quickLinks.querySelectorAll(".quick-main-link strong"), (label) => label.textContent);
+    expect(labels).toEqual(["系學會", "系上活動", "系隊", "學習資料"]);
+    expect(Array.from(quickLinks.querySelectorAll(".quick-main-link"), (link) => link.getAttribute("href"))).toEqual(["/eesa", "/activities", "/team", "/resources"]);
   });
 
   it("shows the next three published activities from the Taiwan date", () => {

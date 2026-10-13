@@ -2,7 +2,7 @@ import { Navigate, Route, Routes, useParams } from "react-router-dom";
 import AppShell from "./shared/components/layout/AppShell";
 import HomePage from "./features/home/index";
 import ContactPage from "./features/contact/index";
-import ActivitiesPage, { ActivityDetailPage } from "./features/activities/index";
+import ActivitiesPage, { ActivityDetailPage, OtherActivitiesPage } from "./features/activities/index";
 import ResourcePage from "./features/resources/index";
 import TeamPage, { TeamDetailPage } from "./features/teams/index";
 import EesaLayout, { EesaPage, DepartmentPage, DepartmentActivitiesPage, DepartmentActivityPage, DepartmentSkillsPage, DepartmentExperiencePage } from "./features/eesa/index";
@@ -31,6 +31,7 @@ export default function App() {
         <Route path="team/:teamKey" element={<TeamDetailPage />} />
         <Route path="activities" element={<Navigate to="/activities/overview" replace />} />
         <Route path="activities/overview" element={<ActivitiesPage />} />
+        <Route path="activities/other" element={<OtherActivitiesPage />} />
         <Route path="activities/:activityId" element={<ActivityDetailPage />} />
         <Route path="activities/:activityId/:tabId" element={<ActivityDetailPage />} />
         <Route path="resources" element={<Navigate to="/resources/courses" replace />} />

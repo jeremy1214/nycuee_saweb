@@ -206,6 +206,17 @@ JSON 最上方的 `$schema` 會讓支援 JSON Schema 的編輯器提示欄位及
 
 ## 圖片管理
 
+### 其他活動相簿
+
+`/#/activities/other` 為獨立的常態活動介紹，由活動總覽「其他活動」圓形進入；原有 `overview?category=other` 篩選網址仍可使用。
+
+- 內容集中於 `src/content/activities/other-activities.json`，陣列順序就是相簿順序，依序為選課大會、破冰大會、分家大會、新生晚會、宿營、系烤、抓馬盃、小畢典。與近期活動資料分開，不需要日期、不加入首頁近期活動。
+- 每項包含 `id`、`title`、`summary`、`intro`（段落陣列）、`cover` 與非空的 `photos`。選填 `groups`，每組包含 `id`、`title`、`paragraphs` 與 `image`。只需修改 JSON 與圖片，無須更改元件；新增項目會自動加入選單與輪播。
+- 圖片包含 `src`、`alt`，可選填 `objectPosition` 與 `fit: "cover" | "contain"`；有文字的簡報圖片用 `contain` 保留完整畫面。所有檔案放於 `public/activities/other/`。
+- 宿營、抓馬盃文字來自舊站 `SooCamp.jsx`、`Drama.jsx`，其餘六項來自舊站 `event/Timeline.jsx`。已刪除年度日期、當屆供餐承諾、固定營期與抓馬盃誤植的營隊文字。素材來自 `imgae/sideIntro`、`imgae/sooCamp`、`imgae/dramaPic`；33 張 WebP 的長邊最多 1600px、品質 82，不放大小圖。
+- 相簿同時最多展示五張，手機最多三張；初始選中第一項，每 6 秒循環翻頁。停留或聚焦介紹時暫停，手動操作後需按播放恢復；減少動態效果時只提供手動瀏覽。重新整理回到第一項。
+- 內容載入器會檢查識別碼、必要文字、照片、組別與圖片欄位；`npm run validate:content` 也會確認圖片存在。輪播行為測試涵蓋切換、首尾循環、自動播放、閱讀暫停、觸控與鍵盤操作。
+
 既有共用圖片保留在 `public/intro/activities/`。新活動建議使用獨立資料夾：
 
 ```text

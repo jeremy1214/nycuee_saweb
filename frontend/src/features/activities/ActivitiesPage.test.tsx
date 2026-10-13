@@ -3,17 +3,16 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import ActivitiesPage from "./ActivitiesPage";
 
-function renderActivitiesPage() {
+function renderActivitiesPage(route = "/activities/overview") {
   return render(
-    <MemoryRouter>
+    <MemoryRouter initialEntries={[route]}>
       <ActivitiesPage />
     </MemoryRouter>,
   );
 }
 
 describe("ActivitiesPage", () => {
-  it("shows detail links and compact activities, then filters by category", async () => {
-    const user = userEvent.setup();
+  it("shows detail links, compact activities and the other-activities album entry", () => {
     renderActivitiesPage();
 
     expect(screen.getByRole("link", { name: "電機營，查看活動詳細頁" })).toHaveAttribute(
@@ -32,13 +31,17 @@ describe("ActivitiesPage", () => {
       "href",
       "/activities/light-dance-workshop",
     );
-    expect(screen.getByRole("button", { name: "篩選其他活動" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "其他活動，查看活動相簿" })).toHaveAttribute("href", "/activities/other");
     const recentActivities = screen.getByRole("region", { name: "近期活動" });
     expect(within(recentActivities).getAllByRole("link", { name: /查看活動詳細頁/ })).toHaveLength(4);
     expect(within(recentActivities).getByRole("link", { name: "光舞：用科技點亮舞台，查看活動詳細頁" })).toHaveAttribute("href", "/activities/light-dance-workshop");
     expect(within(recentActivities).getAllByRole("button", { name: /查看活動詳情/ })).toHaveLength(1);
+  });
 
-    await user.click(screen.getByRole("button", { name: "篩選其他活動" }));
+  it("preserves existing category-filter URLs and can show all activities again", async () => {
+    const user = userEvent.setup();
+    renderActivitiesPage("/activities/overview?category=other");
+    const recentActivities = screen.getByRole("region", { name: "近期活動" });
     expect(screen.getByText("目前顯示：其他活動")).toBeInTheDocument();
     expect(screen.getAllByRole("button", { name: /查看活動詳情/ })).toHaveLength(1);
     expect(screen.getByText("電機生活交流日：社團、系隊與學習資源")).toBeInTheDocument();

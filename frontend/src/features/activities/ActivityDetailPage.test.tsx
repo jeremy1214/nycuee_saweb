@@ -33,7 +33,6 @@ function renderDetailPage(path: string) {
 describe("ActivityDetailPage", () => {
   it.each([
     ["/activities/department-camping-night", "系露營", "小隊任務", "晚間交流"],
-    ["/activities/ee-week-showcase", "電機週", "主題展區", "設計成果"],
   ])("renders the activity and its expandable sections", (path, title, firstSection, lastSection) => {
     renderDetailPage(path);
 
@@ -109,12 +108,71 @@ describe("ActivityDetailPage", () => {
     expect(page.getByRole("link", { name: "各組介紹" })).toHaveAttribute("aria-current", "page");
   }, 15000);
 
+  it.each(["/activities/ee-week-showcase", "/activities/ee-week-showcase/intro"])(
+    "redirects %s to the first EE week page", (path) => {
+      renderDetailPage(path);
+      expect(screen.getByTestId("pathname")).toHaveTextContent("/activities/ee-week-showcase/groups");
+      expect(screen.getByRole("link", { name: "各組介紹" })).toHaveAttribute("aria-current", "page");
+    },
+  );
+
+  it.each([
+    ["groups", "各組介紹", ["公關部", "宣傳部", "課學部", "活動部", "場器部", "Open Lab"], ["擺攤", "儀隊"]],
+    ["events", "細項活動", ["擺攤", "圓桌分享", "Open Lab", "企業參訪", "麻將大賽", "電競比賽", "人氣王", "養樂多大賽"], ["公關部", "儀隊"]],
+    ["performances", "電夜表演", ["儀隊", "光球", "光棍", "光舞", "樂團", "長劇"], ["公關部", "擺攤"]],
+  ])("opens the EE week %s page with a shared introduction", (tabId, label, titles, absentTitles) => {
+    renderDetailPage(`/activities/ee-week-showcase/${tabId}`);
+    const navigation = screen.getByRole("navigation", { name: "活動內容分頁" });
+    const hero = document.getElementById("activity-intro")!;
+    expect(screen.getByRole("heading", { level: 1, name: "電機週" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: label })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: label })).toHaveAttribute("aria-current", "page");
+    expect(within(navigation).getAllByRole("link").map((link) => link.textContent)).toEqual(["各組介紹", "細項活動", "電夜表演"]);
+    expect(hero).toBeInTheDocument();
+    expect(hero.compareDocumentPosition(navigation) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(within(hero).getAllByRole("img")).toHaveLength(2);
+    expect(screen.getAllByRole("heading", { level: 3 })).toHaveLength(titles.length);
+    titles.forEach((title) => expect(screen.getByRole("heading", { level: 3, name: title })).toBeInTheDocument());
+    absentTitles.forEach((title) => expect(screen.queryByRole("heading", { name: title })).not.toBeInTheDocument());
+    expect(screen.queryByRole("button", { name: "主題展區" })).not.toBeInTheDocument();
+  });
+
+  it("renders activities without photos as text without an empty frame", () => {
+    renderDetailPage("/activities/ee-week-showcase/events");
+    const booth = document.getElementById("booths")!;
+    expect(booth).toHaveClass("activity-detail-section-text-only");
+    expect(booth.querySelector("figure")).toBeNull();
+    expect(within(booth).queryByRole("img")).not.toBeInTheDocument();
+    expect(within(document.getElementById("open-lab")!).getByRole("img")).toHaveAttribute("loading", "lazy");
+  });
+
+  it("navigates between EE week pages and supports history and scroll reset", async () => {
+    const user = userEvent.setup();
+    renderDetailPage("/activities/ee-week-showcase/groups");
+    vi.mocked(window.scrollTo).mockClear();
+    await user.click(screen.getByRole("link", { name: "細項活動" }));
+    expect(screen.getByTestId("pathname")).toHaveTextContent("/activities/ee-week-showcase/events");
+    expect(screen.getByRole("heading", { name: "擺攤" })).toBeInTheDocument();
+    expect(window.scrollTo).toHaveBeenLastCalledWith({ top: 0, behavior: "auto" });
+    await user.click(screen.getByRole("link", { name: "電夜表演" }));
+    expect(screen.getByTestId("pathname")).toHaveTextContent("/activities/ee-week-showcase/performances");
+    expect(screen.getByRole("heading", { name: "儀隊" })).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "擺攤" })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "上一頁" }));
+    expect(screen.getByRole("link", { name: "細項活動" })).toHaveAttribute("aria-current", "page");
+    await user.click(screen.getByRole("button", { name: "上一頁" }));
+    expect(screen.getByRole("link", { name: "各組介紹" })).toHaveAttribute("aria-current", "page");
+    await user.click(screen.getByRole("button", { name: "下一頁" }));
+    expect(screen.getByRole("link", { name: "細項活動" })).toHaveAttribute("aria-current", "page");
+  }, 15000);
+
   it.each([
     "/activities/light-dance-workshop",
     "/activities/unknown/intro",
     "/activities/smart-ee-camp/unknown",
     "/activities/smart-ee-camp/hardware-course",
     "/activities/department-camping-night/intro",
+    "/activities/ee-week-showcase/unknown",
   ])("shows the not-found page for unsupported activity or tab %s", (path) => {
     renderDetailPage(path);
 

@@ -15,20 +15,32 @@ export default function ActivityDetailPage() {
   if (!activity?.detail) return <NotFoundPage />;
 
   const { detail } = activity;
+  const sharedIntro = detail.introMode === "shared";
   const selectedTab = detail.tabs?.find((tab) => tab.id === tabId);
 
-  if (detail.tabs && !tabId) {
-    return <Navigate to={`/activities/${activity.id}/intro`} replace />;
+  if (detail.tabs && (!tabId || (sharedIntro && tabId === "intro"))) {
+    const defaultTabId = sharedIntro ? detail.tabs[0].id : "intro";
+    return <Navigate to={`/activities/${activity.id}/${defaultTabId}`} replace />;
   }
   if (tabId && (!detail.tabs || (tabId !== "intro" && !selectedTab))) {
     return <NotFoundPage />;
   }
 
-  const showIntro = !detail.tabs || tabId === "intro";
+  const showIntro = sharedIntro || !detail.tabs || tabId === "intro";
   const sections = selectedTab?.sections ?? detail.sections;
+  const tabNavigation = detail.tabs && (
+    <nav className="activity-detail-section-nav activity-detail-tab-nav" aria-label="活動內容分頁">
+      {!sharedIntro && <NavLink to={`/activities/${activity.id}/intro`} end>活動介紹</NavLink>}
+      {detail.tabs.map((tab) => (
+        <NavLink to={`/activities/${activity.id}/${tab.id}`} key={tab.id} end>
+          {tab.navLabel}
+        </NavLink>
+      ))}
+    </nav>
+  );
 
   return (
-    <main className={`activity-detail-page${detail.tabs ? " activity-detail-tabbed" : ""}`}>
+    <main className={`activity-detail-page${detail.tabs ? " activity-detail-tabbed" : ""}${sharedIntro ? " activity-detail-shared-intro" : ""}`}>
       <PageContainer>
         <Breadcrumb className="activity-detail-breadcrumb" items={[{ label: "系上活動", to: "/activities/overview" }, { label: activity.category }]} />
 
@@ -38,16 +50,7 @@ export default function ActivityDetailPage() {
           <p>{activity.title}</p>
         </header>
 
-        {detail.tabs && (
-          <nav className="activity-detail-section-nav activity-detail-tab-nav" aria-label="活動內容分頁">
-            <NavLink to={`/activities/${activity.id}/intro`} end>活動介紹</NavLink>
-            {detail.tabs.map((tab) => (
-              <NavLink to={`/activities/${activity.id}/${tab.id}`} key={tab.id} end>
-                {tab.navLabel}
-              </NavLink>
-            ))}
-          </nav>
-        )}
+        {!sharedIntro && tabNavigation}
 
         {showIntro && (
           <section id="activity-intro" className="activity-detail-hero" aria-labelledby="activity-intro-title">
@@ -71,6 +74,8 @@ export default function ActivityDetailPage() {
           </section>
         )}
 
+        {sharedIntro && tabNavigation}
+
         {!detail.tabs && (
           <nav className="activity-detail-section-nav" aria-label="活動內容章節">
             <button type="button" onClick={() => scrollToSection("activity-intro")}>活動介紹</button>
@@ -86,16 +91,18 @@ export default function ActivityDetailPage() {
         {sections.length > 0 && (
           <div className="activity-detail-sections">
             {sections.map((section, index) => (
-              <section id={section.id} className="activity-detail-section" key={section.id} aria-labelledby={`${section.id}-title`}>
-                <figure className="activity-detail-section-image">
-                  <img
-                    src={section.image.src}
-                    alt={section.image.alt}
-                    loading={detail.tabs ? "lazy" : undefined}
-                    style={{ objectPosition: section.image.objectPosition }}
-                  />
-                  <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
-                </figure>
+              <section id={section.id} className={`activity-detail-section${section.image ? "" : " activity-detail-section-text-only"}`} key={section.id} aria-labelledby={`${section.id}-title`}>
+                {section.image && (
+                  <figure className="activity-detail-section-image">
+                    <img
+                      src={section.image.src}
+                      alt={section.image.alt}
+                      loading={detail.tabs ? "lazy" : undefined}
+                      style={{ objectPosition: section.image.objectPosition }}
+                    />
+                    <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+                  </figure>
+                )}
                 <div className="activity-detail-section-copy">
                   <span className="eyebrow">{section.eyebrow}</span>
                   {selectedTab ? (

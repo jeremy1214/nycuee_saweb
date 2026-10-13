@@ -19,9 +19,16 @@
       "type": "object",
       "additionalProperties": false,
       "required": ["eyebrow", "intro", "heroImages", "sections"],
+      "allOf": [
+        {
+          "if": { "properties": { "introMode": { "const": "shared" } }, "required": ["introMode"] },
+          "then": { "required": ["tabs"] }
+        }
+      ],
       "properties": {
         "eyebrow": { "type": "string", "minLength": 1 },
         "intro": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "introMode": { "enum": ["tab", "shared"] },
         "heroImages": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "$ref": "#/$defs/image" } },
         "sections": { "type": "array", "items": { "$ref": "#/$defs/section" } },
         "tabs": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/tab" } }
@@ -52,7 +59,7 @@
     "section": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "navLabel", "eyebrow", "title", "paragraphs", "image"],
+      "required": ["id", "navLabel", "eyebrow", "title", "paragraphs"],
       "properties": {
         "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
         "navLabel": { "type": "string", "minLength": 1 },

@@ -715,6 +715,14 @@
   border-top: 0;
 }
 
+.activity-detail-shared-intro .activity-detail-hero {
+  border-top: 1px solid var(--line);
+}
+
+.activity-detail-shared-intro .activity-detail-tab-nav {
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
 .activity-detail-tab-title + .activity-detail-sections {
   margin-top: 42px;
 }
@@ -819,6 +827,20 @@
   margin: 0 0 3px 12px;
   background: var(--teal);
   content: "";
+}
+
+.activity-detail-section.activity-detail-section-text-only {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.activity-detail-section-text-only .activity-detail-section-copy {
+  width: 100%;
+  max-width: 48rem;
+  margin-inline: auto;
+  padding: 32px clamp(24px, 4vw, 48px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
 }
 
 .activity-detail-back {

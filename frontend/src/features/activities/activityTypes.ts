@@ -10,7 +10,7 @@ export interface ActivityDetailSection {
   eyebrow: string;
   title: string;
   paragraphs: string[];
-  image: ActivityDetailImage;
+  image?: ActivityDetailImage;
 }
 
 export interface ActivityDetail {
@@ -19,6 +19,7 @@ export interface ActivityDetail {
   heroImages: [ActivityDetailImage, ActivityDetailImage];
   sections: ActivityDetailSection[];
   tabs?: ActivityDetailTab[];
+  introMode?: "tab" | "shared";
 }
 
 export interface ActivityDetailTab {

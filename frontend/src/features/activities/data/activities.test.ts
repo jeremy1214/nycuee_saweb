@@ -38,7 +38,7 @@ describe("activity data", () => {
       const sections = sectionCollections.flat();
       const images = [
         ...detail.heroImages,
-        ...sections.map((section) => section.image),
+        ...sections.flatMap((section) => section.image ? [section.image] : []),
       ];
 
       sectionCollections.forEach((collection) => {
@@ -76,5 +76,14 @@ describe("activity data", () => {
       ["practice", 5],
     ]);
     expect(camp.detail?.sections).toEqual([]);
+  });
+
+  it("provides the shared introduction and all three EE week pages", () => {
+    const week = activities.find((activity) => activity.id === "ee-week-showcase")!;
+    expect(week.detail?.introMode).toBe("shared");
+    expect(week.detail?.tabs?.map((tab) => [tab.id, tab.sections.length])).toEqual([
+      ["groups", 6], ["events", 8], ["performances", 6],
+    ]);
+    expect(week.detail?.sections).toEqual([]);
   });
 });

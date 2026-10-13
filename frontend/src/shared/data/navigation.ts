@@ -32,7 +32,11 @@ export const sectionMenus: Record<string, { label: string; to: string }[]> = {
       { label: "活動總覽", to: "/activities/overview" },
       ...activityCategories.map((category) => ({
         label: category.label,
-        to: `/activities/overview?category=${encodeURIComponent(category.label)}`,
+        to: category.id === "other"
+          ? "/activities/other"
+          : category.featuredActivityId
+            ? `/activities/${category.featuredActivityId}`
+            : `/activities/overview?category=${encodeURIComponent(category.id)}`,
       })),
     ],
     "/team": teams.map((team) => ({ label: team.name, to: `/team/${team.key}` })),

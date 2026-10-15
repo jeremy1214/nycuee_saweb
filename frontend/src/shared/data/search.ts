@@ -14,6 +14,6 @@ export const searchItems = [
     ...(department.experiences ?? []).map((experience) => ({ label: experience.title, description: experience.content.join(" "), to: `/eesa/${slug}/experiences/${experience.id}` })),
   ]),
   { label: "系所新訊", description: "首頁的最新焦點與學習資訊", to: "/#news" },
-  ...resourceOrder.map((slug) => ({ label: resourceCategories[slug].tabLabel, description: resourceCategories[slug].intro, to: `/resources/${slug}` })),
+  ...resourceOrder.map((slug) => ({ label: resourceCategories[slug].tabLabel, description: resourceCategories[slug].searchDescription, to: `/resources/${slug}` })),
   { label: "電機行事曆", description: "近期系所與學術活動", to: "/#calendar" },
 ];

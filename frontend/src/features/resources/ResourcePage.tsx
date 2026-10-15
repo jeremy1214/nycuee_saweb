@@ -1,6 +1,6 @@
 import { Navigate, useParams } from "react-router-dom";
 import { PageContainer } from "../../shared/components/index";
-import { Checklist, InfoCardGrid, OfficialLinks, ProcessTimeline, ResourceOverview, ResourceTabs } from "./components/ResourceSections";
+import { Checklist, OfficialLinks, ProcessTimeline, ResourceTabs } from "./components/ResourceSections";
 import { isResourceSlug, resourceCategories } from "./data/resources";
 import "./resources.css";
 
@@ -14,11 +14,9 @@ export default function ResourcePage() {
       <PageContainer>
         <ResourceTabs active={slug} />
         <article id="resource-panel" role="tabpanel" aria-labelledby={`tab-${slug}`}>
-          <ResourceOverview category={category} />
-          <InfoCardGrid category={category} />
+          <OfficialLinks category={category} />
           <ProcessTimeline category={category} />
           <Checklist category={category} />
-          <OfficialLinks category={category} />
         </article>
       </PageContainer>
     </main>

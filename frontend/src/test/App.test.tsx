@@ -68,10 +68,11 @@ describe("NYCU EE website", () => {
 
     await user.click(screen.getByRole("button", { name: "搜尋網站" }));
     const input = screen.getByRole("searchbox", { name: "關鍵字" });
-    await user.type(input, "交換");
+    await user.type(input, "出國交換公告");
     await user.click(within(screen.getByRole("dialog")).getByRole("link", { name: /交換資訊/ }));
 
-    expect(await screen.findByRole("heading", { name: /交換申請拆成一條可管理的時間軸/ })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "官方資訊入口", level: 1 })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "交換資訊" })).toHaveAttribute("aria-selected", "true");
   });
 
   it("changes the calendar month", async () => {
@@ -161,7 +162,7 @@ describe("NYCU EE website", () => {
 
     const navigation = screen.getByRole("navigation", { name: "主要導覽" });
     await user.click(within(navigation).getByRole("link", { name: "學習資料" }));
-    expect(screen.getByRole("heading", { name: "把四年的選擇，整理成清楚的學習路徑" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "官方資訊入口", level: 1 })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "關於修課" })).toHaveAttribute("aria-selected", "true");
   });
 

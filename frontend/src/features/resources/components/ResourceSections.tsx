@@ -55,49 +55,15 @@ export function ResourceTabs({ active }: { active: ResourceSlug }) {
   );
 }
 
-export function ResourceOverview({ category }: { category: ResourceCategory }) {
-  return (
-    <header className="resource-hero">
-      <div className="resource-hero-copy">
-        <span className="eyebrow">{category.eyebrow}</span>
-        <h1>{category.title}</h1>
-        <p>{category.intro}</p>
-      </div>
-      <aside className="resource-focus">
-        <span>使用提醒</span>
-        <p>{category.focus}</p>
-      </aside>
-    </header>
-  );
-}
-
-export function InfoCardGrid({ category }: { category: ResourceCategory }) {
-  return (
-    <section className="resource-section" aria-labelledby="resource-key-points">
-      <SectionHeading eyebrow="KEY POINTS" title="先掌握這三件事" />
-      <div className="resource-card-grid" id="resource-key-points">
-        {category.cards.map((card) => (
-          <article className="resource-card" key={card.title}>
-            <span className="card-eyebrow">{card.eyebrow}</span>
-            <h2>{card.title}</h2>
-            <p>{card.description}</p>
-            <ul>{card.points.map((point) => <li key={point}>{point}</li>)}</ul>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 export function ProcessTimeline({ category }: { category: ResourceCategory }) {
   return (
-    <section className="resource-section process-section">
+    <section className="process-section" aria-label={category.stepsTitle}>
       <SectionHeading eyebrow="STEP BY STEP" title={category.stepsTitle} />
       <ol className="process-timeline">
         {category.steps.map((step, index) => (
           <li key={step.title}>
             <span className="step-number">{String(index + 1).padStart(2, "0")}</span>
-            <div><h2>{step.title}</h2><p>{step.description}</p></div>
+            <div><h3>{step.title}</h3><p>{step.description}</p></div>
           </li>
         ))}
       </ol>
@@ -107,8 +73,8 @@ export function ProcessTimeline({ category }: { category: ResourceCategory }) {
 
 export function Checklist({ category }: { category: ResourceCategory }) {
   return (
-    <section className="checklist-block">
-      <div><span className="eyebrow">READY TO GO</span><h2>{category.checklistTitle}</h2></div>
+    <section className="checklist-block" aria-labelledby="resource-checklist-title">
+      <div><span className="eyebrow">READY TO GO</span><h2 id="resource-checklist-title">{category.checklistTitle}</h2></div>
       <ul>{category.checklist.map((item) => <li key={item}><span aria-hidden="true">✓</span>{item}</li>)}</ul>
     </section>
   );
@@ -116,8 +82,11 @@ export function Checklist({ category }: { category: ResourceCategory }) {
 
 export function OfficialLinks({ category }: { category: ResourceCategory }) {
   return (
-    <section className="resource-section official-section">
-      <SectionHeading eyebrow="OFFICIAL SOURCES" title="官方資訊入口" action={<span className="verified-date">資料核對：2026.10.10</span>} />
+    <section className="official-section" aria-labelledby="official-links-title">
+      <header className="official-heading">
+        <span className="eyebrow">OFFICIAL SOURCES</span>
+        <h1 id="official-links-title">官方資訊入口</h1>
+      </header>
       <div className="official-links">
         {category.links.map((link) => (
           <ExternalLink href={link.href} key={link.label}>
@@ -125,7 +94,7 @@ export function OfficialLinks({ category }: { category: ResourceCategory }) {
           </ExternalLink>
         ))}
       </div>
-      <p className="official-note">本頁提供學習規劃摘要；資格、學分、名額及申請方式請以連結中的官方最新公告為準。</p>
+      <p className="official-note">詳細規定與申請方式請以官方最新公告為準。</p>
     </section>
   );
 }

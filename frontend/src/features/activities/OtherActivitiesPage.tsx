@@ -19,7 +19,6 @@ export default function OtherActivitiesPage() {
             <span className="eyebrow">MORE MOMENTS · EE LIFE</span>
             <h1>其他活動</h1>
           </div>
-          <p>從初次見面的破冰，到畢業前的合照。<br />翻開活動相簿，看看電機人的課堂之外。</p>
         </header>
 
         <section className="activity-album" aria-label="其他活動相簿" aria-roledescription="輪播" onKeyDown={album.onKeyDown}
@@ -45,7 +44,6 @@ export default function OtherActivitiesPage() {
                 >
                   <img src={item.cover.src} alt={item.cover.alt} style={{ objectFit: item.cover.fit ?? "cover", objectPosition: item.cover.objectPosition }} draggable={false} />
                   <span className="activity-album-card-caption">
-                    <span className="activity-album-card-number" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
                     <span><strong>{item.title}</strong><small>{item.summary}</small></span>
                   </span>
                 </button>
@@ -55,7 +53,6 @@ export default function OtherActivitiesPage() {
 
           <div className="activity-album-controls">
             <span className="activity-album-counter" aria-live={album.rotating ? "off" : "polite"} aria-atomic="true">
-              <strong>{String(album.current + 1).padStart(2, "0")}</strong><span>/ {String(otherActivities.length).padStart(2, "0")}</span>
               <span className="activity-album-current-name">{activity.title}</span>
             </span>
             <div className="activity-album-buttons">
@@ -67,11 +64,10 @@ export default function OtherActivitiesPage() {
               <button type="button" aria-label="下一個活動" onClick={() => album.select(album.current + 1)}>→</button>
             </div>
           </div>
-          <p className="activity-album-hint">選擇活動閱讀介紹，或左右滑動翻閱相簿。{album.playing && " 自動播放每 6 秒翻頁，閱讀時暫停。"}</p>
           <nav className="activity-album-picker" aria-label="選擇其他活動">
             {otherActivities.map((item, index) => (
               <button type="button" key={item.id} aria-pressed={index === album.current} aria-controls="other-activity-introduction" onClick={() => album.select(index)}>
-                <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>{item.title}
+                <span aria-hidden="true"></span>{item.title}
               </button>
             ))}
           </nav>

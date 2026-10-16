@@ -221,75 +221,7 @@
       }
     ]
   },
-  {
-    "id": "drama",
-    "title": "抓馬盃",
-    "summary": "從劇本到舞台，把創意與合作化成一場演出。",
-    "intro": [
-      "抓馬盃是讓大一新生投入戲劇創作與演出的競賽活動，也是許多人第一次籌辦演出或登上舞台的契機。電機系學長姐協助學弟妹準備，參與者可以投入劇本創作、表演、燈光音效或美術宣傳。",
-      "從排練到正式演出，大家在合作中認識同屆夥伴、交流創意，並探索表演與舞台設計的興趣，一起感受站上舞台的成就感。"
-    ],
-    "cover": {
-      "src": "/activities/other/drama-intro-02.webp",
-      "alt": "抓馬盃演員在燈光照亮的舞台上演出"
-    },
-    "photos": [
-      {
-        "src": "/activities/other/drama-intro-01.webp",
-        "alt": "抓馬盃團隊在室內合照"
-      },
-      {
-        "src": "/activities/other/drama-intro-02.webp",
-        "alt": "抓馬盃演員在燈光照亮的舞台上演出"
-      }
-    ],
-    "groups": [
-      {
-        "id": "actors",
-        "title": "演員組",
-        "paragraphs": [
-          "負責舞台表演、角色詮釋與台詞練習，展現戲劇張力與舞台魅力。"
-        ],
-        "image": {
-          "src": "/activities/other/drama-actors.webp",
-          "alt": "抓馬盃演員在舞台上排成一列演出"
-        }
-      },
-      {
-        "id": "design",
-        "title": "美宣組",
-        "paragraphs": [
-          "設計主視覺、宣傳文案、道具與妝造，打造舞台整體風格。"
-        ],
-        "image": {
-          "src": "/activities/other/drama-design.webp",
-          "alt": "抓馬盃宣傳展示擺放海報與道具"
-        }
-      },
-      {
-        "id": "writing",
-        "title": "編劇組",
-        "paragraphs": [
-          "構思劇情、撰寫劇本並協調故事方向，掌握全劇節奏與主題精神。"
-        ],
-        "image": {
-          "src": "/activities/other/drama-writing.webp",
-          "alt": "抓馬盃同學與手作欄杆道具合照"
-        }
-      },
-      {
-        "id": "stage",
-        "title": "場控組",
-        "paragraphs": [
-          "負責燈光、音效與後台運作，確保演出流程流暢。"
-        ],
-        "image": {
-          "src": "/activities/other/drama-stage.webp",
-          "alt": "抓馬盃場控組同學與舞台道具在戶外合照"
-        }
-      }
-    ]
-  },
+
   {
     "id": "graduation",
     "title": "小畢典",

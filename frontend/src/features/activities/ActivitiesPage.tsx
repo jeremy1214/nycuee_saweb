@@ -40,7 +40,6 @@ export default function ActivitiesPage() {
               <span>{selectedActivity.location}</span>
             </div>
             <p>{selectedActivity.details}</p>
-            <p className="activity-dialog-note">此活動為網站版面示意，正式時間、地點與報名方式請以系所公告為準。</p>
           </div>
         )}
       </Modal>

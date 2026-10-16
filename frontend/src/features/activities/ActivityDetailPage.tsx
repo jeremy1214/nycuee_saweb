@@ -33,7 +33,6 @@ export default function ActivityDetailPage() {
               <div><dt>日期</dt><dd><time dateTime={activity.date}>{activity.date}</time></dd></div>
               <div><dt>地點</dt><dd>{activity.location}</dd></div>
             </dl>
-            <p className="activity-detail-draft-note"><span aria-hidden="true">●</span> 本頁為第一版內容草稿，正式時間、地點與報名方式請以系學會公告為準。</p>
           </article>
         </PageContainer>
       </main>
@@ -92,10 +91,6 @@ export default function ActivityDetailPage() {
               <span className="activity-detail-label">活動介紹</span>
               <h2 id="activity-intro-title">從活動認識電機人的另一種日常</h2>
               {detail.intro.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
-              <p className="activity-detail-draft-note">
-                <span aria-hidden="true">●</span>
-                本頁為第一版內容草稿，正式時間、地點、流程與照片說明請以系學會公告為準。
-              </p>
             </div>
           </section>
         )}

@@ -1,0 +1,59 @@
+{
+  "$schema": "../resource.schema.json",
+  "id": "graduate",
+  "status": "published",
+  "links": [
+    {
+      "label": "電機工程研究所修業規章",
+      "description": "查看不同學年度的碩博士班修業規定",
+      "href": "https://iece.dee.nycu.edu.tw/pages.php?locale=tw&pa=regulation"
+    },
+    {
+      "label": "電機系招生消息",
+      "description": "研究所招生與相關說明公告",
+      "href": "https://dee.nycu.edu.tw/news.php?locale=tw"
+    },
+    {
+      "label": "陽明交大招生資訊",
+      "description": "正式招生簡章、報名與錄取資訊",
+      "href": "https://exam.nycu.edu.tw/"
+    }
+  ],
+  "sections": [
+    {
+      "id": "preparation",
+      "type": "process",
+      "title": "升學準備順序",
+      "items": [
+        {
+          "title": "探索方向",
+          "description": "修讀基礎與特色領域課程，透過專題或講座觀察自己的興趣。"
+        },
+        {
+          "title": "蒐集資訊",
+          "description": "比較班組、教師、實驗室、修業規定與歷年招生方式。"
+        },
+        {
+          "title": "準備申請",
+          "description": "依管道整理成績、履歷、讀書研究計畫、推薦信或考科。"
+        },
+        {
+          "title": "評估選擇",
+          "description": "綜合研究適配、指導方式、資源與生涯方向做最後決定。"
+        }
+      ]
+    },
+    {
+      "id": "checklist",
+      "type": "checklist",
+      "title": "申請資料整理",
+      "items": [
+        "歷年成績與核心課程表現",
+        "履歷與讀書／研究計畫",
+        "專題、作品或研究成果",
+        "推薦信與教授聯繫紀錄",
+        "招生簡章與各項期限"
+      ]
+    }
+  ]
+}

@@ -1,4 +1,5 @@
-export type ResourceSlug = "courses" | "scholarships" | "exchange" | "graduate";
+// IDs are validated against the published JSON content by isResourceSlug.
+export type ResourceSlug = string;
 
 export interface OfficialLink {
   label: string;
@@ -6,13 +7,27 @@ export interface OfficialLink {
   href: string;
 }
 
+interface ResourceSectionBase {
+  id: string;
+  title: string;
+}
+
+export interface ProcessSection extends ResourceSectionBase {
+  type: "process";
+  items: { title: string; description: string }[];
+}
+
+export interface ChecklistSection extends ResourceSectionBase {
+  type: "checklist";
+  items: string[];
+}
+
+export type ResourceSection = ProcessSection | ChecklistSection;
+
 export interface ResourceCategory {
   slug: ResourceSlug;
   tabLabel: string;
   searchDescription: string;
-  stepsTitle: string;
-  steps: { title: string; description: string }[];
-  checklistTitle: string;
-  checklist: string[];
   links: OfficialLink[];
+  sections: ResourceSection[];
 }

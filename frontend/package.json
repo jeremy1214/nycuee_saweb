@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "test": "vitest run",
     "test:watch": "vitest",
-    "validate:content": "vitest run src/features/activities/data/activities.test.ts src/features/activities/data/otherActivities.test.ts"
+    "validate:content": "vitest run src/features/activities/data/activities.test.ts src/features/activities/data/otherActivities.test.ts src/features/resources/data/resourceRepository.test.ts",
+    "prebuild": "vitest run src/features/resources/data/resourceRepository.test.ts --maxWorkers=1"
   },
   "dependencies": {
     "react": "^19.2.0",

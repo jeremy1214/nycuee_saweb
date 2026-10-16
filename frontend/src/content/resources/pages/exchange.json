@@ -1,0 +1,59 @@
+{
+  "$schema": "../resource.schema.json",
+  "id": "exchange",
+  "status": "published",
+  "links": [
+    {
+      "label": "國際事務處",
+      "description": "最新出國交換公告、簡章與名額資訊",
+      "href": "https://www.nycu.edu.tw/oia/ch/index"
+    },
+    {
+      "label": "出國交換公告",
+      "description": "依梯次查看校內甄選與申請說明",
+      "href": "https://www.nycu.edu.tw/oia/ch/app/data/list?id=715&module=nycu0006"
+    },
+    {
+      "label": "出國獎學金",
+      "description": "交換、雙聯及海外學習補助資訊",
+      "href": "https://www.nycu.edu.tw/oia/ch/app/data/list?id=716&module=nycu0007"
+    }
+  ],
+  "sections": [
+    {
+      "id": "preparation",
+      "type": "process",
+      "title": "交換準備時間軸",
+      "items": [
+        {
+          "title": "提前 12–18 個月",
+          "description": "探索國家與學校，準備語言檢定並檢視成績條件。"
+        },
+        {
+          "title": "校內甄選期間",
+          "description": "閱讀當期簡章、名額表及 fact sheet，完成志願與申請文件。"
+        },
+        {
+          "title": "取得提名後",
+          "description": "申請姐妹校、住宿與獎學金，同步處理學分認定。"
+        },
+        {
+          "title": "出國前與返國後",
+          "description": "完成簽證保險與行前程序，返國後繳交成績及成果資料。"
+        }
+      ]
+    },
+    {
+      "id": "checklist",
+      "type": "checklist",
+      "title": "交換申請檢查",
+      "items": [
+        "歷年成績單與排名資料",
+        "有效語言能力證明",
+        "自傳與研修計畫",
+        "志願校課程及學分對照",
+        "財務、住宿與簽證規劃"
+      ]
+    }
+  ]
+}

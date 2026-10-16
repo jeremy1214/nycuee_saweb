@@ -1,0 +1,59 @@
+{
+  "$schema": "../resource.schema.json",
+  "id": "scholarships",
+  "status": "published",
+  "links": [
+    {
+      "label": "電機系最新消息",
+      "description": "查看系級獎學金與校外獎助轉知",
+      "href": "https://dee.nycu.edu.tw/news.php?locale=tw"
+    },
+    {
+      "label": "國際事務處出國獎學金",
+      "description": "交換、雙聯、實習與短期課程相關補助",
+      "href": "https://www.nycu.edu.tw/oia/ch/app/data/list?id=716&module=nycu0007"
+    },
+    {
+      "label": "學生事務處",
+      "description": "就學支持、生活輔導與校級獎助資訊",
+      "href": "https://osa.nycu.edu.tw/"
+    }
+  ],
+  "sections": [
+    {
+      "id": "preparation",
+      "type": "process",
+      "title": "申請準備節奏",
+      "items": [
+        {
+          "title": "每月查看公告",
+          "description": "固定查看系所、學務處與國際事務處，避免只依賴轉傳訊息。"
+        },
+        {
+          "title": "快速判讀資格",
+          "description": "先核對身分、年級、成績、經濟條件與是否可重複領取。"
+        },
+        {
+          "title": "建立共用資料包",
+          "description": "預先準備成績單、在學證明、自傳與常用佐證文件。"
+        },
+        {
+          "title": "送件後留存",
+          "description": "保留申請表、附件版本與收件紀錄，並追蹤結果與後續義務。"
+        }
+      ]
+    },
+    {
+      "id": "checklist",
+      "type": "checklist",
+      "title": "常見申請文件",
+      "items": [
+        "申請表與個人基本資料",
+        "歷年成績單與在學證明",
+        "自傳、讀書或研究計畫",
+        "推薦信或導師簽章",
+        "清寒、語言或成果證明"
+      ]
+    }
+  ]
+}

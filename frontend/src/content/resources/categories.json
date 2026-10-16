@@ -1,0 +1,26 @@
+{
+  "$schema": "./categories.schema.json",
+  "defaultCategory": "courses",
+  "categories": [
+    {
+      "id": "courses",
+      "label": "關於修課",
+      "searchDescription": "修課規定、選課系統與課程查詢官方連結，搭配選課流程與檢查清單。"
+    },
+    {
+      "id": "scholarships",
+      "label": "獎助學金",
+      "searchDescription": "系級、校級與出國獎助學金官方連結，搭配申請流程與文件清單。"
+    },
+    {
+      "id": "exchange",
+      "label": "交換資訊",
+      "searchDescription": "出國交換公告與獎學金官方連結，搭配交換準備流程與申請清單。"
+    },
+    {
+      "id": "graduate",
+      "label": "研究所",
+      "searchDescription": "研究所修業規章與招生官方連結，搭配升學準備流程與申請資料清單。"
+    }
+  ]
+}

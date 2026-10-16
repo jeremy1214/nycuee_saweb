@@ -1,8 +1,8 @@
-import { useEffect, useRef, type KeyboardEvent } from "react";
+import { useEffect, useRef, type CSSProperties, type KeyboardEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { resourceCategories, resourceOrder } from "../data/resources";
-import type { ResourceCategory, ResourceSlug } from "../resourceTypes";
-import { ExternalLink, SectionHeading } from "../../../shared/components/index";
+import type { ChecklistSection, ProcessSection, ResourceCategory, ResourceSlug } from "../resourceTypes";
+import { ExternalLink } from "../../../shared/components/index";
 
 export function ResourceTabs({ active }: { active: ResourceSlug }) {
   const navigate = useNavigate();
@@ -55,13 +55,29 @@ export function ResourceTabs({ active }: { active: ResourceSlug }) {
   );
 }
 
-export function ProcessTimeline({ category }: { category: ResourceCategory }) {
+export function ResourceContentSections({ category }: { category: ResourceCategory }) {
+  return category.sections.map((section) => {
+    const headingId = `resource-${category.slug}-${section.id}-title`;
+    return section.type === "process"
+      ? <ProcessTimeline key={section.id} section={section} headingId={headingId} />
+      : <Checklist key={section.id} section={section} headingId={headingId} />;
+  });
+}
+
+function ProcessTimeline({ section, headingId }: { section: ProcessSection; headingId: string }) {
+  const columns = {
+    "--process-columns": Math.min(4, section.items.length),
+    "--process-tablet-columns": Math.min(2, section.items.length),
+  } as CSSProperties;
+
   return (
-    <section className="process-section" aria-label={category.stepsTitle}>
-      <SectionHeading eyebrow="STEP BY STEP" title={category.stepsTitle} />
-      <ol className="process-timeline">
-        {category.steps.map((step, index) => (
-          <li key={step.title}>
+    <section className="process-section" aria-labelledby={headingId}>
+      <header className="section-heading">
+        <div><span className="eyebrow">STEP BY STEP</span><h2 id={headingId}>{section.title}</h2></div>
+      </header>
+      <ol className="process-timeline" style={columns}>
+        {section.items.map((step, index) => (
+          <li key={index}>
             <span className="step-number">{String(index + 1).padStart(2, "0")}</span>
             <div><h3>{step.title}</h3><p>{step.description}</p></div>
           </li>
@@ -71,11 +87,11 @@ export function ProcessTimeline({ category }: { category: ResourceCategory }) {
   );
 }
 
-export function Checklist({ category }: { category: ResourceCategory }) {
+function Checklist({ section, headingId }: { section: ChecklistSection; headingId: string }) {
   return (
-    <section className="checklist-block" aria-labelledby="resource-checklist-title">
-      <div><span className="eyebrow">READY TO GO</span><h2 id="resource-checklist-title">{category.checklistTitle}</h2></div>
-      <ul>{category.checklist.map((item) => <li key={item}><span aria-hidden="true">✓</span>{item}</li>)}</ul>
+    <section className="checklist-block" aria-labelledby={headingId}>
+      <div><span className="eyebrow">READY TO GO</span><h2 id={headingId}>{section.title}</h2></div>
+      <ul>{section.items.map((item, index) => <li key={index}><span aria-hidden="true">✓</span>{item}</li>)}</ul>
     </section>
   );
 }
@@ -88,8 +104,8 @@ export function OfficialLinks({ category }: { category: ResourceCategory }) {
         <h1 id="official-links-title">官方資訊入口</h1>
       </header>
       <div className="official-links">
-        {category.links.map((link) => (
-          <ExternalLink href={link.href} key={link.label}>
+        {category.links.map((link, index) => (
+          <ExternalLink href={link.href} key={`${link.href}-${index}`}>
             <span><strong>{link.label}</strong><small>{link.description}</small></span>
           </ExternalLink>
         ))}

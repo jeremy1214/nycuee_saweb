@@ -2,6 +2,7 @@ import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import App from "../App";
+import { defaultResourceSlug, resourceCategories } from "../features/resources/data/resources";
 
 function renderApp(route = "/") {
   return render(
@@ -163,7 +164,7 @@ describe("NYCU EE website", () => {
     const navigation = screen.getByRole("navigation", { name: "主要導覽" });
     await user.click(within(navigation).getByRole("link", { name: "學習資料" }));
     expect(screen.getByRole("heading", { name: "官方資訊入口", level: 1 })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "關於修課" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tab", { name: resourceCategories[defaultResourceSlug].tabLabel })).toHaveAttribute("aria-selected", "true");
   });
 
   it("keeps the correct header item active on nested section pages", () => {

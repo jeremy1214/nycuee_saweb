@@ -1,3 +1,3 @@
 export { default } from "./ResourcePage";
-export { resourceCategories, resourceOrder, isResourceSlug } from "./data/resources";
-export type { OfficialLink, ResourceCategory, ResourceSlug } from "./resourceTypes";
+export { resourceCategories, resourceOrder, defaultResourceSlug, isResourceSlug } from "./data/resources";
+export type { OfficialLink, ResourceCategory, ResourceSlug, ResourceSection, ProcessSection, ChecklistSection } from "./resourceTypes";

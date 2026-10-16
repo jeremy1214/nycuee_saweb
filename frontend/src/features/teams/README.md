@@ -17,7 +17,7 @@ features/teams/
 └─ index.ts                            # 模組出口
 ```
 
-內容放在 `src/content/teams/teams/<id>.json`，一支隊伍一個檔案。`id` 控制 `/team/<id>` 網址；`order` 控制入口、輪播及上一支／下一支順序。其餘 `name`、`intro`、`schedule`、`activities`、`contact` 與圖片欄位沿用原專案資料。
+內容放在 `src/content/teams/<id>.json`，一支隊伍一個檔案。`id` 控制 `/team/<id>` 網址；`order` 控制入口、輪播及上一支／下一支順序。其餘 `name`、`intro`、`schedule`、`activities`、`contact` 與圖片欄位沿用原專案資料。
 照片位置維持 `public/team/`，JSON 的圖片路徑仍相對於該目錄。
 
 輪播互動使用全站 `shared/hooks/useCarousel.ts`，與首頁共用自動播放、暫停、鍵盤、觸控及減少動態偏好；不同頁面的照片與版面各自管理。

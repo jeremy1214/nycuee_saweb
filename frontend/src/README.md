@@ -16,7 +16,7 @@ src/
 ├─ content/                    # 可單獨編輯的內容 JSON
 │  ├─ activities/              # 活動分類與每筆活動
 │  ├─ eesa/                    # 系學會總覽及每個部門
-│  └─ teams/teams/             # 每支系隊
+│  └─ teams/                   # 每支系隊
 ├─ features/
 │  ├─ home/                    # 首頁入口、首頁區塊、資料、型別、日曆匯出與樣式
 │  ├─ contact/                 # 聯絡頁與樣式

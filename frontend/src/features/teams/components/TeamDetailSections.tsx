@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { PageContainer, SectionHeading, Breadcrumb } from "../../../shared/components/index";
 import { getTeamImage, teams } from "../data/teams";
 import type { TeamData, ScheduleBlock } from "../teamTypes";
@@ -11,7 +11,13 @@ function ScheduleContent({ block }: { block: ScheduleBlock }) {
 }
 
 export function TeamDetails({ team, teamKey }: { team: TeamData; teamKey: string }) {
-  const [activityId, setActivityId] = useState(team.activities[0]?.id ?? null);
+  const [searchParams] = useSearchParams();
+  const requestedActivity = searchParams.get("activity");
+  const [activityId, setActivityId] = useState(() =>
+    team.activities.find((activity) => activity.id === requestedActivity)?.id ?? team.activities[0]?.id ?? null);
+  useEffect(() => {
+    setActivityId(team.activities.find((activity) => activity.id === requestedActivity)?.id ?? team.activities[0]?.id ?? null);
+  }, [team, requestedActivity]);
   const activeActivity = team.activities.find((activity) => activity.id === activityId);
   const currentIndex = teams.findIndex((entry) => entry.key === teamKey);
   const previous = teams[currentIndex - 1];
@@ -82,4 +88,3 @@ export function TeamDetails({ team, teamKey }: { team: TeamData; teamKey: string
     </main>
   );
 }
-

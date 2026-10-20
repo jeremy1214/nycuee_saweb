@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Breadcrumb, PageContainer } from "../../shared/components/index";
 import { otherActivities } from "./data/otherActivities";
 import { useActivityAlbum } from "./hooks/useActivityAlbum";
@@ -7,7 +7,9 @@ import "./activities.css";
 import "./otherActivities.css";
 
 export default function OtherActivitiesPage() {
-  const album = useActivityAlbum(otherActivities.length);
+  const [searchParams] = useSearchParams();
+  const requestedIndex = otherActivities.findIndex((item) => item.id === searchParams.get("activity"));
+  const album = useActivityAlbum(otherActivities.length, Math.max(0, requestedIndex));
   const activity = otherActivities[album.current];
 
   return (

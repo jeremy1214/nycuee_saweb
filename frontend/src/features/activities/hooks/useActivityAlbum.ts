@@ -1,14 +1,19 @@
 import { useEffect, useRef, useState, type FocusEvent, type KeyboardEvent, type TouchEvent } from "react";
 
-export function useActivityAlbum(count: number) {
-  const [current, setCurrent] = useState(0);
-  const [playing, setPlaying] = useState(true);
+export function useActivityAlbum(count: number, initialIndex = 0) {
+  const [current, setCurrent] = useState(initialIndex);
+  const [playing, setPlaying] = useState(initialIndex === 0);
   const [hovered, setHovered] = useState(false);
   const [reading, setReading] = useState(false);
   const [hidden, setHidden] = useState(() => document.hidden);
   const [reducedMotion, setReducedMotion] = useState(() => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
   const rotating = playing && !hovered && !reading && !hidden && !reducedMotion && count > 1;
+
+  useEffect(() => {
+    setCurrent(initialIndex);
+    if (initialIndex !== 0) setPlaying(false);
+  }, [initialIndex]);
 
   useEffect(() => {
     const media = window.matchMedia?.("(prefers-reduced-motion: reduce)");

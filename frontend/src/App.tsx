@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Navigate, Route, Routes, useParams } from "react-router-dom";
 import AppShell from "./shared/components/layout/AppShell";
 import HomePage from "./features/home/index";
@@ -8,6 +9,8 @@ import TeamPage, { TeamDetailPage } from "./features/teams/index";
 import EesaLayout, { EesaPage, DepartmentPage, DepartmentActivitiesPage, DepartmentActivityPage, DepartmentSkillsPage, DepartmentExperiencePage } from "./features/eesa/index";
 import NotFoundPage from "./shared/pages/NotFoundPage";
 
+const AdminRoutes = lazy(() => import("./features/admin/AdminRoutes"));
+
 function LegacyEesaRedirect() {
   const { "*": path = "" } = useParams();
   return <Navigate to={path === "eesa-intro" || !path ? "/eesa" : `/eesa/${path}`} replace />;
@@ -16,6 +19,7 @@ function LegacyEesaRedirect() {
 export default function App() {
   return (
     <Routes>
+      <Route path="admin/*" element={<Suspense fallback={<p role="status">載入後台中…</p>}><AdminRoutes /></Suspense>} />
       <Route element={<AppShell />}>
         <Route index element={<HomePage />} />
         <Route path="eesa" element={<EesaLayout />}>

@@ -47,7 +47,7 @@ export function HomeHero() {
           </span>
         </h1>
         <p>從一個想法，到改變世界的技術。<br />在交大電機，探索、實作，讓創新發生。</p>
-        <Link className="home-button" to="/eesa">探索交大電機 <span aria-hidden="true">↗</span></Link>
+        <Link className="home-button" to="https://dee.nycu.edu.tw/">探索交大電機 <span aria-hidden="true">↗</span></Link>
       </div>
       <div className="home-waves" aria-hidden="true">
         <div className="home-wave-layer wave-one"><svg viewBox="0 0 1440 176" preserveAspectRatio="none">

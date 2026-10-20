@@ -101,5 +101,5 @@ export const searchItems: SearchItem[] = [
     return item(category.tabLabel, `/resources/${slug}`, category.searchDescription,
       "官方資訊入口 詳細規定與申請方式請以官方最新公告為準。", category.links, category.sections);
   }),
-  item("電機行事曆", "/", "首頁的系所與學術活動", calendarEvents),
+  item("電機行事曆", "/", "首頁的系上活動與日期", calendarEvents),
 ];

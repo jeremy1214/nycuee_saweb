@@ -1,11 +1,15 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { activityCategories } from "../../activities/data/activities";
+import { todayInTaiwan } from "../../activities/data/activityDates";
 import { SectionHeading } from "../../../shared/components/index";
 import type { CalendarEvent } from "../homeTypes";
 import { calendarEvents } from "../data/home";
 import CalendarImport from "./CalendarImport";
 
 export function EventCalendar({ onEvent }: { onEvent: (event: CalendarEvent) => void }) {
-  const today = new Date(2026, 9, 10);
+  const todayKey = todayInTaiwan();
+  const today = new Date(`${todayKey}T00:00:00`);
   const [viewDate, setViewDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
   const cells = useMemo(() => buildCalendarCells(viewDate), [viewDate]);
   const formatter = new Intl.DateTimeFormat("zh-TW", { year: "numeric", month: "long" });
@@ -15,10 +19,9 @@ export function EventCalendar({ onEvent }: { onEvent: (event: CalendarEvent) => 
   }
 
   return (
-    <section className="calendar-section" id="calendar" data-home-reveal>
-      <SectionHeading eyebrow="UPCOMING EVENTS" title="電機行事曆" action={
+    <section className="calendar-section" id="calendar" aria-label="行事曆" data-home-reveal>
+      <SectionHeading eyebrow="UPCOMING EVENTS" title="行事曆" action={
         <div className="calendar-header-actions">
-          <span className="calendar-note">示意活動 · 正式資訊請見系網</span>
           <CalendarImport events={calendarEvents} />
         </div>
       } />
@@ -30,16 +33,20 @@ export function EventCalendar({ onEvent }: { onEvent: (event: CalendarEvent) => 
             <button type="button" onClick={() => changeMonth(1)} aria-label="下一個月">›</button>
             <button className="today-button" type="button" onClick={() => setViewDate(new Date(today.getFullYear(), today.getMonth(), 1))}>本月</button>
           </div>
-          <div className="calendar-legend"><span>系所活動</span><span>學術交流</span></div>
+          <div className="calendar-legend">{activityCategories.map((category) => <span className={`calendar-category-${category.id}`} key={category.id}>{category.label}</span>)}</div>
         </div>
         <div className="weekdays" aria-hidden="true">{["日", "一", "二", "三", "四", "五", "六"].map((day) => <span key={day}>{day}</span>)}</div>
         <div className="calendar-days">
           {cells.map(({ date, key, outside }) => {
-            const event = calendarEvents.find((item) => item.date === key);
+            const events = calendarEvents.filter((item) => item.date === key);
             return (
-              <div className={`calendar-day ${outside ? "is-outside" : ""} ${key === "2026-10-10" ? "is-today" : ""}`} key={key}>
-                <span className="day-number">{date.getDate()}</span>
-                {event && <button className={`calendar-event ${event.type}`} type="button" onClick={() => onEvent(event)}>{event.title}</button>}
+              <div className={`calendar-day ${outside ? "is-outside" : ""} ${key === todayKey ? "is-today" : ""}`} key={key}>
+                <time className="day-number" dateTime={key} aria-current={key === todayKey ? "date" : undefined}>{date.getDate()}</time>
+                {events.map((event) => event.detail ? (
+                  <Link className={`calendar-event calendar-category-${event.categoryId}`} key={event.id} to={`/activities/${event.id}`} title={`${event.category}｜${event.title}`} aria-label={`${event.title}，查看活動詳細頁`}>{event.title}</Link>
+                ) : (
+                  <button className={`calendar-event calendar-category-${event.categoryId}`} key={event.id} type="button" onClick={() => onEvent(event)} title={`${event.category}｜${event.title}`} aria-label={`${event.title}，查看活動詳情`}>{event.title}</button>
+                ))}
               </div>
             );
           })}

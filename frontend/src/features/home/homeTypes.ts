@@ -18,8 +18,4 @@ export interface ExploreContent {
   slides: Slide[];
 }
 
-export interface CalendarEvent {
-  date: string;
-  title: string;
-  type: "department" | "academic";
-}
+export type CalendarEvent = import("../activities/data/activityDates").DatedActivity;

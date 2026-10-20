@@ -22,13 +22,8 @@ describe("NYCU EE website", () => {
     await user.click(screen.getByRole("link", { name: `${activity.title}，查看活動詳細頁` }));
     expect(screen.getByRole("heading", { level: 1, name: activity.title })).toBeInTheDocument();
     expect(screen.getByRole("region", { name: `${activity.title}活動照片` })).toBeInTheDocument();
-    const content = activities.find((item) => item.id === activity.id)!;
-    if (content.date) {
-      expect(screen.getByRole("time")).toHaveAttribute("datetime", content.date);
-    } else {
-      expect(screen.queryByRole("time")).not.toBeInTheDocument();
-    }
-    if (!content.date && !content.location) expect(screen.queryByLabelText("活動資訊")).not.toBeInTheDocument();
+    expect(screen.queryByRole("time")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("活動資訊")).not.toBeInTheDocument();
     if (activity.id === "freshman-camp") {
       for (const group of activity.groups!) {
         expect(screen.getByRole("heading", { level: 2, name: group.title })).toBeInTheDocument();
@@ -108,12 +103,34 @@ describe("NYCU EE website", () => {
   });
 
   it("changes the calendar month", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-10-19T16:00:00.000Z"));
     const user = userEvent.setup();
-    renderApp();
+    try {
+      renderApp();
+      expect(screen.getByText("2026年10月")).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: "下一個月" }));
+      expect(screen.getByText("2026年11月")).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: "本月" }));
+      expect(screen.getByText("2026年10月")).toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 
-    expect(screen.getByText("2026年10月")).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "下一個月" }));
-    expect(screen.getByText("2026年11月")).toBeInTheDocument();
+  it("opens an activity from the calendar", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-10-19T16:00:00.000Z"));
+    const user = userEvent.setup();
+    try {
+      renderApp();
+      const calendar = screen.getByRole("region", { name: "行事曆" });
+      await user.click(within(calendar).getByRole("link", { name: "新生晚會，查看活動詳細頁" }));
+      expect(screen.getByRole("heading", { level: 1, name: "新生晚會" })).toBeInTheDocument();
+      expect(screen.queryByRole("time")).not.toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("shows the four student link groups in the requested order", () => {
@@ -234,12 +251,12 @@ describe("NYCU EE website", () => {
     expect(screen.getByRole("heading", { name: "活動總覽" })).toBeInTheDocument();
   });
 
-  it("opens and closes a placeholder modal", async () => {
+  it("opens and closes the calendar import modal", async () => {
     const user = userEvent.setup();
     renderApp();
 
-    await user.click(screen.getByRole("button", { name: /Sign in/ }));
-    expect(screen.getByRole("dialog", { name: "系統登入" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "匯入 Google 日曆" }));
+    expect(screen.getByRole("dialog", { name: "匯入 Google 日曆" })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "關閉視窗" }));
     await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
   });

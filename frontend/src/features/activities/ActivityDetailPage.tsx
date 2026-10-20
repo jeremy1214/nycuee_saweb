@@ -18,12 +18,6 @@ export default function ActivityDetailPage() {
   const breadcrumbItems = activity.categoryId === "other"
     ? [{ label: "系上活動", to: "/activities/overview" }, { label: "其他活動", to: "/activities/other" }, { label: activity.title }]
     : [{ label: "系上活動", to: "/activities/overview" }, { label: activity.category }];
-  const activityMeta = (activity.date || activity.location) && (
-    <dl className="activity-detail-meta" aria-label="活動資訊">
-      {activity.date && <div><dt>日期</dt><dd><time dateTime={activity.date}>{activity.date}</time></dd></div>}
-      {activity.location && <div><dt>地點</dt><dd>{activity.location}</dd></div>}
-    </dl>
-  );
 
   if (!activity.detail) {
     return (
@@ -40,7 +34,6 @@ export default function ActivityDetailPage() {
             <h2>{activity.title}</h2>
             <p>{activity.summary}</p>
             <p>{activity.details}</p>
-            {activityMeta}
           </article>
         </PageContainer>
       </main>
@@ -81,7 +74,6 @@ export default function ActivityDetailPage() {
           <span className="eyebrow">{detail.eyebrow}</span>
           <h1>{activityTitle}</h1>
           <p>{activity.categoryId === "other" ? activity.summary : activity.title}</p>
-          {activityMeta}
         </header>
 
         {!sharedIntro && tabNavigation}

@@ -33,8 +33,8 @@ export default function CalendarImport({ events }: { events: CalendarEvent[] }) 
       </div>
       <p className={styles.downloadStatus} role="status">{downloadStarted ? "已開始下載。接著開啟 Google 匯入頁面，選取下載的檔案。" : ""}</p>
       <div className={styles.note}>
-        <p>批次匯入請使用電腦版 Google 日曆。手機可點選月曆中的活動，再按「加入 Google 日曆」。</p>
-        <p>目前活動為示意資料，匯入後會顯示為全天活動。這次匯入不會自動同步後續更新。</p>
+        <p>批次匯入請使用電腦版 Google 日曆。</p>
+        <p>活動取自系上活動，目前依日期匯入為全天活動。匯入後不會自動同步後續更新，正式時間與報名方式請以系所公告為準。</p>
         <a href="https://support.google.com/calendar/answer/37118?hl=zh-Hant" target="_blank" rel="noopener noreferrer">Google 官方匯入說明 ↗</a>
       </div>
     </Modal>

@@ -1,8 +1,13 @@
 import type { CalendarEvent } from "../homeTypes";
 
 export const googleCalendarImportUrl = "https://calendar.google.com/calendar/u/0/r/settings/export";
-const eventDescription = "交大電機行事曆｜此活動為網站示意內容，正式活動時間與報名方式請以系所公告為準。";
-const categories = { department: "系所活動", academic: "學術交流" };
+function activityUrl(event: CalendarEvent) {
+  return new URL(`#/activities/${event.id}`, window.location.href).href;
+}
+
+function eventDescription(event: CalendarEvent) {
+  return `${event.category}\n${event.details}\n\n活動詳情：${activityUrl(event)}`;
+}
 
 function dateRange(date: string) {
   const [year, month, day] = date.split("-").map(Number);
@@ -16,7 +21,8 @@ export function googleCalendarEventUrl(event: CalendarEvent) {
     action: "TEMPLATE",
     text: event.title,
     dates: `${dates.start}/${dates.end}`,
-    details: `${categories[event.type]}\n${eventDescription}`,
+    details: eventDescription(event),
+    ...(event.location ? { location: event.location } : {}),
     ctz: "Asia/Taipei",
   });
   return `https://calendar.google.com/calendar/r/eventedit?${params}`;
@@ -44,11 +50,7 @@ function foldLine(line: string) {
 }
 
 function eventUid(event: CalendarEvent) {
-  let hash = 2166136261;
-  for (const character of `${event.date}|${event.title}|${event.type}`) {
-    hash = Math.imul(hash ^ character.codePointAt(0)!, 16777619);
-  }
-  return `${event.date}-${(hash >>> 0).toString(16)}@nycuee-saweb.local`;
+  return `${event.id}@nycuee-saweb.local`;
 }
 
 export function createCalendarFile(events: CalendarEvent[]) {
@@ -69,8 +71,10 @@ export function createCalendarFile(events: CalendarEvent[]) {
         `DTSTART;VALUE=DATE:${dates.start}`,
         `DTEND;VALUE=DATE:${dates.end}`,
         `SUMMARY:${escapeText(event.title)}`,
-        `DESCRIPTION:${escapeText(eventDescription)}`,
-        `CATEGORIES:${escapeText(categories[event.type])}`,
+        `DESCRIPTION:${escapeText(eventDescription(event))}`,
+        `CATEGORIES:${escapeText(event.category)}`,
+        ...(event.location ? [`LOCATION:${escapeText(event.location)}`] : []),
+        `URL:${activityUrl(event)}`,
         "TRANSP:TRANSPARENT",
         "END:VEVENT",
       ];

@@ -131,21 +131,25 @@
 
 .calendar { overflow: hidden; border: 1px solid var(--line); border-radius: 4px; background: #fff; }
 
-.calendar-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid var(--line); }
+.calendar-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 20px 24px; border-bottom: 1px solid var(--line); }
 
-.month-controls { display: flex; align-items: center; gap: 15px; }
+.month-controls { display: flex; flex-shrink: 0; align-items: center; gap: 15px; }
 
 .month-controls button { width: 29px; height: 29px; border: 1px solid var(--line); border-radius: 3px; background: #fff; color: var(--ink); }
 
 .month-controls strong { min-width: 130px; font-size: .95rem; letter-spacing: .04em; text-align: center; }
 
-.month-controls .today-button { width: auto; padding: 0 12px; font-size: .68rem; }
+.month-controls .today-button { width: auto; padding: 0 12px; font-size: .68rem; white-space: nowrap; }
 
-.calendar-legend { display: flex; gap: 17px; color: var(--muted); font-size: .63rem; }
+.calendar-legend { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px 17px; color: var(--muted); font-size: .63rem; }
 
-.calendar-legend span::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 6px; border-radius: 50%; background: var(--teal); }
+.calendar-legend span::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 6px; border-radius: 50%; background: var(--calendar-color, var(--teal)); }
 
-.calendar-legend span:last-child::before { background: var(--gold); }
+.calendar-category-ee-camp { --calendar-color: #087f83; --calendar-background: #e6f3ef; --calendar-text: #22665f; }
+.calendar-category-department-camping { --calendar-color: #ac701e; --calendar-background: #fbf2df; --calendar-text: #80591e; }
+.calendar-category-ee-week { --calendar-color: #4e68a5; --calendar-background: #edf1fb; --calendar-text: #3c5389; }
+.calendar-category-light-dance { --calendar-color: #8760a8; --calendar-background: #f2ebf8; --calendar-text: #6e478f; }
+.calendar-category-other { --calendar-color: #a55265; --calendar-background: #faedf0; --calendar-text: #873d4e; }
 
 .weekdays, .calendar-days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
 
@@ -161,9 +165,8 @@
 
 .calendar-day.is-today .day-number { border-radius: 50%; background: var(--teal); color: #fff; }
 
-.calendar-event { display: block; width: 100%; margin-top: 4px; padding: 5px; overflow: hidden; border: 0; border-left: 2px solid var(--teal); background: #e6f3ef; color: #22665f; font-size: .62rem; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
-
-.calendar-event.academic { border-color: var(--gold); background: #fbf2df; color: #906d32; }
+.calendar-event { display: block; width: 100%; margin-top: 4px; padding: 5px; overflow: hidden; border: 0; border-left: 2px solid var(--calendar-color, var(--teal)); background: var(--calendar-background, #e6f3ef); color: var(--calendar-text, #22665f); font-size: .62rem; text-align: left; text-decoration: none; text-overflow: ellipsis; white-space: nowrap; }
+.calendar-event:focus-visible { outline: 2px solid var(--calendar-color, var(--teal)); outline-offset: -2px; }
 
 @media (max-width: 900px) {
 .hero { height: 310px; }
@@ -220,13 +223,13 @@
 
 .quick-icon { font-size: 1rem; }
 
-.calendar-toolbar { padding: 14px 10px; }
+.calendar-toolbar { flex-wrap: wrap; gap: 12px; padding: 14px 10px; }
 
 .month-controls { gap: 6px; }
 
 .month-controls strong { min-width: 103px; font-size: .8rem; }
 
-.calendar-legend { display: none; }
+.calendar-legend { justify-content: flex-start; gap: 8px 12px; }
 
 .weekdays span { padding: 9px 5px; }
 
@@ -234,9 +237,7 @@
 
 .day-number { width: 23px; height: 23px; }
 
-.calendar-event { padding: 3px 2px; font-size: 0; }
-
-.calendar-event::after { content: "活動"; font-size: .53rem; }
+.calendar-event { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; min-height: 32px; padding: 5px 2px; font-size: .6rem; line-height: 1.5; white-space: normal; overflow-wrap: anywhere; }
 }
 
 @media (max-width: 600px) {

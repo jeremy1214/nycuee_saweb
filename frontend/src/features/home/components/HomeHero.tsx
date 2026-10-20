@@ -33,7 +33,7 @@ export function HomeHero() {
         <h1>從交大電機出發，<br />
           <span className="home-hero-title-stack">
             {/* Every title participates in sizing, so even wrapped mobile titles reserve the same space. */}
-            {slides.map((slide) => <span className="home-hero-title-sizer" aria-hidden="true" key={slide.title}>{slide.title}</span>)}
+            {slides.map((slide) => <span className="home-hero-title-sizer" aria-hidden="true" key={slide.id}>{slide.title}</span>)}
             <span className="home-hero-changing" key={current} aria-live={isPaused ? "polite" : "off"}>
               <span className="home-hero-accessible-text">{title}</span>
               <span aria-hidden="true">

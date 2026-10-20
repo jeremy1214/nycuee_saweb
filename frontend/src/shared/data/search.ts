@@ -1,6 +1,6 @@
 import { sectionPages, contactPage } from "./navigation";
 import { siteContact, socialLinks } from "./site";
-import { slides, calendarEvents } from "../../features/home/data/home";
+import { exploreContent, calendarEvents } from "../../features/home/data/home";
 import { eesaOverview, departments, departmentCards } from "../../features/eesa/data/eesa";
 import { teams } from "../../features/teams/data/teams";
 import { activities, activityCategories } from "../../features/activities/data/activities";
@@ -34,8 +34,8 @@ function item(label: string, to: string, description: string, ...content: unknow
 }
 
 export const searchItems: SearchItem[] = [
-  item("首頁", "/", "探索交大電機、近期活動與電機行事曆", slides, calendarEvents,
-    "從交大電機出發 認識電機系學會 探索交大電機 一起探索電機生活 從課程、實作到交流，看看交大電機的不同面貌。",
+  item("首頁", "/", "探索交大電機、近期活動與電機行事曆", exploreContent, calendarEvents,
+    "從交大電機出發 認識電機系學會 探索交大電機",
     "從系學會、活動與系隊出發，找到你需要的學習資訊。", eesaOverview.introduction,
     "近期活動 活動資訊為示意，正式時間與報名方式請以系所公告為準。",
     "電機行事曆 匯入 Google 日曆 下載活動檔案 活動目前會以全天顯示。"),

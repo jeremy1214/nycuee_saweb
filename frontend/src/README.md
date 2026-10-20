@@ -16,6 +16,7 @@ src/
 ├─ content/                    # 可單獨編輯的內容 JSON
 │  ├─ activities/              # 活動分類與每筆活動
 │  ├─ eesa/                    # 系學會總覽及每個部門
+│  ├─ home/                    # 首頁探索輪播與維護說明
 │  └─ teams/                   # 每支系隊
 ├─ features/
 │  ├─ home/                    # 首頁入口、首頁區塊、資料、型別、日曆匯出與樣式
@@ -28,6 +29,8 @@ src/
 ```
 
 ## 放檔案的原則
+
+首頁「一起探索電機生活」的內容維護方式請見 [content/home/README.md](content/home/README.md)。
 
 - 跨功能共用的顯示元件放 `shared/components`；只服務某個功能的元件放該功能的 `components`。
 - 功能頁入口放在 `features/<功能>/` 根目錄，透過 `index.ts` 匯出。

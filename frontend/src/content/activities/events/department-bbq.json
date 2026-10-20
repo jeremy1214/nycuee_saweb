@@ -1,0 +1,45 @@
+{
+  "$schema": "../activity.schema.json",
+  "id": "department-bbq",
+  "status": "published",
+  "title": "系烤",
+  "date": "2026-11-15",
+  "categoryId": "other",
+  "summary": "用烤肉、遊戲與聊天，串起不同年級的日常。",
+  "details": "系烤讓大家一起準備烤肉、玩遊戲、聊天交朋友。透過輕鬆的氣氛與美食，不同年級的同學能互相認識、分享生活。\n\n從一起準備食材到圍在烤爐旁聊天，留下歡笑與回憶，感受系上交流的溫度。",
+  "detail": {
+    "eyebrow": "EE LIFE · DEPARTMENT BBQ",
+    "intro": [
+      "系烤讓大家一起準備烤肉、玩遊戲、聊天交朋友。透過輕鬆的氣氛與美食，不同年級的同學能互相認識、分享生活。",
+      "從一起準備食材到圍在烤爐旁聊天，留下歡笑與回憶，感受系上交流的溫度。"
+    ],
+    "heroImages": [
+      {
+        "src": "/activities/other/department-bbq-01.webp",
+        "alt": "系烤參與者在夜間戶外舉手互動"
+      },
+      {
+        "src": "/activities/other/department-bbq-02.webp",
+        "alt": "系烤同學在夜間戶外合照"
+      }
+    ],
+    "sections": []
+  },
+  "album": {
+    "order": 6,
+    "cover": {
+      "src": "/activities/other/department-bbq-02.webp",
+      "alt": "系烤同學在夜間戶外合照"
+    },
+    "photos": [
+      {
+        "src": "/activities/other/department-bbq-01.webp",
+        "alt": "系烤參與者在夜間戶外舉手互動"
+      },
+      {
+        "src": "/activities/other/department-bbq-02.webp",
+        "alt": "系烤同學在夜間戶外合照"
+      }
+    ]
+  }
+}

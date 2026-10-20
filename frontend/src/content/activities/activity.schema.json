@@ -4,17 +4,19 @@
   "title": "活動內容資料",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "status", "title", "date", "categoryId", "summary", "details", "location"],
+  "required": ["id", "status", "title", "categoryId", "summary", "details"],
+  "allOf": [{ "if": { "required": ["album"] }, "then": { "required": ["detail"] } }],
   "properties": {
     "$schema": { "type": "string" },
     "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
     "status": { "enum": ["draft", "published", "archived"] },
     "title": { "type": "string", "minLength": 1 },
-    "date": { "type": "string", "format": "date" },
+    "date": { "type": "string", "format": "date", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
     "categoryId": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
     "summary": { "type": "string", "minLength": 1 },
     "details": { "type": "string", "minLength": 1 },
-    "location": { "type": "string", "minLength": 1 },
+    "location": { "type": "string", "minLength": 1, "pattern": "\\S" },
+    "album": { "$ref": "#/$defs/album" },
     "detail": {
       "type": "object",
       "additionalProperties": false,
@@ -36,6 +38,16 @@
     }
   },
   "$defs": {
+    "album": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["order", "cover", "photos"],
+      "properties": {
+        "order": { "type": "integer", "minimum": 0 },
+        "cover": { "$ref": "#/$defs/image" },
+        "photos": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/image" } }
+      }
+    },
     "tab": {
       "type": "object",
       "additionalProperties": false,
@@ -53,7 +65,8 @@
       "properties": {
         "src": { "type": "string", "pattern": "^/" },
         "alt": { "type": "string", "minLength": 1 },
-        "objectPosition": { "type": "string", "minLength": 1 }
+        "objectPosition": { "type": "string", "minLength": 1 },
+        "fit": { "enum": ["cover", "contain"] }
       }
     },
     "section": {

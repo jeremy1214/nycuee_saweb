@@ -36,8 +36,8 @@ export default function ActivitiesPage() {
           <div className="activity-dialog-content">
             <div className="activity-dialog-meta">
               <span>{selectedActivity.category}</span>
-              <time dateTime={selectedActivity.date}>{selectedActivity.date.replaceAll("-", ".")}</time>
-              <span>{selectedActivity.location}</span>
+              {selectedActivity.date && <time dateTime={selectedActivity.date}>{selectedActivity.date.replaceAll("-", ".")}</time>}
+              {selectedActivity.location && <span>{selectedActivity.location}</span>}
             </div>
             <p>{selectedActivity.details}</p>
           </div>

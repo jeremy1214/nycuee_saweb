@@ -1,0 +1,53 @@
+{
+  "$schema": "../activity.schema.json",
+  "id": "mentorship",
+  "status": "published",
+  "title": "分家大會",
+  "date": "2026-10-10",
+  "categoryId": "other",
+  "summary": "認識直屬學長姐，讓大學生活多一份照應。",
+  "details": "剛上大學，對選課系統或教授的教學風格感到陌生嗎？分家大會讓新生認識自己的直屬學長姐，建立能交流課業與生活經驗的連結。\n\n從選課建議、考試準備到校園生活，有了能一起討論的夥伴，遇到疑問時也多了一個可以請教的方向。",
+  "detail": {
+    "eyebrow": "EE LIFE · MENTORSHIP",
+    "intro": [
+      "剛上大學，對選課系統或教授的教學風格感到陌生嗎？分家大會讓新生認識自己的直屬學長姐，建立能交流課業與生活經驗的連結。",
+      "從選課建議、考試準備到校園生活，有了能一起討論的夥伴，遇到疑問時也多了一個可以請教的方向。"
+    ],
+    "heroImages": [
+      {
+        "src": "/activities/other/mentorship-01.webp",
+        "alt": "分家大會同學坐在階梯教室合照"
+      },
+      {
+        "src": "/activities/other/mentorship-02.webp",
+        "alt": "分家大會參與者在夜間戶外合照"
+      }
+    ],
+    "sections": []
+  },
+  "album": {
+    "order": 3,
+    "cover": {
+      "src": "/activities/other/mentorship-01.webp",
+      "alt": "分家大會同學坐在階梯教室合照"
+    },
+    "photos": [
+      {
+        "src": "/activities/other/mentorship-01.webp",
+        "alt": "分家大會同學坐在階梯教室合照"
+      },
+      {
+        "src": "/activities/other/mentorship-02.webp",
+        "alt": "分家大會參與者在夜間戶外合照"
+      },
+      {
+        "src": "/activities/other/mentorship-03.webp",
+        "alt": "兩位同學在教室前方分享"
+      },
+      {
+        "src": "/activities/other/mentorship-04.webp",
+        "alt": "同學站在教室黑板前發言"
+      }
+    ]
+  }
+}

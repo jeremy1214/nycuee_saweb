@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { activities, activityCategories } from "../data/activities";
+import { compareActivityDates, hasActivityDate } from "../data/activityDates";
 import type { ActivityItem } from "../activityTypes";
 
 interface ActivityOverviewProps {
@@ -83,7 +84,7 @@ interface RecentActivitiesProps {
 }
 
 export function RecentActivities({ selectedCategory, onActivitySelect }: RecentActivitiesProps) {
-  const upcomingActivities = [...activities].sort((first, second) => first.date.localeCompare(second.date));
+  const upcomingActivities = activities.filter(hasActivityDate).sort(compareActivityDates);
   const visibleActivities = selectedCategory
     ? upcomingActivities.filter((activity) => activity.categoryId === selectedCategory)
     : upcomingActivities;

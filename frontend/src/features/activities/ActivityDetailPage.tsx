@@ -14,25 +14,33 @@ export default function ActivityDetailPage() {
 
   if (!activity || (tabId && !activity.detail)) return <NotFoundPage />;
 
+  const activityTitle = activity.categoryId === "other" ? activity.title : activity.category;
+  const breadcrumbItems = activity.categoryId === "other"
+    ? [{ label: "系上活動", to: "/activities/overview" }, { label: "其他活動", to: "/activities/other" }, { label: activity.title }]
+    : [{ label: "系上活動", to: "/activities/overview" }, { label: activity.category }];
+  const activityMeta = (activity.date || activity.location) && (
+    <dl className="activity-detail-meta" aria-label="活動資訊">
+      {activity.date && <div><dt>日期</dt><dd><time dateTime={activity.date}>{activity.date}</time></dd></div>}
+      {activity.location && <div><dt>地點</dt><dd>{activity.location}</dd></div>}
+    </dl>
+  );
+
   if (!activity.detail) {
     return (
       <main className="activity-detail-page">
         <PageContainer>
-          <Breadcrumb className="activity-detail-breadcrumb" items={[{ label: "系上活動", to: "/activities/overview" }, { label: activity.category }]} />
+          <Breadcrumb className="activity-detail-breadcrumb" items={breadcrumbItems} />
           <header className="activity-detail-titlebar">
             <span className="eyebrow">UPCOMING EVENT</span>
-            <h1>{activity.category}</h1>
-            <p>{activity.title}</p>
+            <h1>{activityTitle}</h1>
+            <p>{activity.categoryId === "other" ? activity.summary : activity.title}</p>
           </header>
           <article className="activity-detail-fallback">
             <span className="activity-detail-label">活動資訊</span>
             <h2>{activity.title}</h2>
             <p>{activity.summary}</p>
             <p>{activity.details}</p>
-            <dl>
-              <div><dt>日期</dt><dd><time dateTime={activity.date}>{activity.date}</time></dd></div>
-              <div><dt>地點</dt><dd>{activity.location}</dd></div>
-            </dl>
+            {activityMeta}
           </article>
         </PageContainer>
       </main>
@@ -67,22 +75,23 @@ export default function ActivityDetailPage() {
   return (
     <main className={`activity-detail-page${detail.tabs ? " activity-detail-tabbed" : ""}${sharedIntro ? " activity-detail-shared-intro" : ""}`}>
       <PageContainer>
-        <Breadcrumb className="activity-detail-breadcrumb" items={[{ label: "系上活動", to: "/activities/overview" }, { label: activity.category }]} />
+        <Breadcrumb className="activity-detail-breadcrumb" items={breadcrumbItems} />
 
         <header className="activity-detail-titlebar">
           <span className="eyebrow">{detail.eyebrow}</span>
-          <h1>{activity.category}</h1>
-          <p>{activity.title}</p>
+          <h1>{activityTitle}</h1>
+          <p>{activity.categoryId === "other" ? activity.summary : activity.title}</p>
+          {activityMeta}
         </header>
 
         {!sharedIntro && tabNavigation}
 
         {showIntro && (
           <section id="activity-intro" className="activity-detail-hero" aria-labelledby="activity-intro-title">
-            <div className="activity-detail-collage" aria-label={`${activity.category}活動照片`}>
+            <div className="activity-detail-collage" aria-label={`${activityTitle}活動照片`}>
               {detail.heroImages.map((image, index) => (
                 <figure className={`activity-detail-photo activity-detail-photo-${index + 1}`} key={image.src}>
-                  <img src={image.src} alt={image.alt} style={{ objectPosition: image.objectPosition }} />
+                  <img src={image.src} alt={image.alt} style={{ objectPosition: image.objectPosition, objectFit: image.fit }} />
                 </figure>
               ))}
             </div>
@@ -105,6 +114,7 @@ export default function ActivityDetailPage() {
                 {section.navLabel}
               </button>
             ))}
+            {activity.album && <button type="button" onClick={() => scrollToSection("activity-photos")}>活動照片</button>}
           </nav>
         )}
 
@@ -119,7 +129,7 @@ export default function ActivityDetailPage() {
                       src={section.image.src}
                       alt={section.image.alt}
                       loading={detail.tabs ? "lazy" : undefined}
-                      style={{ objectPosition: section.image.objectPosition }}
+                      style={{ objectPosition: section.image.objectPosition, objectFit: section.image.fit }}
                     />
                     <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
                   </figure>
@@ -136,6 +146,20 @@ export default function ActivityDetailPage() {
               </section>
             ))}
           </div>
+        )}
+
+        {showIntro && activity.album && (
+          <section id="activity-photos" className="activity-detail-gallery" aria-labelledby="activity-photos-title">
+            <h2 id="activity-photos-title">{activity.title}活動照片</h2>
+            <div className="activity-detail-gallery-grid">
+              {activity.album.photos.map((photo) => (
+                <figure key={photo.src}>
+                  <img src={photo.src} alt={photo.alt} loading="lazy" style={{ objectFit: photo.fit ?? "cover", objectPosition: photo.objectPosition }} />
+                  <figcaption>{photo.alt}</figcaption>
+                </figure>
+              ))}
+            </div>
+          </section>
         )}
 
         <div className="activity-detail-back">

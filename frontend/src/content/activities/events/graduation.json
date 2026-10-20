@@ -1,0 +1,53 @@
+{
+  "$schema": "../activity.schema.json",
+  "id": "graduation",
+  "status": "published",
+  "title": "小畢典",
+  "date": "2026-06-28",
+  "categoryId": "other",
+  "summary": "回顧四年的點滴，留下屬於電機人的最後一張合照。",
+  "details": "小畢典是為電機系畢業生準備的溫馨活動，以更貼近系上的方式，一同回顧大學生活的點點滴滴。\n\n透過典禮、回顧與合照，慶祝成長、感謝一路同行的夥伴，為這段青春留下共同的回憶。",
+  "detail": {
+    "eyebrow": "EE LIFE · GRADUATION",
+    "intro": [
+      "小畢典是為電機系畢業生準備的溫馨活動，以更貼近系上的方式，一同回顧大學生活的點點滴滴。",
+      "透過典禮、回顧與合照，慶祝成長、感謝一路同行的夥伴，為這段青春留下共同的回憶。"
+    ],
+    "heroImages": [
+      {
+        "src": "/activities/other/graduation-01.webp",
+        "alt": "電機系畢業生與師長在戶外合照"
+      },
+      {
+        "src": "/activities/other/graduation-02.webp",
+        "alt": "小畢典師長為畢業生進行撥穗"
+      }
+    ],
+    "sections": []
+  },
+  "album": {
+    "order": 7,
+    "cover": {
+      "src": "/activities/other/graduation-01.webp",
+      "alt": "電機系畢業生與師長在戶外合照"
+    },
+    "photos": [
+      {
+        "src": "/activities/other/graduation-01.webp",
+        "alt": "電機系畢業生與師長在戶外合照"
+      },
+      {
+        "src": "/activities/other/graduation-02.webp",
+        "alt": "小畢典師長為畢業生進行撥穗"
+      },
+      {
+        "src": "/activities/other/graduation-03.webp",
+        "alt": "畢業生在活動背板前合照"
+      },
+      {
+        "src": "/activities/other/graduation-04.webp",
+        "alt": "畢業生穿著學士服在典禮上合照"
+      }
+    ]
+  }
+}

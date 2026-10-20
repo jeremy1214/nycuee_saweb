@@ -37,7 +37,7 @@ describe("ActivityDetailPage", () => {
     expect(screen.getByTestId("pathname")).toHaveTextContent("/activities/light-dance-workshop/intro");
     expect(screen.getByRole("heading", { level: 1, name: "光舞" })).toBeInTheDocument();
     expect(screen.getByText("光舞：用科技點亮舞台")).toBeInTheDocument();
-    expect(screen.getByText(/本頁為第一版內容草稿/)).toBeInTheDocument();
+    expect(screen.getByRole("time")).toHaveAttribute("datetime", "2026-10-28");
     expect(screen.getByRole("link", { name: /回到活動總覽/ })).toHaveAttribute("href", "/activities/overview");
   });
 
@@ -86,7 +86,7 @@ describe("ActivityDetailPage", () => {
     expect(screen.getByTestId("pathname")).toHaveTextContent("/activities/department-camping-night/intro");
     expect(screen.getByRole("heading", { level: 1, name: "系露營" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "活動介紹" })).toHaveAttribute("aria-current", "page");
-    expect(screen.getByText(/本頁為第一版內容草稿/)).toBeInTheDocument();
+    expect(screen.getByRole("time")).toHaveAttribute("datetime", "2026-10-18");
     expect(screen.getByRole("link", { name: /回到活動總覽/ })).toHaveAttribute("href", "/activities/overview");
   });
 
@@ -135,7 +135,7 @@ describe("ActivityDetailPage", () => {
     expect(screen.getByTestId("pathname")).toHaveTextContent("/activities/smart-ee-camp/intro");
     expect(screen.getByRole("link", { name: "活動介紹" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("heading", { level: 1, name: "電機營" })).toBeInTheDocument();
-    expect(screen.getByText(/本頁為第一版內容草稿/)).toBeInTheDocument();
+    expect(screen.getByRole("time")).toHaveAttribute("datetime", "2026-10-14");
     expect(screen.getByRole("link", { name: /回到活動總覽/ })).toHaveAttribute("href", "/activities/overview");
     expect(screen.queryByText("硬體課程")).not.toBeInTheDocument();
     expect(screen.queryByText("軟體課程")).not.toBeInTheDocument();

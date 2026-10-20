@@ -1,0 +1,50 @@
+{
+  "$schema": "../activity.schema.json",
+  "id": "course-selection",
+  "status": "published",
+  "title": "選課大會",
+  "date": "2026-08-28",
+  "categoryId": "other",
+  "summary": "從學長姐的經驗出發，找到適合自己的課程。",
+  "details": "學長姐分享必選修課程的教學內容與教授風格，幫助同學更了解課程特色，找到適合自己的課。\n\n從課程安排到學習經驗，透過交流與提問，為大學的選課做好準備。",
+  "detail": {
+    "eyebrow": "EE LIFE · COURSE SELECTION",
+    "intro": [
+      "學長姐分享必選修課程的教學內容與教授風格，幫助同學更了解課程特色，找到適合自己的課。",
+      "從課程安排到學習經驗，透過交流與提問，為大學的選課做好準備。"
+    ],
+    "heroImages": [
+      {
+        "src": "/activities/other/course-selection-01.webp",
+        "alt": "新生選課大會的藍綠色簡報封面",
+        "fit": "contain"
+      },
+      {
+        "src": "/activities/other/course-selection-02.webp",
+        "alt": "選課大會簡報列出微分方程、電子學與電磁學等介紹順序",
+        "fit": "contain"
+      }
+    ],
+    "sections": []
+  },
+  "album": {
+    "order": 1,
+    "cover": {
+      "src": "/activities/other/course-selection-01.webp",
+      "alt": "新生選課大會的藍綠色簡報封面",
+      "fit": "contain"
+    },
+    "photos": [
+      {
+        "src": "/activities/other/course-selection-01.webp",
+        "alt": "新生選課大會的藍綠色簡報封面",
+        "fit": "contain"
+      },
+      {
+        "src": "/activities/other/course-selection-02.webp",
+        "alt": "選課大會簡報列出微分方程、電子學與電磁學等介紹順序",
+        "fit": "contain"
+      }
+    ]
+  }
+}

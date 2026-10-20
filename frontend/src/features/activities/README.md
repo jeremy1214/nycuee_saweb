@@ -31,12 +31,13 @@ src/features/activities/
 - `id`：永久識別值，也是網址的一部分；上線後不要隨意修改。
 - `status`：`draft`、`published` 或 `archived`。只有 `published` 會出現在網站。
 - `title`：卡片及詳細頁副標題。
-- `date`：使用 `YYYY-MM-DD`，總覽會自動依日期排序。
+- `date`：選填，使用有效的 `YYYY-MM-DD`。未確認時省略，不填空字串或 `null`；有日期才會進入總覽近期列表，首頁最新消息再挑出台灣日期今天起最近三筆。
 - `categoryId`：必須對應 `categories.json` 的分類 `id`。
 - `summary`：總覽卡片摘要。
 - `details`：沒有獨立專頁時，顯示於彈窗的完整介紹。
-- `location`：活動地點。
+- `location`：選填，填寫已確認的活動地點；未知時省略。
 - `detail`：選填；存在時卡片會連到獨立詳細頁，省略時維持彈窗。
+- `album`：選填，相簿順序、封面與全部照片；有設定時必須同時提供 `detail`。
 
 JSON 最上方的 `$schema` 會讓支援 JSON Schema 的編輯器提示欄位及格式錯誤。請保留：
 
@@ -46,9 +47,9 @@ JSON 最上方的 `$schema` 會讓支援 JSON Schema 的編輯器提示欄位及
 
 ## 新增活動
 
-1. 複製 `src/content/activities/events/student-community-day.json`。
+1. 複製 `src/content/activities/events/course-selection.json`，或使用下方最小範例建立新檔。
 2. 將檔名與 `id` 改成相同的英文小寫連字號格式，例如 `example-event.json` 與 `example-event`。
-3. 更新日期、分類、文字及地點。
+3. 更新分類與文字；日期及地點確認後再填寫。新增其他活動可複製 `events/course-selection.json`，並設定 `album.order`。
 4. 編輯期間使用 `"status": "draft"`；確認後改成 `"published"`。
 5. 執行 `npm run validate:content`。
 
@@ -208,14 +209,22 @@ JSON 最上方的 `$schema` 會讓支援 JSON Schema 的編輯器提示欄位及
 
 ### 其他活動相簿
 
-`/#/activities/other` 為獨立的常態活動介紹，由活動總覽「其他活動」圓形進入；原有 `overview?category=other` 篩選網址仍可使用。
+`/#/activities/other` 保留原本相簿，由活動總覽「其他活動」圓形進入；原有 `overview?category=other` 篩選網址仍可使用。每個活動也能直接開啟 `/#/activities/<id>`，或從相簿介紹中的「查看活動詳細頁」進入。
 
-- 內容集中於 `src/content/activities/other-activities.json`，陣列順序就是相簿順序，依序為選課大會、破冰大會、分家大會、新生晚會、宿營、系烤、抓馬盃、小畢典。與近期活動資料分開，不需要日期、不加入首頁近期活動。
-- 每項包含 `id`、`title`、`summary`、`intro`（段落陣列）、`cover` 與非空的 `photos`。選填 `groups`，每組包含 `id`、`title`、`paragraphs` 與 `image`。只需修改 JSON 與圖片，無須更改元件；新增項目會自動加入選單與輪播。
-- 圖片包含 `src`、`alt`，可選填 `objectPosition` 與 `fit: "cover" | "contain"`；有文字的簡報圖片用 `contain` 保留完整畫面。所有檔案放於 `public/activities/other/`。
-- 宿營、抓馬盃文字來自舊站 `SooCamp.jsx`、`Drama.jsx`，其餘六項來自舊站 `event/Timeline.jsx`。已刪除年度日期、當屆供餐承諾、固定營期與抓馬盃誤植的營隊文字。素材來自 `imgae/sideIntro`、`imgae/sooCamp`、`imgae/dramaPic`；33 張 WebP 的長邊最多 1600px、品質 82，不放大小圖。
-- 相簿同時最多展示五張，手機最多三張；初始選中第一項，每 6 秒循環翻頁。停留或聚焦介紹時暫停，手動操作後需按播放恢復；減少動態效果時只提供手動瀏覽。重新整理回到第一項。
-- 內容載入器會檢查識別碼、必要文字、照片、組別與圖片欄位；`npm run validate:content` 也會確認圖片存在。輪播行為測試涵蓋切換、首尾循環、自動播放、閱讀暫停、觸控與鍵盤操作。
+- 每個活動都放在 `src/content/activities/events/<id>.json`，由共用載入器驗證；相簿與詳細頁共用同一份文字與照片，沒有額外的相簿內容 JSON。
+- 現有七個活動依序為選課大會、破冰大會、分家大會、新生晚會、宿營、系烤、小畢典。`categoryId` 設為 `other`，`status` 設為 `published` 才會顯示；草稿與封存項目不會出現在相簿或詳細頁。
+- `detail.intro` 是活動介紹，`detail.heroImages` 是兩張主照片，`detail.sections` 放組別介紹；宿營保留五組，一般活動填 `[]`，不必建立分頁。
+- `album.order` 為非負整數，由小到大排序，同值時依 ID 排序。`album.cover` 是輪播與首頁卡片封面，`album.photos` 是相簿及詳細頁完整照片清單，不可為空。
+- 圖片共用 `src`、`alt`，可選填 `objectPosition` 與 `fit: "cover" | "contain"`；選課簡報用 `contain` 保留完整畫面。現有照片仍位於 `public/activities/other/`。
+- 相簿保留自動輪播、暫停、左右方向鍵、觸控切換及減少動態效果支援；切換活動會同步更新介紹、照片、組別與詳細頁連結。
+
+### 讓其他活動出現在最新消息
+
+在該活動 JSON 頂層補上實際日期，例如 `"date": "2027-01-15"`；地點確認後可另加 `location`。保持 `status: "published"`，重新執行驗證、建置與部署後，即自動參與首頁最新消息排序，不需要修改 React 程式。
+
+首頁依台灣日期挑選今天起最近三筆，同日依 ID 排序；其他活動卡片顯示實際活動名稱。無日期與已過期活動不出現在首頁最新消息，仍可從相簿瀏覽介紹；總覽近期列表只排除無日期活動，其餘日期行為維持原有方式。行事曆仍使用原本獨立資料。
+
+### 照片檔案規範
 
 既有共用圖片保留在 `public/intro/activities/`。新活動建議使用獨立資料夾：
 

@@ -2,6 +2,7 @@ export interface ActivityDetailImage {
   src: string;
   alt: string;
   objectPosition?: string;
+  fit?: "cover" | "contain";
 }
 
 export interface ActivityDetailSection {
@@ -31,13 +32,20 @@ export interface ActivityDetailTab {
 export interface ActivityItem {
   id: string;
   title: string;
-  date: string;
+  date?: string;
   categoryId: string;
   category: string;
   summary: string;
   details: string;
-  location: string;
+  location?: string;
   detail?: ActivityDetail;
+  album?: ActivityAlbum;
+}
+
+export interface ActivityAlbum {
+  order: number;
+  cover: ActivityDetailImage;
+  photos: ActivityDetailImage[];
 }
 
 export interface ActivityCategoryOption {
@@ -47,22 +55,18 @@ export interface ActivityCategoryOption {
   featuredActivityId?: string;
 }
 
-/** Evergreen introductions, separate from the dated upcoming-events feed. */
-export interface OtherActivityImage extends ActivityDetailImage {
-  fit?: "cover" | "contain";
-}
-
+/** Album view derived from published activity content. */
 export interface OtherActivity {
   id: string;
   title: string;
   summary: string;
   intro: string[];
-  cover: OtherActivityImage;
-  photos: OtherActivityImage[];
+  cover: ActivityDetailImage;
+  photos: ActivityDetailImage[];
   groups?: {
     id: string;
     title: string;
     paragraphs: string[];
-    image: OtherActivityImage;
+    image: ActivityDetailImage;
   }[];
 }

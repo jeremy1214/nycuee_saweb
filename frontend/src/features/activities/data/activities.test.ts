@@ -14,7 +14,7 @@ describe("activity data", () => {
     expect(new Set(ids).size).toBe(ids.length);
     activities.forEach((activity) => {
       expect(activity.id).toMatch(slugPattern);
-      expect(activity.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      if (activity.date !== undefined) expect(activity.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
       expect(categoryIds.has(activity.categoryId)).toBe(true);
       expect(activityCategories.find((category) => category.id === activity.categoryId)?.label).toBe(
         activity.category,
@@ -39,6 +39,7 @@ describe("activity data", () => {
       const images = [
         ...detail.heroImages,
         ...sections.flatMap((section) => section.image ? [section.image] : []),
+        ...(activity.album ? [activity.album.cover, ...activity.album.photos] : []),
       ];
 
       sectionCollections.forEach((collection) => {

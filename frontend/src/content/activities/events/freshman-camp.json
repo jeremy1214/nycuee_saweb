@@ -1,0 +1,111 @@
+{
+  "$schema": "../activity.schema.json",
+  "id": "freshman-camp",
+  "status": "published",
+  "title": "宿營",
+  "date": "2026-09-28",
+  "categoryId": "other",
+  "summary": "和未來的同學一起冒險，點亮大學生活的第一道火花。",
+  "details": "電機系宿營是一場屬於新鮮人的冒險。透過團康、闖關任務、晚會表演與夜間活動，和未來的同學從陌生到熟悉，累積歡笑與共同回憶。\n\n學長姐設計活動與故事，讓新生在遊戲中認識系上文化。無論個性內向或外向，都能在參與過程中找到夥伴，一起展開大學生活。",
+  "detail": {
+    "eyebrow": "EE LIFE · FRESHMAN CAMP",
+    "intro": [
+      "電機系宿營是一場屬於新鮮人的冒險。透過團康、闖關任務、晚會表演與夜間活動，和未來的同學從陌生到熟悉，累積歡笑與共同回憶。",
+      "學長姐設計活動與故事，讓新生在遊戲中認識系上文化。無論個性內向或外向，都能在參與過程中找到夥伴，一起展開大學生活。"
+    ],
+    "heroImages": [
+      {
+        "src": "/activities/other/freshman-camp-intro-01.webp",
+        "alt": "宿營同學在室內伸出手臂參與團體活動"
+      },
+      {
+        "src": "/activities/other/freshman-camp-intro-02.webp",
+        "alt": "宿營同學圍坐室內地面參與活動"
+      }
+    ],
+    "sections": [
+      {
+        "id": "activity",
+        "navLabel": "活動組",
+        "eyebrow": "ACTIVITY",
+        "title": "活動組",
+        "paragraphs": [
+          "負責營隊活動的故事與關卡設計，並擔任關主，透過演技與創意帶領大家投入活動。"
+        ],
+        "image": {
+          "src": "/activities/other/freshman-camp-activity.webp",
+          "alt": "活動組同學圍在桌旁一起進行任務"
+        }
+      },
+      {
+        "id": "design",
+        "navLabel": "美宣組",
+        "eyebrow": "DESIGN",
+        "title": "美宣組",
+        "paragraphs": [
+          "負責活動與劇情所需的道具製作，將故事中的構想轉化為實際的視覺與道具。"
+        ],
+        "image": {
+          "src": "/activities/other/freshman-camp-design.webp",
+          "alt": "宿營美宣組同學坐在椅子上合照"
+        }
+      },
+      {
+        "id": "mentors",
+        "navLabel": "公關組",
+        "eyebrow": "MENTORS",
+        "title": "公關組",
+        "paragraphs": [
+          "擔任小隊輔，陪伴新生參與營隊、協助帶隊與活動進行，並成為新生認識系上的夥伴。"
+        ],
+        "image": {
+          "src": "/activities/other/freshman-camp-mentors.webp",
+          "alt": "公關組同學在室內帶領互動活動"
+        }
+      },
+      {
+        "id": "stage",
+        "navLabel": "場控組",
+        "eyebrow": "STAGE",
+        "title": "場控組",
+        "paragraphs": [
+          "負責架場、音控、燈光等幕後工作，處理場地與技術需求，讓活動順利進行。"
+        ],
+        "image": {
+          "src": "/activities/other/freshman-camp-stage.webp",
+          "alt": "場控組同學在筆記型電腦旁操作"
+        }
+      },
+      {
+        "id": "logistics",
+        "navLabel": "生活組",
+        "eyebrow": "LOGISTICS",
+        "title": "生活組",
+        "paragraphs": [
+          "負責訂餐、準備食物與餐後整理，照顧營隊中的日常需求。"
+        ],
+        "image": {
+          "src": "/activities/other/freshman-camp-logistics.webp",
+          "alt": "生活組同學在室內穿著黃色圍裙"
+        }
+      }
+    ]
+  },
+  "album": {
+    "order": 5,
+    "cover": {
+      "src": "/activities/other/freshman-camp-intro-01.webp",
+      "alt": "宿營同學在室內伸出手臂參與團體活動"
+    },
+    "photos": [
+      {
+        "src": "/activities/other/freshman-camp-intro-01.webp",
+        "alt": "宿營同學在室內伸出手臂參與團體活動"
+      },
+      {
+        "src": "/activities/other/freshman-camp-intro-02.webp",
+        "alt": "宿營同學圍坐室內地面參與活動"
+      }
+    ]
+  }
+}

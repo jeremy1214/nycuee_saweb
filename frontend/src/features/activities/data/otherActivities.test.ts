@@ -1,4 +1,4 @@
-import { otherActivities, parseOtherActivities } from "./otherActivities";
+import { otherActivities } from "./otherActivities";
 import { activities } from "./activities";
 
 const publicImagePaths = new Set(
@@ -7,17 +7,22 @@ const publicImagePaths = new Set(
 );
 
 describe("other activities content", () => {
-  it("contains the eight requested evergreen activities in order, separate from the upcoming feed", () => {
-    expect(otherActivities.map((item) => item.title)).toEqual(["選課大會", "破冰大會", "分家大會", "新生晚會", "宿營", "系烤", "抓馬盃", "小畢典"]);
+  it("derives the seven album entries from the same published activity JSON in their original order", () => {
+    expect(otherActivities.map((item) => item.title)).toEqual(["選課大會", "破冰大會", "分家大會", "新生晚會", "宿營", "系烤", "小畢典"]);
     for (const item of otherActivities) {
-      expect(activities.some((activity) => activity.id === item.id)).toBe(false);
-      expect(item).not.toHaveProperty("date");
+      const activity = activities.find((activity) => activity.id === item.id)!;
+      expect(activity.categoryId).toBe("other");
+      expect(item.intro).toEqual(activity.detail?.intro);
+      expect(item.photos).toEqual(activity.album?.photos);
+      expect(item.cover).toEqual(activity.album?.cover);
+      expect(activity.detail?.heroImages).toEqual(item.photos.slice(0, 2));
     }
     expect(otherActivities.find((item) => item.id === "freshman-camp")?.groups).toHaveLength(5);
-    expect(otherActivities.find((item) => item.id === "drama")?.groups).toHaveLength(4);
+    expect(activities.find((item) => item.id === "freshman-camp")?.detail?.sections.map((section) => section.title))
+      .toEqual(["活動組", "美宣組", "公關組", "場控組", "生活組"]);
   });
 
-  it("has existing local images, descriptive alt text, and no obsolete dates or copied camp text in drama", () => {
+  it("retains existing local images, descriptive alt text and slide image fit", () => {
     for (const item of otherActivities) {
       for (const image of [item.cover, ...item.photos, ...(item.groups?.map((group) => group.image) ?? [])]) {
         expect(publicImagePaths.has(image.src), image.src).toBe(true);
@@ -25,16 +30,6 @@ describe("other activities content", () => {
       }
       expect(item.intro.join(" ")).not.toMatch(/2024|2025|三天兩夜|免費宵夜/);
     }
-    expect(otherActivities.find((item) => item.id === "drama")?.intro.join(" ")).not.toContain("營隊");
     expect(otherActivities[0].cover.fit).toBe("contain");
-  });
-
-  it("rejects duplicate IDs, missing introductions, empty photos, malformed groups and invalid image metadata", () => {
-    expect(() => parseOtherActivities([otherActivities[0], otherActivities[0]])).toThrow("activities[].id");
-    for (const change of [{ id: "INVALID" }, { intro: [] }, { photos: [] }, { cover: { ...otherActivities[0].cover, alt: "" } }, { cover: { ...otherActivities[0].cover, fit: "stretch" } }, { cover: { ...otherActivities[0].cover, src: "https://example.com/a.jpg" } }]) {
-      expect(() => parseOtherActivities([{ ...otherActivities[0], ...change }])).toThrow("[other activity content]");
-    }
-    const camp = otherActivities.find((item) => item.id === "freshman-camp")!;
-    expect(() => parseOtherActivities([{ ...camp, groups: [camp.groups![0], camp.groups![0]] }])).toThrow("groups[].id");
   });
 });

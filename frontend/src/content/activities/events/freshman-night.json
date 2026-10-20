@@ -1,0 +1,53 @@
+{
+  "$schema": "../activity.schema.json",
+  "id": "freshman-night",
+  "status": "published",
+  "title": "新生晚會",
+  "date": "2026-10-28",
+  "categoryId": "other",
+  "summary": "把想像力帶上舞台，留下屬於這一屆的演出。",
+  "details": "新生晚會提供新生一個發揮想像力的舞台，讓大家展現表演、創意與合作的可能。\n\n從排練、角色發想到正式演出，同學們一起把心中的點子變成舞台上的畫面，也在準備過程中認識彼此。",
+  "detail": {
+    "eyebrow": "EE LIFE · FRESHMAN NIGHT",
+    "intro": [
+      "新生晚會提供新生一個發揮想像力的舞台，讓大家展現表演、創意與合作的可能。",
+      "從排練、角色發想到正式演出，同學們一起把心中的點子變成舞台上的畫面，也在準備過程中認識彼此。"
+    ],
+    "heroImages": [
+      {
+        "src": "/activities/other/freshman-night-01.webp",
+        "alt": "新生晚會同學在舞台上演出"
+      },
+      {
+        "src": "/activities/other/freshman-night-02.webp",
+        "alt": "同學戴著手作道具進行舞台演出"
+      }
+    ],
+    "sections": []
+  },
+  "album": {
+    "order": 4,
+    "cover": {
+      "src": "/activities/other/freshman-night-04.webp",
+      "alt": "新生晚會全體同學在舞台合照"
+    },
+    "photos": [
+      {
+        "src": "/activities/other/freshman-night-01.webp",
+        "alt": "新生晚會同學在舞台上演出"
+      },
+      {
+        "src": "/activities/other/freshman-night-02.webp",
+        "alt": "同學戴著手作道具進行舞台演出"
+      },
+      {
+        "src": "/activities/other/freshman-night-03.webp",
+        "alt": "新生晚會舞台上的角色互動"
+      },
+      {
+        "src": "/activities/other/freshman-night-04.webp",
+        "alt": "新生晚會全體同學在舞台合照"
+      }
+    ]
+  }
+}

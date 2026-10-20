@@ -2,6 +2,8 @@ import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import App from "../App";
+import { otherActivities } from "../features/activities/data/otherActivities";
+import { activities } from "../features/activities/data/activities";
 import { defaultResourceSlug, resourceCategories } from "../features/resources/data/resources";
 
 function renderApp(route = "/") {
@@ -13,6 +15,35 @@ function renderApp(route = "/") {
 }
 
 describe("NYCU EE website", () => {
+  it.each(otherActivities)("opens $title from its album link and supports direct access", async (activity) => {
+    const user = userEvent.setup();
+    const view = renderApp("/activities/other");
+    await user.click(within(screen.getByRole("navigation", { name: "選擇其他活動" })).getByRole("button", { name: activity.title }));
+    await user.click(screen.getByRole("link", { name: `${activity.title}，查看活動詳細頁` }));
+    expect(screen.getByRole("heading", { level: 1, name: activity.title })).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: `${activity.title}活動照片` })).toBeInTheDocument();
+    const content = activities.find((item) => item.id === activity.id)!;
+    if (content.date) {
+      expect(screen.getByRole("time")).toHaveAttribute("datetime", content.date);
+    } else {
+      expect(screen.queryByRole("time")).not.toBeInTheDocument();
+    }
+    if (!content.date && !content.location) expect(screen.queryByLabelText("活動資訊")).not.toBeInTheDocument();
+    if (activity.id === "freshman-camp") {
+      for (const group of activity.groups!) {
+        expect(screen.getByRole("heading", { level: 2, name: group.title })).toBeInTheDocument();
+      }
+    }
+    view.unmount();
+    renderApp(`/activities/${activity.id}`);
+    expect(screen.getByRole("heading", { level: 1, name: activity.title })).toBeInTheDocument();
+    expect(within(screen.getByRole("region", { name: `${activity.title}活動照片` })).getAllByRole("img"))
+      .toHaveLength(activity.photos.length);
+    if (activity.id === "course-selection") {
+      screen.getAllByRole("img", { name: /選課大會/ }).forEach((image) => expect(image).toHaveStyle({ objectFit: "contain" }));
+    }
+  });
+
   it("opens the other-activities album from the overview and supports direct access", async () => {
     const user = userEvent.setup();
     const view = renderApp("/activities/overview");
@@ -100,17 +131,17 @@ describe("NYCU EE website", () => {
     try {
       renderApp();
       const section = screen.getByRole("region", { name: "首頁近期活動" });
-      expect(within(section).getByRole("heading", { name: "近期活動" })).toBeInTheDocument();
+      expect(within(section).getByRole("heading", { name: "最新消息" })).toBeInTheDocument();
       expect(within(section).getByRole("link", { name: /查看更多活動/ })).toHaveAttribute("href", "/activities/overview");
       expect(within(section).getAllByRole("link", { name: /查看活動詳細頁/ }).map((item) => item.getAttribute("href"))).toEqual([
-        "/activities/smart-ee-camp", "/activities/department-camping-night", "/activities/ee-week-showcase",
+        "/activities/smart-ee-camp", "/activities/department-camping-night", "/activities/freshman-night",
       ]);
       expect(within(section).getAllByRole("time").map((item) => item.getAttribute("dateTime"))).toEqual([
-        "2026-10-14", "2026-10-18", "2026-10-22",
+        "2026-10-14", "2026-10-18", "2026-10-28",
       ]);
       expect(within(section).getByText("電機營")).toBeInTheDocument();
       expect(within(section).getByText("系露營")).toBeInTheDocument();
-      expect(within(section).getByText("電機週")).toBeInTheDocument();
+      expect(within(section).getByText("新生晚會")).toBeInTheDocument();
       expect(within(section).queryByText("智慧電機探索營：從電路到未來應用")).not.toBeInTheDocument();
     } finally {
       vi.useRealTimers();
@@ -119,13 +150,13 @@ describe("NYCU EE website", () => {
 
   it("shows fewer cards when fewer upcoming activities remain", () => {
     vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-11-04T16:00:00.000Z"));
+    vi.setSystemTime(new Date("2027-05-21T16:00:00.000Z"));
 
     try {
       renderApp();
       const section = screen.getByRole("region", { name: "首頁近期活動" });
       expect(within(section).getAllByRole("link", { name: /查看活動詳細頁/ })).toHaveLength(1);
-      expect(within(section).getByRole("link", { name: /電機生活交流日.*查看活動詳細頁/ })).toHaveAttribute("href", "/activities/student-community-day");
+      expect(within(section).getByRole("link", { name: /電機週.*查看活動詳細頁/ })).toHaveAttribute("href", "/activities/ee-week-showcase");
     } finally {
       vi.useRealTimers();
     }
@@ -133,7 +164,7 @@ describe("NYCU EE website", () => {
 
   it("shows an empty state after the last activity", () => {
     vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-11-05T16:00:00.000Z"));
+    vi.setSystemTime(new Date("2027-05-22T16:00:00.000Z"));
 
     try {
       renderApp();
@@ -153,8 +184,9 @@ describe("NYCU EE website", () => {
     await user.click(within(navigation).getByRole("link", { name: "系上活動" }));
     expect(screen.getByRole("heading", { name: "活動總覽" })).toBeInTheDocument();
     const recentActivities = screen.getByRole("region", { name: "近期活動" });
-    expect(within(recentActivities).getAllByRole("link", { name: /查看活動詳細頁/ })).toHaveLength(4);
-    expect(within(recentActivities).getAllByRole("button", { name: /查看活動詳情/ })).toHaveLength(1);
+    expect(within(recentActivities).getAllByRole("link", { name: /查看活動詳細頁/ }))
+      .toHaveLength(activities.filter((activity) => activity.date && activity.detail).length);
+    expect(within(recentActivities).queryByRole("button", { name: /查看活動詳情/ })).not.toBeInTheDocument();
   });
 
   it("opens the default learning resources page from the global navigation", async () => {

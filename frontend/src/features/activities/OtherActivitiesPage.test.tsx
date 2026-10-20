@@ -15,13 +15,13 @@ function story(title: string) {
 describe("OtherActivitiesPage", () => {
   afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals(); });
 
-  it("shows eight activities and at most five visible cards, with the first story selected", () => {
+  it("shows seven activities and at most five visible cards, with the first story selected", () => {
     const view = renderPage();
     expect(screen.getByRole("heading", { name: "其他活動" })).toBeInTheDocument();
-    expect(within(screen.getByRole("navigation", { name: "選擇其他活動" })).getAllByRole("button")).toHaveLength(8);
+    expect(within(screen.getByRole("navigation", { name: "選擇其他活動" })).getAllByRole("button")).toHaveLength(7);
     expect(screen.getAllByRole("button", { name: /^選擇/ })).toHaveLength(5);
     expect(story("選課大會")).toBeInTheDocument();
-    expect(view.container.querySelectorAll('.activity-album-card[aria-hidden="true"]')).toHaveLength(3);
+    expect(view.container.querySelectorAll('.activity-album-card[aria-hidden="true"]')).toHaveLength(2);
     view.container.querySelectorAll('.activity-album-card[aria-hidden="true"]').forEach((card) => expect(card).toHaveAttribute("tabindex", "-1"));
     expect(within(story("選課大會")).getAllByRole("img")).toHaveLength(2);
   });
@@ -32,9 +32,9 @@ describe("OtherActivitiesPage", () => {
     choose("宿營");
     expect(within(story("宿營")).getAllByRole("heading", { level: 4 })).toHaveLength(5);
     expect(within(story("宿營")).getAllByRole("img")).toHaveLength(7);
-    choose("抓馬盃");
-    expect(within(story("抓馬盃")).getAllByRole("heading", { level: 4 })).toHaveLength(4);
-    expect(within(story("抓馬盃")).queryByText("生活組")).not.toBeInTheDocument();
+    choose("小畢典");
+    expect(within(story("小畢典")).queryByRole("heading", { level: 4 })).not.toBeInTheDocument();
+    expect(within(story("小畢典")).queryByText("生活組")).not.toBeInTheDocument();
     expect(screen.queryByRole("article", { name: "宿營" })).not.toBeInTheDocument();
     expect(window.scrollTo).not.toHaveBeenCalled();
   });
@@ -55,7 +55,7 @@ describe("OtherActivitiesPage", () => {
     for (let index = 0; index < 5; index++) {
       fireEvent.keyDown(screen.getByRole("group", { name: "活動照片，使用左右方向鍵切換" }), { key: "ArrowRight" });
     }
-    expect(story("抓馬盃")).toBeInTheDocument();
+    expect(story("小畢典")).toBeInTheDocument();
     expect(screen.getByRole("group", { name: "活動照片，使用左右方向鍵切換" })).toHaveFocus();
   });
 
@@ -77,10 +77,10 @@ describe("OtherActivitiesPage", () => {
     expect(story("選課大會")).toBeInTheDocument();
   });
 
-  it("automatically rotates every six seconds and loops through all eight activities", () => {
+  it("automatically rotates every six seconds and loops through all seven activities", () => {
     vi.useFakeTimers();
     const view = renderPage();
-    for (const title of ["破冰大會", "分家大會", "新生晚會", "宿營", "系烤", "抓馬盃", "小畢典", "選課大會"]) {
+    for (const title of ["破冰大會", "分家大會", "新生晚會", "宿營", "系烤", "小畢典", "選課大會"]) {
       act(() => vi.advanceTimersByTime(6000));
       expect(story(title)).toBeInTheDocument();
     }
@@ -107,10 +107,10 @@ describe("OtherActivitiesPage", () => {
     expect(story("系烤")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "播放活動相簿" }));
     act(() => vi.advanceTimersByTime(6000));
-    expect(story("抓馬盃")).toBeInTheDocument();
+    expect(story("小畢典")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "暫停自動播放" }));
     act(() => vi.advanceTimersByTime(6000));
-    expect(story("抓馬盃")).toBeInTheDocument();
+    expect(story("小畢典")).toBeInTheDocument();
     view.unmount();
   });
 

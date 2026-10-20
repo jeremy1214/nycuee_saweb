@@ -1,23 +1,14 @@
 import { Link } from "react-router-dom";
 import { activities } from "../../activities/data/activities";
+import { compareActivityDates, hasActivityDate, todayInTaiwan } from "../../activities/data/activityDates";
 import { SectionHeading } from "../../../shared/components/index";
-
-function todayInTaiwan() {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: "Asia/Taipei",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(new Date());
-  const value = (type: string) => parts.find((part) => part.type === type)?.value;
-  return `${value("year")}-${value("month")}-${value("day")}`;
-}
 
 export function RecentActivitiesSection() {
   const today = todayInTaiwan();
   const upcomingActivities = activities
+    .filter(hasActivityDate)
     .filter((activity) => activity.date >= today)
-    .sort((first, second) => first.date.localeCompare(second.date) || first.id.localeCompare(second.id))
+    .sort(compareActivityDates)
     .slice(0, 3);
 
   return (
@@ -30,15 +21,15 @@ export function RecentActivitiesSection() {
       {upcomingActivities.length > 0 ? (
         <div className="news-grid">
           {upcomingActivities.map((activity) => {
-            const image = activity.detail?.heroImages[0];
+            const image = activity.album?.cover ?? activity.detail?.heroImages[0];
             return (
               <Link className="news-card" to={`/activities/${activity.id}`} key={activity.id} aria-label={`${activity.title}，查看活動詳細頁`}>
                 <span className="news-art">
-                  <img src={image?.src ?? "/intro/activities.jpg"} alt={image?.alt ?? "系上活動紀錄"} style={{ objectPosition: image?.objectPosition }} />
+                  <img src={image?.src ?? "/intro/activities.jpg"} alt={image?.alt ?? "系上活動紀錄"} style={{ objectPosition: image?.objectPosition, objectFit: image?.fit }} />
                 </span>
                 <span className="news-body">
                   <time className="news-date" dateTime={activity.date}>{activity.date.replaceAll("-", ".")}</time>
-                  <strong>{activity.category}</strong>
+                  <strong>{activity.categoryId === "other" ? activity.title : activity.category}</strong>
                 </span>
               </Link>
             );

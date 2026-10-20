@@ -10,6 +10,19 @@ export default function OtherActivitiesPage() {
   const album = useActivityAlbum(otherActivities.length);
   const activity = otherActivities[album.current];
 
+  if (!activity) {
+    return (
+      <main className="other-activities-page">
+        <PageContainer>
+          <Breadcrumb className="activity-detail-breadcrumb" items={[{ label: "系上活動", to: "/activities/overview" }, { label: "其他活動" }]} />
+          <header className="other-activities-heading"><h1>其他活動</h1></header>
+          <p>目前沒有已發布的活動相簿。</p>
+          <div className="activity-detail-back"><Link to="/activities/overview">回到活動總覽</Link></div>
+        </PageContainer>
+      </main>
+    );
+  }
+
   return (
     <main className="other-activities-page">
       <PageContainer>
@@ -84,6 +97,7 @@ export default function OtherActivitiesPage() {
               <div className="other-activity-copy">
                 <span className="activity-detail-label">活動介紹</span>
                 {activity.intro.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+                <Link className="section-more" to={`/activities/${activity.id}`} aria-label={`${activity.title}，查看活動詳細頁`}>查看活動詳細頁 <span aria-hidden="true">↗</span></Link>
               </div>
             </div>
             <section className="other-activity-memories" aria-label={`${activity.title}活動照片`}>
@@ -97,13 +111,13 @@ export default function OtherActivitiesPage() {
                 ))}
               </div>
             </section>
-            {activity.groups && (
+            {activity.groups && activity.groups.length > 0 && (
               <section className="other-activity-groups" aria-labelledby="other-activity-groups-title">
                 <div className="other-activity-section-heading"><h3 id="other-activity-groups-title">一起把活動做出來的人</h3><span>THE TEAM</span></div>
                 <div className="other-activity-group-grid">
                   {activity.groups.map((group) => (
                     <section className="other-activity-group" key={group.id} aria-labelledby={`other-group-${group.id}`}>
-                      <img src={group.image.src} alt={group.image.alt} loading="lazy" style={{ objectPosition: group.image.objectPosition }} />
+                      <img src={group.image.src} alt={group.image.alt} loading="lazy" style={{ objectPosition: group.image.objectPosition, objectFit: group.image.fit }} />
                       <div><h4 id={`other-group-${group.id}`}>{group.title}</h4>{group.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div>
                     </section>
                   ))}

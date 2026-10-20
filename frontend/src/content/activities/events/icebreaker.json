@@ -1,0 +1,53 @@
+{
+  "$schema": "../activity.schema.json",
+  "id": "icebreaker",
+  "status": "published",
+  "title": "破冰大會",
+  "date": "2026-11-28",
+  "categoryId": "other",
+  "summary": "用遊戲與闖關，讓第一次見面變成新的友誼。",
+  "details": "破冰大會是電機系大一新生認識彼此的活動。透過團康遊戲、分組互動與一起闖關，讓原本陌生的同學有機會聊起來。\n\n從一起完成任務開始，找到能分享課業與生活的夥伴，為大學生活留下第一段共同回憶。",
+  "detail": {
+    "eyebrow": "EE LIFE · ICEBREAKER",
+    "intro": [
+      "破冰大會是電機系大一新生認識彼此的活動。透過團康遊戲、分組互動與一起闖關，讓原本陌生的同學有機會聊起來。",
+      "從一起完成任務開始，找到能分享課業與生活的夥伴，為大學生活留下第一段共同回憶。"
+    ],
+    "heroImages": [
+      {
+        "src": "/activities/other/icebreaker-01.webp",
+        "alt": "新生在室內走廊進行團康互動"
+      },
+      {
+        "src": "/activities/other/icebreaker-02.webp",
+        "alt": "破冰大會參與同學在室內合照"
+      }
+    ],
+    "sections": []
+  },
+  "album": {
+    "order": 2,
+    "cover": {
+      "src": "/activities/other/icebreaker-02.webp",
+      "alt": "破冰大會參與同學在室內合照"
+    },
+    "photos": [
+      {
+        "src": "/activities/other/icebreaker-01.webp",
+        "alt": "新生在室內走廊進行團康互動"
+      },
+      {
+        "src": "/activities/other/icebreaker-02.webp",
+        "alt": "破冰大會參與同學在室內合照"
+      },
+      {
+        "src": "/activities/other/icebreaker-03.webp",
+        "alt": "同學圍坐地面交流與互動"
+      },
+      {
+        "src": "/activities/other/icebreaker-04.webp",
+        "alt": "破冰大會同學分組坐在室內走廊"
+      }
+    ]
+  }
+}

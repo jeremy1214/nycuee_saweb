@@ -1,5 +1,6 @@
 import rawCategoryContent from "../../../content/activities/categories.json";
 import type {
+  ActivityAlbum,
   ActivityCategoryOption,
   ActivityDetail,
   ActivityDetailImage,
@@ -51,12 +52,16 @@ function unique(values: string[], source: string) {
 
 function parseImage(value: unknown, source: string): ActivityDetailImage {
   const image = record(value, source);
-  onlyKeys(image, ["src", "alt", "objectPosition"], source);
+  onlyKeys(image, ["src", "alt", "objectPosition", "fit"], source);
   const src = string(image.src, `${source}.src`);
   if (!src.startsWith("/")) fail(`${source}.src`, "must start with /");
+  if (image.fit !== undefined && image.fit !== "cover" && image.fit !== "contain") {
+    fail(`${source}.fit`, "must be cover or contain");
+  }
   return {
     src,
     alt: string(image.alt, `${source}.alt`),
+    ...(image.fit === undefined ? {} : { fit: image.fit }),
     ...(image.objectPosition === undefined
       ? {}
       : { objectPosition: string(image.objectPosition, `${source}.objectPosition`) }),
@@ -129,38 +134,62 @@ function parseDetail(value: unknown, source: string): ActivityDetail {
   };
 }
 
-function parseActivity(value: unknown, source: string): ParsedActivity {
-  const activity = record(value, source);
-  onlyKeys(
-    activity,
-    ["$schema", "id", "status", "title", "date", "categoryId", "summary", "details", "location", "detail"],
-    source,
-  );
-  const status = string(activity.status, `${source}.status`);
-  if (status !== "draft" && status !== "published" && status !== "archived") {
-    fail(`${source}.status`, "must be draft, published, or archived");
+function parseAlbum(value: unknown, source: string): ActivityAlbum {
+  const album = record(value, source);
+  onlyKeys(album, ["order", "cover", "photos"], source);
+  if (typeof album.order !== "number" || !Number.isInteger(album.order) || album.order < 0) {
+    fail(`${source}.order`, "must be a non-negative integer");
   }
-  const date = string(activity.date, `${source}.date`);
+  if (!Array.isArray(album.photos) || album.photos.length === 0) {
+    fail(`${source}.photos`, "must be a non-empty array");
+  }
+  return {
+    order: album.order,
+    cover: parseImage(album.cover, `${source}.cover`),
+    photos: album.photos.map((image, index) => parseImage(image, `${source}.photos[${index}]`)),
+  };
+}
+
+function parseDate(value: unknown, source: string): string {
+  const date = string(value, source);
   const [year, month, day] = date.split("-").map(Number);
-  const parsedDate = new Date(Date.UTC(year, month - 1, day));
+  const parsedDate = new Date(`${date}T00:00:00.000Z`);
   if (
     !datePattern.test(date)
     || parsedDate.getUTCFullYear() !== year
     || parsedDate.getUTCMonth() + 1 !== month
     || parsedDate.getUTCDate() !== day
   ) {
-    fail(`${source}.date`, "must be a valid YYYY-MM-DD date");
+    fail(source, "must be a valid YYYY-MM-DD date");
+  }
+  return date;
+}
+
+function parseActivity(value: unknown, source: string): ParsedActivity {
+  const activity = record(value, source);
+  onlyKeys(
+    activity,
+    ["$schema", "id", "status", "title", "date", "categoryId", "summary", "details", "location", "detail", "album"],
+    source,
+  );
+  const status = string(activity.status, `${source}.status`);
+  if (status !== "draft" && status !== "published" && status !== "archived") {
+    fail(`${source}.status`, "must be draft, published, or archived");
+  }
+  if (activity.album !== undefined && activity.detail === undefined) {
+    fail(`${source}.album`, "requires detail content");
   }
   return {
     id: slug(activity.id, `${source}.id`),
     status,
     title: string(activity.title, `${source}.title`),
-    date,
+    ...(activity.date === undefined ? {} : { date: parseDate(activity.date, `${source}.date`) }),
     categoryId: slug(activity.categoryId, `${source}.categoryId`),
     summary: string(activity.summary, `${source}.summary`),
     details: string(activity.details, `${source}.details`),
-    location: string(activity.location, `${source}.location`),
+    ...(activity.location === undefined ? {} : { location: string(activity.location, `${source}.location`) }),
     ...(activity.detail === undefined ? {} : { detail: parseDetail(activity.detail, `${source}.detail`) }),
+    ...(activity.album === undefined ? {} : { album: parseAlbum(activity.album, `${source}.album`) }),
   };
 }
 

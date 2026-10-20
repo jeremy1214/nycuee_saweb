@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { primaryNavigation } from "../../data/navigation";
 import { Brand } from "./Brand";
 import { PageContainer } from "./PageContainer";
@@ -8,7 +8,7 @@ interface SiteHeaderProps {
   onPlaceholder: (title: string) => void;
 }
 
-export function SiteHeader({ onSearch, onPlaceholder }: SiteHeaderProps) {
+export function SiteHeader({ onSearch }: SiteHeaderProps) {
   return (
     <header className="site-header">
       <PageContainer className="header-inner">
@@ -23,9 +23,9 @@ export function SiteHeader({ onSearch, onPlaceholder }: SiteHeaderProps) {
           <button className="icon-button" type="button" onClick={onSearch} aria-label="搜尋網站">
             <span aria-hidden="true">⌕</span>
           </button>
-          <button className="sign-in-button" type="button" onClick={() => onPlaceholder("系統登入")}>
+          <Link className="sign-in-button" to="/admin/login">
             Sign in <span aria-hidden="true">↗</span>
-          </button>
+          </Link>
         </div>
       </PageContainer>
     </header>

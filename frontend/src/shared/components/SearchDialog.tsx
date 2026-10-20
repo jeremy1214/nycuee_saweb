@@ -3,15 +3,27 @@ import { Link } from "react-router-dom";
 import { searchItems } from "../data/search";
 import { Modal } from "./ui/Modal";
 
+function resultSnippet(content: string, description: string, query: string) {
+  if (!query) return description;
+  const index = content.toLocaleLowerCase("zh-Hant").indexOf(query);
+  if (index < 0) return description;
+  const start = Math.max(0, index - 32);
+  const end = Math.min(content.length, index + query.length + 54);
+  return `${start ? "…" : ""}${content.slice(start, end).trim()}${end < content.length ? "…" : ""}`;
+}
+
 export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [query, setQuery] = useState("");
+  const normalized = query.trim().toLocaleLowerCase("zh-Hant");
   const results = useMemo(() => {
-    const normalized = query.trim().toLocaleLowerCase("zh-Hant");
     if (!normalized) return searchItems;
-    return searchItems.filter((item) =>
-      `${item.label}${item.description}`.toLocaleLowerCase("zh-Hant").includes(normalized),
-    );
-  }, [query]);
+    return searchItems.filter((item) => item.content.toLocaleLowerCase("zh-Hant").includes(normalized))
+      .sort((first, second) => {
+        const rank = (item: typeof first) => item.label.toLocaleLowerCase("zh-Hant").includes(normalized) ? 0
+          : item.description.toLocaleLowerCase("zh-Hant").includes(normalized) ? 1 : 2;
+        return rank(first) - rank(second);
+      });
+  }, [normalized]);
 
   return (
     <Modal open={open} title="搜尋系所資訊" onClose={onClose}>
@@ -27,8 +39,8 @@ export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => 
       />
       <div className="search-results" aria-live="polite">
         {results.length > 0 ? results.map((item) => (
-          <Link key={item.label} to={item.to} onClick={onClose}>
-            <span><strong>{item.label}</strong><small>{item.description}</small></span>
+          <Link key={`${item.to}-${item.label}`} to={item.to} onClick={onClose}>
+            <span><strong>{item.label}</strong><small>{resultSnippet(item.content, item.description, normalized)}</small></span>
             <span aria-hidden="true">→</span>
           </Link>
         )) : <p className="empty-state">沒有符合的項目，請試試其他關鍵字。</p>}

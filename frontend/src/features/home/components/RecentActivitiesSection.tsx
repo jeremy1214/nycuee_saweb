@@ -24,10 +24,9 @@ export function RecentActivitiesSection() {
     <section className="home-section home-activities-section" id="recent-activities" data-home-reveal aria-label="首頁近期活動">
       <SectionHeading
         eyebrow="UPCOMING EVENTS"
-        title="近期活動"
+        title="最新消息"
         action={<Link className="section-more" to="/activities/overview">查看更多活動 <span aria-hidden="true">↗</span></Link>}
       />
-      <p className="home-activity-note">活動資訊為示意，正式時間與報名方式請以系所公告為準。</p>
       {upcomingActivities.length > 0 ? (
         <div className="news-grid">
           {upcomingActivities.map((activity) => {

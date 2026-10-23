@@ -2,7 +2,7 @@
   "$schema": "../activity.schema.json",
   "id": "department-camping-night",
   "status": "published",
-  "title": "系露營：一起籌辦，留下大一的共同回憶",
+  "title": "系露營",
   "date": "2026-10-18",
   "categoryId": "department-camping",
   "summary": "從活動設計、道具製作到小隊帶領，和夥伴一起籌辦營隊，在系出遊中認識彼此。",

@@ -103,12 +103,11 @@ export default function OtherActivitiesPage() {
               </div>
             </div>
             <section className="other-activity-memories" aria-label={`${activity.title}活動照片`}>
-              <div className="other-activity-section-heading"><h3>相簿裡的片刻</h3><span>{activity.photos.length} PHOTOS</span></div>
+              <div className="other-activity-section-heading"><h3>活動回顧</h3><span>{activity.photos.length} PHOTOS</span></div>
               <div className="other-activity-photo-grid">
                 {activity.photos.map((photo, index) => (
                   <figure key={photo.src}>
                     <img src={photo.src} alt={photo.alt} loading="lazy" style={{ objectFit: photo.fit ?? "cover", objectPosition: photo.objectPosition }} />
-                    <figcaption><span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>{photo.alt}</figcaption>
                   </figure>
                 ))}
               </div>

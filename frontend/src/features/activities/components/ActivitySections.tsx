@@ -15,15 +15,6 @@ export function ActivityOverview({ selectedCategory, onCategoryChange }: Activit
         <span className="eyebrow">CAMPUS LIFE · EE COMMUNITY</span>
         <h1 id="activity-overview-title">活動總覽</h1>
         <p>從營隊、展演到系上交流，從不同活動認識電機人的學習與生活。</p>
-        <p className="activity-demo-note"><span aria-hidden="true">●</span> 第一版為版面示意，正式時間與報名方式請以系所公告為準。</p>
-        <button
-          className="activity-all-button"
-          type="button"
-          aria-pressed={selectedCategory === null}
-          onClick={() => onCategoryChange(null)}
-        >
-          顯示全部活動 <span aria-hidden="true">→</span>
-        </button>
       </div>
 
       <div className="activity-category-cloud" role="group" aria-label="依活動分類篩選">
@@ -112,9 +103,7 @@ export function RecentActivities({ selectedCategory, onActivitySelect }: RecentA
               <span>{activity.date.slice(0, 7).replace("-", ".")}</span>
             </time>
             <span className="activity-card-content">
-              <span className="activity-card-category">{activity.category}</span>
               <strong className="activity-card-title">{activity.title}</strong>
-              <span className="activity-card-summary">{activity.summary}</span>
             </span>
             <span className="activity-card-arrow" aria-hidden="true">↗</span>
             </>

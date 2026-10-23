@@ -2,7 +2,7 @@
   "$schema": "../activity.schema.json",
   "id": "smart-ee-camp",
   "status": "published",
-  "title": "智慧電機探索營：從電路到未來應用",
+  "title": "電機營",
   "date": "2026-10-14",
   "categoryId": "ee-camp",
   "summary": "透過主題講解與動手實作，認識電機領域如何連結生活中的智慧科技。",

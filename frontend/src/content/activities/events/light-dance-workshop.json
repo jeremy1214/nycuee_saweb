@@ -2,7 +2,7 @@
   "$schema": "../activity.schema.json",
   "id": "light-dance-workshop",
   "status": "published",
-  "title": "光舞：用科技點亮舞台",
+  "title": "光舞",
   "date": "2026-10-28",
   "categoryId": "light-dance",
   "summary": "結合 LED、光纖、程式控制與舞蹈，讓音樂、動作與燈光一起點亮舞台。",

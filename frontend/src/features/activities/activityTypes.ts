@@ -38,6 +38,7 @@ export interface ActivityItem {
   id: string;
   title: string;
   date?: string;
+  endDate?: string;
   categoryId: string;
   category: string;
   summary: string;
@@ -65,6 +66,8 @@ export interface ActivityCategoryOption {
 export interface OtherActivity {
   id: string;
   title: string;
+  date?: string;
+  endDate?: string;
   summary: string;
   intro: string[];
   links?: ActivityLink[];

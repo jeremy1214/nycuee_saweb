@@ -37,6 +37,13 @@ describe("optional activity dates and shared album validation", () => {
     expect(activity.location).toBeUndefined();
   });
 
+  it.each(["2026-09-28", "2026-09-30", "2027-01-02"])("accepts an inclusive end date %s and shares it with the album", async (endDate) => {
+    const { activities } = await loadWith({ date: "2026-09-28", endDate });
+    expect(activities.find((item) => item.id === rawOther.id)).toMatchObject({ date: "2026-09-28", endDate });
+    const { otherActivities } = await import("./otherActivities");
+    expect(otherActivities.find((item) => item.id === rawOther.id)).toMatchObject({ date: "2026-09-28", endDate });
+  });
+
   it.each(["draft", "archived"])("hides %s activities from both published content and the album", async (status) => {
     await loadWith({ status, date: "2026-10-20" });
     const { activities } = await import("./activityRepository");
@@ -59,6 +66,11 @@ describe("optional activity dates and shared album validation", () => {
     ["impossible date", { date: "2026-02-30" }, ".date: must be a valid YYYY-MM-DD date"],
     ["non-leap February", { date: "2027-02-29" }, ".date: must be a valid YYYY-MM-DD date"],
     ["invalid month", { date: "2026-13-01" }, ".date: must be a valid YYYY-MM-DD date"],
+    ["end without start", { date: undefined, endDate: "2026-09-30" }, ".endDate: requires date"],
+    ["end before start", { date: "2026-09-30", endDate: "2026-09-28" }, ".endDate: must be on or after date"],
+    ["invalid end date", { date: "2026-09-28", endDate: "2026-09-31" }, ".endDate: must be a valid YYYY-MM-DD date"],
+    ["empty end date", { endDate: "" }, ".endDate: must be a non-empty string"],
+    ["null end date", { endDate: null }, ".endDate: must be a non-empty string"],
     ["blank location", { location: " " }, ".location: must be a non-empty string"],
     ["null location", { location: null }, ".location: must be a non-empty string"],
     ["invalid status", { status: "visible" }, ".status: must be draft, published, or archived"],

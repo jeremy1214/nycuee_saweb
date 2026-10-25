@@ -1,13 +1,14 @@
 import { Link } from "react-router-dom";
 import { activities } from "../../activities/data/activities";
-import { compareActivityDates, hasActivityDate, todayInTaiwan } from "../../activities/data/activityDates";
+import { activityEndDate, compareActivityDates, hasActivityDate, todayInTaiwan } from "../../activities/data/activityDates";
+import { ActivityDate } from "../../activities/components/ActivityDate";
 import { SectionHeading } from "../../../shared/components/index";
 
 export function RecentActivitiesSection() {
   const today = todayInTaiwan();
   const upcomingActivities = activities
     .filter(hasActivityDate)
-    .filter((activity) => activity.date >= today)
+    .filter((activity) => activityEndDate(activity) >= today)
     .sort(compareActivityDates)
     .slice(0, 3);
 
@@ -28,7 +29,7 @@ export function RecentActivitiesSection() {
                   <img src={image?.src ?? "/intro/activities.jpg"} alt={image?.alt ?? "系上活動紀錄"} style={{ objectPosition: image?.objectPosition, objectFit: image?.fit }} />
                 </span>
                 <span className="news-body">
-                  <time className="news-date" dateTime={activity.date}>{activity.date.replaceAll("-", ".")}</time>
+                  <ActivityDate className="news-date" activity={activity} />
                   <strong>{activity.categoryId === "other" ? activity.title : activity.category}</strong>
                 </span>
               </Link>

@@ -6,6 +6,21 @@ export function hasActivityDate(activity: ActivityItem): activity is DatedActivi
   return activity.date !== undefined;
 }
 
+/** Both dates in the content are inclusive; an omitted end date means one day. */
+export function activityEndDate(activity: Pick<DatedActivity, "date" | "endDate">) {
+  return activity.endDate ?? activity.date;
+}
+
+export function activityOccursOn(activity: Pick<DatedActivity, "date" | "endDate">, day: string) {
+  return activity.date <= day && activityEndDate(activity) >= day;
+}
+
+export function formatActivityDateRange(activity: Pick<DatedActivity, "date" | "endDate">) {
+  const start = activity.date.replaceAll("-", ".");
+  const end = activityEndDate(activity);
+  return end === activity.date ? start : `${start} – ${end.replaceAll("-", ".")}`;
+}
+
 export function compareActivityDates(first: DatedActivity, second: DatedActivity) {
   return first.date.localeCompare(second.date) || first.id.localeCompare(second.id);
 }

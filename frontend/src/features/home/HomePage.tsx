@@ -6,6 +6,7 @@ import { HomeAbout } from "./components/HomeAbout";
 import { AddToGoogleCalendar } from "./components/CalendarImport";
 import type { CalendarEvent } from "./homeTypes";
 import { ActivityLinks } from "../activities/components/ActivityLinks";
+import { ActivityDate } from "../activities/components/ActivityDate";
 
 import "./home.css";
 
@@ -43,7 +44,7 @@ export default function HomePage() {
         </PageContainer>
       </main>
       <Modal open={selectedEvent !== null} title={selectedEvent?.title ?? "活動資訊"} onClose={() => setSelectedEvent(null)}>
-        <p className="dialog-copy">{selectedEvent?.date}｜{selectedEvent?.category}{selectedEvent?.location && `｜${selectedEvent.location}`}</p>
+        <p className="dialog-copy">{selectedEvent && <ActivityDate activity={selectedEvent} />}｜{selectedEvent?.category}{selectedEvent?.location && `｜${selectedEvent.location}`}</p>
         <p className="dialog-copy">{selectedEvent?.details}</p>
         {selectedEvent && <>
           <ActivityLinks links={selectedEvent.links} />

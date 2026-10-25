@@ -12,6 +12,9 @@ vi.mock("../data/home", async (importOriginal) => {
     calendarEvents: [...original.calendarEvents, {
       id: "calendar-fallback", title: "活動資訊測試", date: "2026-10-28",
       categoryId: "other", category: "其他活動", summary: "摘要", details: "完整活動介紹",
+    }, {
+      id: "cross-month", title: "跨月活動", date: "2026-10-31", endDate: "2026-11-02",
+      categoryId: "other", category: "其他活動", summary: "摘要", details: "跨月介紹",
     }],
   };
 });
@@ -66,4 +69,21 @@ it("uses the same complete activity list for calendar import", async () => {
   renderCalendar();
   await user.click(screen.getByRole("button", { name: "匯入 Google 日曆" }));
   expect(screen.getByRole("dialog")).toHaveTextContent(`全部 ${calendarEvents.length} 筆活動`);
+});
+
+it("shows camp on all three inclusive days and nowhere else", () => {
+  renderCalendar();
+  const links = screen.getAllByRole("link", { name: "宿營，查看活動詳細頁" });
+  expect(links.map((link) => link.parentElement?.querySelector("time")?.dateTime))
+    .toEqual(["2026-09-28", "2026-09-29", "2026-09-30"]);
+  links.forEach((link) => expect(link).toHaveAttribute("title", "其他活動｜宿營｜2026.09.28 – 2026.09.30"));
+});
+
+it("continues an activity across month navigation without adding a fourth day", async () => {
+  renderCalendar();
+  const user = userEvent.setup();
+  await user.click(screen.getByRole("button", { name: "下一個月" }));
+  const links = screen.getAllByRole("button", { name: "跨月活動，查看活動詳情" });
+  expect(links.map((link) => link.parentElement?.querySelector("time")?.dateTime))
+    .toEqual(["2026-11-01", "2026-11-02"]);
 });

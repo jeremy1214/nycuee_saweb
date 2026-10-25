@@ -1,4 +1,5 @@
 import type { CalendarEvent } from "../homeTypes";
+import { activityEndDate } from "../../activities/data/activityDates";
 
 export const googleCalendarImportUrl = "https://calendar.google.com/calendar/u/0/r/settings/export";
 function activityUrl(event: CalendarEvent) {
@@ -9,14 +10,14 @@ function eventDescription(event: CalendarEvent) {
   return `${event.category}\n${event.details}\n\n活動詳情：${activityUrl(event)}`;
 }
 
-function dateRange(date: string) {
-  const [year, month, day] = date.split("-").map(Number);
+function dateRange(event: CalendarEvent) {
+  const [year, month, day] = activityEndDate(event).split("-").map(Number);
   const nextDay = new Date(Date.UTC(year, month - 1, day + 1));
-  return { start: date.replaceAll("-", ""), end: nextDay.toISOString().slice(0, 10).replaceAll("-", "") };
+  return { start: event.date.replaceAll("-", ""), end: nextDay.toISOString().slice(0, 10).replaceAll("-", "") };
 }
 
 export function googleCalendarEventUrl(event: CalendarEvent) {
-  const dates = dateRange(event.date);
+  const dates = dateRange(event);
   const params = new URLSearchParams({
     action: "TEMPLATE",
     text: event.title,
@@ -63,7 +64,7 @@ export function createCalendarFile(events: CalendarEvent[]) {
     "METHOD:PUBLISH",
     "X-WR-CALNAME:交大電機行事曆",
     ...events.flatMap((event) => {
-      const dates = dateRange(event.date);
+      const dates = dateRange(event);
       return [
         "BEGIN:VEVENT",
         `UID:${eventUid(event)}`,

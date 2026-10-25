@@ -191,7 +191,7 @@ function parseActivity(value: unknown, source: string): ParsedActivity {
   const activity = record(value, source);
   onlyKeys(
     activity,
-    ["$schema", "id", "status", "title", "date", "categoryId", "summary", "details", "location", "links", "detail", "album"],
+    ["$schema", "id", "status", "title", "date", "endDate", "categoryId", "summary", "details", "location", "links", "detail", "album"],
     source,
   );
   const status = string(activity.status, `${source}.status`);
@@ -201,11 +201,18 @@ function parseActivity(value: unknown, source: string): ParsedActivity {
   if (activity.album !== undefined && activity.detail === undefined) {
     fail(`${source}.album`, "requires detail content");
   }
+  const date = activity.date === undefined ? undefined : parseDate(activity.date, `${source}.date`);
+  const endDate = activity.endDate === undefined ? undefined : parseDate(activity.endDate, `${source}.endDate`);
+  if (endDate !== undefined) {
+    if (date === undefined) fail(`${source}.endDate`, "requires date");
+    if (endDate < date) fail(`${source}.endDate`, "must be on or after date");
+  }
   return {
     id: slug(activity.id, `${source}.id`),
     status,
     title: string(activity.title, `${source}.title`),
-    ...(activity.date === undefined ? {} : { date: parseDate(activity.date, `${source}.date`) }),
+    ...(date === undefined ? {} : { date }),
+    ...(endDate === undefined ? {} : { endDate }),
     categoryId: slug(activity.categoryId, `${source}.categoryId`),
     summary: string(activity.summary, `${source}.summary`),
     details: string(activity.details, `${source}.details`),

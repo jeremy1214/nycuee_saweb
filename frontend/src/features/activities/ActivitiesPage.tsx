@@ -4,6 +4,7 @@ import { Modal, PageContainer } from "../../shared/components/index";
 import type { ActivityItem } from "./activityTypes";
 import { ActivityOverview, RecentActivities } from "./components/ActivitySections";
 import { ActivityLinks } from "./components/ActivityLinks";
+import { ActivityDate } from "./components/ActivityDate";
 import { activityCategories } from "./data/activities";
 import "./activities.css";
 
@@ -37,7 +38,7 @@ export default function ActivitiesPage() {
           <div className="activity-dialog-content">
             <div className="activity-dialog-meta">
               <span>{selectedActivity.category}</span>
-              {selectedActivity.date && <time dateTime={selectedActivity.date}>{selectedActivity.date.replaceAll("-", ".")}</time>}
+              {selectedActivity.date && <ActivityDate activity={selectedActivity} />}
               {selectedActivity.location && <span>{selectedActivity.location}</span>}
             </div>
             <p>{selectedActivity.details}</p>

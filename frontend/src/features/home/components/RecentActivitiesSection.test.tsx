@@ -41,6 +41,19 @@ afterEach(() => {
 });
 
 describe("latest activity announcements", () => {
+  it("keeps an ongoing activity through its final Taiwan date and excludes it the next day", () => {
+    activities.push(
+      { ...event("ongoing", "2026-10-18"), endDate: "2026-10-20" },
+      { ...event("ended", "2026-10-17"), endDate: "2026-10-19" },
+    );
+    const view = render(<MemoryRouter><RecentActivitiesSection /></MemoryRouter>);
+    expect(screen.getByRole("link", { name: "ongoing，查看活動詳細頁" }))
+      .toHaveTextContent("2026.10.18 – 2026.10.20");
+    expect(screen.queryByRole("link", { name: "ended，查看活動詳細頁" })).not.toBeInTheDocument();
+    vi.setSystemTime(new Date("2026-10-20T16:00:00.000Z"));
+    view.rerender(<MemoryRouter><RecentActivitiesSection /></MemoryRouter>);
+    expect(screen.queryByRole("link", { name: "ongoing，查看活動詳細頁" })).not.toBeInTheDocument();
+  });
   it("ignores undated introductions and past dates, includes today in Taiwan, and shows only the next three", () => {
     activities.push(
       event("undated"), event("past", "2026-10-19"), event("later", "2026-11-01"),

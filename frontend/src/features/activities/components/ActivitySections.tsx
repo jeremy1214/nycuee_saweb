@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { activities, activityCategories } from "../data/activities";
 import { compareActivityDates, hasActivityDate } from "../data/activityDates";
 import type { ActivityItem } from "../activityTypes";
+import { ActivityDate } from "./ActivityDate";
 
 interface ActivityOverviewProps {
   selectedCategory: string | null;
@@ -104,6 +105,9 @@ export function RecentActivities({ selectedCategory, onActivitySelect }: RecentA
             </time>
             <span className="activity-card-content">
               <strong className="activity-card-title">{activity.title}</strong>
+              {activity.endDate && activity.endDate !== activity.date && (
+                <span className="activity-card-range"><ActivityDate activity={activity} /></span>
+              )}
             </span>
             <span className="activity-card-arrow" aria-hidden="true">↗</span>
             </>

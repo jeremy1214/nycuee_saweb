@@ -79,7 +79,7 @@ export const searchItems: SearchItem[] = [
     "從營隊、展演到系上交流，從不同活動認識電機人的學習與生活。", activities.map((activity) => [activity.title, activity.summary])),
   ...activities.flatMap((activity) => {
     const base = `/activities/${activity.id}`;
-    const shared = [activity.title, activity.category, activity.date, activity.location,
+    const shared = [activity.title, activity.category, activity.date, activity.endDate, activity.location,
       activity.summary, activity.details];
     const intro = activity.detail ? [activity.detail.eyebrow, activity.detail.intro,
       activity.detail.sections] : [];

@@ -8,6 +8,8 @@ export const otherActivities: OtherActivity[] = activities
   .map((activity) => ({
     id: activity.id,
     title: activity.title,
+    ...(activity.date === undefined ? {} : { date: activity.date }),
+    ...(activity.endDate === undefined ? {} : { endDate: activity.endDate }),
     summary: activity.summary,
     intro: activity.detail!.intro,
     ...(activity.links === undefined ? {} : { links: activity.links }),

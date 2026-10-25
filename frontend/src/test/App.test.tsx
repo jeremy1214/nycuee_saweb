@@ -22,7 +22,8 @@ describe("NYCU EE website", () => {
     await user.click(screen.getByRole("link", { name: `${activity.title}，查看活動詳細頁` }));
     expect(screen.getByRole("heading", { level: 1, name: activity.title })).toBeInTheDocument();
     expect(screen.getByRole("region", { name: `${activity.title}活動照片` })).toBeInTheDocument();
-    expect(screen.queryByRole("time")).not.toBeInTheDocument();
+    expect(screen.queryAllByRole("time").map((time) => time.getAttribute("datetime")))
+      .toEqual(activity.date ? [activity.date, ...(activity.endDate && activity.endDate !== activity.date ? [activity.endDate] : [])] : []);
     expect(screen.queryByLabelText("活動資訊")).not.toBeInTheDocument();
     if (activity.id === "freshman-camp") {
       for (const group of activity.groups!) {
@@ -127,7 +128,7 @@ describe("NYCU EE website", () => {
       const calendar = screen.getByRole("region", { name: "行事曆" });
       await user.click(within(calendar).getByRole("link", { name: "新生晚會，查看活動詳細頁" }));
       expect(screen.getByRole("heading", { level: 1, name: "新生晚會" })).toBeInTheDocument();
-      expect(screen.queryByRole("time")).not.toBeInTheDocument();
+      expect(screen.getByRole("time")).toHaveAttribute("datetime", activities.find((activity) => activity.title === "新生晚會")?.date);
     } finally {
       vi.useRealTimers();
     }

@@ -3,6 +3,7 @@ import { Breadcrumb, PageContainer } from "../../shared/components/index";
 import NotFoundPage from "../../shared/pages/NotFoundPage";
 import { activities } from "./data/activities";
 import { ActivityLinks } from "./components/ActivityLinks";
+import { ActivityDate } from "./components/ActivityDate";
 import "./activities.css";
 
 function scrollToSection(sectionId: string) {
@@ -29,6 +30,7 @@ export default function ActivityDetailPage() {
             <span className="eyebrow">UPCOMING EVENT</span>
             <h1>{activityTitle}</h1>
             <p>{activity.categoryId === "other" ? activity.summary : activity.title}</p>
+            <ActivityDate activity={activity} className="activity-detail-dates" />
           </header>
           <article className="activity-detail-fallback">
             <span className="activity-detail-label">活動資訊</span>
@@ -76,6 +78,7 @@ export default function ActivityDetailPage() {
           <span className="eyebrow">{detail.eyebrow}</span>
           <h1>{activityTitle}</h1>
           <p>{activity.categoryId === "other" ? activity.summary : activity.title}</p>
+          <ActivityDate activity={activity} className="activity-detail-dates" />
         </header>
 
         {!sharedIntro && tabNavigation}

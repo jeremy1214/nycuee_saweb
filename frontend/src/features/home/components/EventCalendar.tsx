@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { activityCategories } from "../../activities/data/activities";
-import { todayInTaiwan } from "../../activities/data/activityDates";
+import { activityOccursOn, formatActivityDateRange, todayInTaiwan } from "../../activities/data/activityDates";
 import { SectionHeading } from "../../../shared/components/index";
 import type { CalendarEvent } from "../homeTypes";
 import { calendarEvents } from "../data/home";
@@ -38,14 +38,14 @@ export function EventCalendar({ onEvent }: { onEvent: (event: CalendarEvent) => 
         <div className="weekdays" aria-hidden="true">{["日", "一", "二", "三", "四", "五", "六"].map((day) => <span key={day}>{day}</span>)}</div>
         <div className="calendar-days">
           {cells.map(({ date, key, outside }) => {
-            const events = calendarEvents.filter((item) => item.date === key);
+            const events = calendarEvents.filter((item) => activityOccursOn(item, key));
             return (
               <div className={`calendar-day ${outside ? "is-outside" : ""} ${key === todayKey ? "is-today" : ""}`} key={key}>
                 <time className="day-number" dateTime={key} aria-current={key === todayKey ? "date" : undefined}>{date.getDate()}</time>
                 {events.map((event) => event.detail ? (
-                  <Link className={`calendar-event calendar-category-${event.categoryId}`} key={event.id} to={`/activities/${event.id}`} title={`${event.category}｜${event.title}`} aria-label={`${event.title}，查看活動詳細頁`}>{event.title}</Link>
+                  <Link className={`calendar-event calendar-category-${event.categoryId}`} key={event.id} to={`/activities/${event.id}`} title={`${event.category}｜${event.title}｜${formatActivityDateRange(event)}`} aria-label={`${event.title}，查看活動詳細頁`}>{event.title}</Link>
                 ) : (
-                  <button className={`calendar-event calendar-category-${event.categoryId}`} key={event.id} type="button" onClick={() => onEvent(event)} title={`${event.category}｜${event.title}`} aria-label={`${event.title}，查看活動詳情`}>{event.title}</button>
+                  <button className={`calendar-event calendar-category-${event.categoryId}`} key={event.id} type="button" onClick={() => onEvent(event)} title={`${event.category}｜${event.title}｜${formatActivityDateRange(event)}`} aria-label={`${event.title}，查看活動詳情`}>{event.title}</button>
                 ))}
               </div>
             );

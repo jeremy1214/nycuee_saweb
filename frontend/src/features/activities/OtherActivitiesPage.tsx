@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { Breadcrumb, PageContainer } from "../../shared/components/index";
 import { otherActivities } from "./data/otherActivities";
 import { ActivityLinks } from "./components/ActivityLinks";
+import { ActivityDate } from "./components/ActivityDate";
 import { useActivityAlbum } from "./hooks/useActivityAlbum";
 import "./activities.css";
 import "./otherActivities.css";
@@ -96,6 +97,7 @@ export default function OtherActivitiesPage() {
                 <span className="eyebrow">THE STORY · {String(album.current + 1).padStart(2, "0")}</span>
                 <h2 id="other-activity-title">{activity.title}</h2>
                 <p>{activity.summary}</p>
+                <ActivityDate activity={activity} />
               </div>
               <div className="other-activity-copy">
                 <span className="activity-detail-label">活動介紹</span>

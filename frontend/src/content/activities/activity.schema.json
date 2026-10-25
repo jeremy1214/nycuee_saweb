@@ -5,13 +5,17 @@
   "type": "object",
   "additionalProperties": false,
   "required": ["id", "status", "title", "categoryId", "summary", "details"],
-  "allOf": [{ "if": { "required": ["album"] }, "then": { "required": ["detail"] } }],
+  "allOf": [
+    { "if": { "required": ["album"] }, "then": { "required": ["detail"] } },
+    { "if": { "required": ["endDate"] }, "then": { "required": ["date"] } }
+  ],
   "properties": {
     "$schema": { "type": "string" },
     "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
     "status": { "enum": ["draft", "published", "archived"] },
     "title": { "type": "string", "minLength": 1 },
     "date": { "type": "string", "format": "date", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "endDate": { "type": "string", "format": "date", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "description": "最後一天（包含當天），不可早於 date；省略時為單日活動。" },
     "categoryId": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
     "summary": { "type": "string", "minLength": 1 },
     "details": { "type": "string", "minLength": 1 },

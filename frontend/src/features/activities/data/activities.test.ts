@@ -15,11 +15,21 @@ describe("activity data", () => {
     activities.forEach((activity) => {
       expect(activity.id).toMatch(slugPattern);
       if (activity.date !== undefined) expect(activity.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      if (activity.endDate !== undefined) {
+        expect(activity.date).toBeDefined();
+        expect(activity.endDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+        expect(activity.endDate >= activity.date!).toBe(true);
+      }
       expect(categoryIds.has(activity.categoryId)).toBe(true);
       expect(activityCategories.find((category) => category.id === activity.categoryId)?.label).toBe(
         activity.category,
       );
     });
+  });
+
+  it("sets freshman camp to September 28 through September 30, 2026", () => {
+    expect(activities.find((activity) => activity.id === "freshman-camp"))
+      .toMatchObject({ date: "2026-09-28", endDate: "2026-09-30" });
   });
 
   it("maps every featured category to its own published detail page", () => {

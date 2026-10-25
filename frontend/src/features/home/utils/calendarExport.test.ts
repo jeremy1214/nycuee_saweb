@@ -41,3 +41,17 @@ it("keeps a stable UID when an activity date or title changes and omits unknown 
   expect(updated).not.toContain("LOCATION:");
   expect(new URL(googleCalendarEventUrl({ ...event, location: undefined })).searchParams.has("location")).toBe(false);
 });
+
+it.each([
+  ["2026-09-28", "2026-09-30", "20260928/20261001"],
+  ["2026-12-31", "2027-01-02", "20261231/20270103"],
+  ["2028-02-28", "2028-02-29", "20280228/20280301"],
+  ["2026-09-28", "2026-09-28", "20260928/20260929"],
+])("exports the inclusive range %s to %s as one all-day event", (date, endDate, expectedDates) => {
+  const rangeEvent = { ...event, date, endDate };
+  expect(new URL(googleCalendarEventUrl(rangeEvent)).searchParams.get("dates")).toBe(expectedDates);
+  const [start, end] = expectedDates.split("/");
+  const file = createCalendarFile([rangeEvent]).replace(/\r\n /g, "");
+  expect(file.match(/BEGIN:VEVENT/g)).toHaveLength(1);
+  expect(file).toContain(`DTSTART;VALUE=DATE:${start}\r\nDTEND;VALUE=DATE:${end}`);
+});

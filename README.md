@@ -2,7 +2,7 @@
 
 使用 Vite、React 19、TypeScript 及 Hash Router 的前端網站，包含首頁、系學會、系上活動、系隊、學習資料與聯絡頁。
 
-另提供 NestJS、PostgreSQL 與 Prisma 的管理員帳密登入系統。後台入口為 `/#/admin`，登入頁為 `/#/admin/login`；網站頁首的 Sign in 可開啟登入頁。
+另提供 NestJS、PostgreSQL 與 Prisma 的管理員帳密登入系統及聯絡表單收件匣。後台入口為 `/#/admin`，登入頁為 `/#/admin/login`；網站頁首的 Sign in 可開啟登入頁。
 
 ## 啟動登入系統（Docker）
 
@@ -59,7 +59,7 @@ npm run dev
 
 兩個 POST 都必須攜帶 `X-CSRF-Token`，值取自同一 Cookie Session 的 `csrf` 回應，並使用 JSON 請求。登入成功後請重新取得 Token。驗證回應禁止快取，密碼雜湊不會回傳至前端。
 
-本次提供登入、登出及顯示目前帳號的後台首頁；Google 登入、帳號管理介面、密碼重設與內容編輯依後續階段擴充。
+後台提供登入、登出、目前帳號及聯絡表單收件匣；Google 登入、帳號管理介面、密碼重設與內容編輯依後續階段擴充。
 
 ## 正式 HTTPS 部署
 
@@ -74,7 +74,7 @@ COOKIE_SECURE=true
 
 執行 `docker compose up --build -d`，Caddy 會申請 HTTPS 憑證，同網域提供前台及 `/api`。後端在 production 模式要求 Secure Cookie。後端連接埠不對外發布，僅信任緊鄰的 Caddy 一層代理；本機直接啟動後端使用 `TRUST_PROXY=false`。資料庫連接埠僅綁定主機回環位址。
 
-依本次要求，交付時未執行測試、建置或瀏覽器驗證。Dockerfile 內含部署所需的編譯步驟，待實際啟動時執行。
+Dockerfile 內含部署所需的編譯步驟，後端啟動時自動套用已提交的 migrations。
 
 ## 本機開啟
 
@@ -161,7 +161,42 @@ npm run dev
 
 ## 聯絡表單
 
-參考 `frontend/.env.example` 設定 `VITE_CONTACT_FORM_ENDPOINT`。未設定時，頁面提供直接寄信方式；設定後會以 JSON POST 傳送表單資料。
+聯絡頁 `/#/contact` 預設將表單送到本站 API，永久儲存在 PostgreSQL。管理員登入後，總覽顯示未讀數，`/#/admin/contact-messages` 提供全部／未讀篩選、每頁 20 筆分頁及重新整理；點開訊息可查看完整內容並按「標記已讀」。時間以台灣時區顯示，回覆請使用既有信箱；第一版未提供自動通知信、後台寄信或刪除功能。
+
+| API | 用途 |
+| --- | --- |
+| `POST /api/v1/public/contact-messages` | 匿名 JSON 提交 `{ name, email, category, subject, message, website? }`；成功儲存回傳 201 `{ "ok": true }` |
+| `GET /api/v1/admin/contact-messages?page=1&read=all` | 回傳 `{ items, total, unreadCount, page, pageSize }`；`read` 可為 `all` 或 `unread`，最新優先，摘要不含問題內容 |
+| `GET /api/v1/admin/contact-messages/:id` | 回傳完整訊息，含伺服器收件時間 `createdAt` 與 `readAt`；不存在為 404 |
+| `PATCH /api/v1/admin/contact-messages/:id/read` | 標記已讀並回傳訊息；重複操作保留首次已讀時間 |
+
+所有管理 API 需要有效 ADMIN Session；PATCH 亦需從 `/api/v1/auth/csrf` 取得 `X-CSRF-Token`。未登入或停用帳號為 401、無管理權限或 CSRF 不符為 403。列表 `total` 為目前篩選筆數，`unreadCount` 為全部未讀數，非法分頁／篩選回傳 400。
+
+姓名 1–60 字、Email 最高 120 字、主旨 1–120 字、內容 10–2000 字；所有字串去除首尾空白。類別限 `association`、`activities`、`teams`、`resources`、`website`、`other`。收件與已讀時間均由伺服器產生，不採用訪客提供的時間；必填、格式或長度錯誤為 400，JSON 請求上限 32 KB。
+
+公開收件以 IP 的 SHA-256 雜湊加固定時間區間進行資料庫限速，每 10 分鐘最多 5 次請求（含無效資料及隱藏欄位命中），第 6 次回傳 429 及 `Retry-After` 秒數。非空的 `website` 隱藏欄位回傳成功但不儲存，降低簡單機器人垃圾訊息。限速紀錄每 15 分鐘清理，後端重啟仍保留當期次數。代理信任設定沿用登入系統。
+
+表單傳送時停用輸入，成功才清空；錯誤及限速均保留原內容。`frontend/.env.example` 的 `VITE_CONTACT_FORM_ENDPOINT` 留白即可使用本站 API，也可在建置時覆寫為外部收件服務；僅部署靜態前端時須自行提供收件端點。
+
+既有 Docker 環境更新後執行 `docker compose up --build -d`，後端會自動套用新增資料表；本機開發則在 `backend` 執行 `npm run db:generate`、`npm run db:migrate` 再重啟後端。訊息與登入資料共用既有 PostgreSQL volume。
+
+後端整合測試使用獨立資料庫，**必須命名為 `contact_test`，測試會清空其中的使用者、Session、聯絡訊息與限速資料**。例如在 PowerShell 啟動暫時資料庫並執行：
+
+```powershell
+docker run --rm -d --name nycuee-contact-tests -e POSTGRES_PASSWORD=contact-test-only -p 127.0.0.1:55432:5432 postgres:16-alpine
+# 資料庫就緒後建立測試庫。
+docker exec nycuee-contact-tests createdb -U postgres contact_test
+cd backend
+npm ci
+$env:DATABASE_URL='postgresql://postgres:contact-test-only@127.0.0.1:55432/contact_test'
+$env:TEST_DATABASE_URL=$env:DATABASE_URL
+npm run db:generate
+npm run db:migrate
+npm test
+docker stop nycuee-contact-tests
+```
+
+未設定 `TEST_DATABASE_URL` 時，整合測試會明確顯示跳過；上述測試包含真實 HTTP、migration 後資料寫入、API 重啟保留、限速、管理員／CSRF 保護及已讀操作。
 
 ## 開發指令
 

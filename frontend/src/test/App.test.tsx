@@ -224,7 +224,8 @@ describe("NYCU EE website", () => {
     expect(within(navigation).getByRole("link", { name: "學習資料" })).toHaveClass("active");
   });
 
-  it("opens the contact page and validates unavailable online submission", async () => {
+  it("opens the contact page and submits to the built-in contact API", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 201 }));
     const user = userEvent.setup();
     renderApp();
 
@@ -240,7 +241,9 @@ describe("NYCU EE website", () => {
     await user.type(screen.getByRole("textbox", { name: /問題內容/ }), "我想詢問網站上的學習資料如何更新。");
     await user.click(screen.getByRole("button", { name: /送出問題/ }));
 
-    expect(screen.getByRole("alert")).toHaveTextContent("線上收件服務尚未啟用");
+    expect(await screen.findByRole("status")).toHaveTextContent("問題已成功送出");
+    expect(fetchMock).toHaveBeenCalledWith("/api/v1/public/contact-messages", expect.objectContaining({ method: "POST" }));
+    fetchMock.mockRestore();
   });
 
   it("provides an activities page entry in the home quick links", async () => {

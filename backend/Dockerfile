@@ -1,9 +1,9 @@
 FROM node:22-bookworm-slim
 WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends openssl && rm -rf /var/lib/apt/lists/*
-COPY package.json ./
+COPY package.json package-lock.json ./
 COPY prisma ./prisma
-RUN npm install
+RUN npm ci
 RUN npm run db:generate
 COPY tsconfig.json ./
 COPY src ./src

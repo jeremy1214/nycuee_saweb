@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { Link, Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import { AuthError, getCurrentUser, login, logout } from "./api";
 import type { AdminUser } from "./api";
+import { ContactInbox, ContactMessageDetail, InboxSummary } from "./ContactInbox";
 import "./admin.css";
 
 type AuthState =
@@ -85,6 +86,7 @@ function Dashboard({ user, onLogout }: { user: AdminUser; onLogout: () => void }
         <div><dt>使用者帳號</dt><dd>{user.username}</dd></div>
         <div><dt>角色</dt><dd>管理員</dd></div>
       </dl>
+      <InboxSummary onSessionExpired={onLogout} />
       {error && <p className="admin-error" role="alert">{error}</p>}
       <div className="admin-actions">
         <button className="admin-button" type="button" onClick={signOut} disabled={pending}>
@@ -99,6 +101,7 @@ function Dashboard({ user, onLogout }: { user: AdminUser; onLogout: () => void }
 export default function AdminRoutes() {
   const [auth, setAuth] = useState<AuthState>({ status: "loading" });
   const [retry, setRetry] = useState(0);
+  const sessionExpired = useCallback(() => setAuth({ status: "ready", user: null }), []);
 
   useEffect(() => {
     let active = true;
@@ -137,7 +140,13 @@ export default function AdminRoutes() {
                 ? <Navigate to="/admin" replace />
                 : <LoginPage onLogin={(user) => setAuth({ status: "ready", user })} />} />
               <Route index element={auth.user
-                ? <Dashboard user={auth.user} onLogout={() => setAuth({ status: "ready", user: null })} />
+                ? <Dashboard user={auth.user} onLogout={sessionExpired} />
+                : <Navigate to="/admin/login" replace />} />
+              <Route path="contact-messages" element={auth.user
+                ? <ContactInbox onSessionExpired={sessionExpired} />
+                : <Navigate to="/admin/login" replace />} />
+              <Route path="contact-messages/:id" element={auth.user
+                ? <ContactMessageDetail onSessionExpired={sessionExpired} />
                 : <Navigate to="/admin/login" replace />} />
               <Route path="*" element={<Navigate to={auth.user ? "/admin" : "/admin/login"} replace />} />
             </Routes>

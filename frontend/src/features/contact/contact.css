@@ -119,3 +119,4 @@
   .contact-form-footer { align-items: flex-start; flex-direction: column; }
   .contact-form-footer button { width: 100%; }
 }
+.contact-form-fields { display: contents; border: 0; padding: 0; margin: 0; min-width: 0; }

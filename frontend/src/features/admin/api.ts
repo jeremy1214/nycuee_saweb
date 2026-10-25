@@ -12,10 +12,10 @@ export class AuthError extends Error {
   }
 }
 
-async function request<T>(path: string, options?: RequestInit): Promise<T> {
+export async function apiRequest<T>(path: string, options?: RequestInit): Promise<T> {
   let response: Response;
   try {
-    response = await fetch(`/api/v1/auth/${path}`, {
+    response = await fetch(`/api/v1/${path}`, {
       ...options, credentials: "same-origin", cache: "no-store",
     });
   } catch {
@@ -25,11 +25,13 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   if (!response.ok) {
     throw new AuthError(response.status,
       response.status < 500 && typeof data?.message === "string"
-        ? data.message : "登入服務暫時無法使用，請稍後重試。");
+        ? data.message : "服務暫時無法使用，請稍後重試。");
   }
-  if (!data) throw new AuthError(0, "登入服務回應異常，請稍後重試。");
+  if (!data) throw new AuthError(0, "服務回應異常，請稍後重試。");
   return data as T;
 }
+
+const request = <T,>(path: string, options?: RequestInit) => apiRequest<T>(`auth/${path}`, options);
 
 async function mutate<T>(path: string, body: object = {}): Promise<T> {
   const { csrfToken } = await request<{ csrfToken: string }>("csrf");

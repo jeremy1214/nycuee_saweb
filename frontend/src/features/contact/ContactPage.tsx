@@ -1,34 +1,26 @@
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { Breadcrumb, PageContainer } from "../../shared/components/index";
 import { siteContact } from "../../shared/data/site";
 import "./contact.css";
 
 const contactEmail = siteContact.email;
 
-type SubmissionStatus = "idle" | "submitting" | "success" | "error" | "unavailable";
+type SubmissionStatus = "idle" | "submitting" | "success" | "error" | "limited";
 
 export default function ContactPage() {
   const [status, setStatus] = useState<SubmissionStatus>("idle");
-  const endpoint = import.meta.env.VITE_CONTACT_FORM_ENDPOINT?.trim();
+  const submitting = useRef(false);
+  const endpoint = import.meta.env.VITE_CONTACT_FORM_ENDPOINT?.trim() || "/api/v1/public/contact-messages";
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!endpoint) {
-      setStatus("unavailable");
-      return;
-    }
+    if (submitting.current) return;
 
     const form = event.currentTarget;
     const formData = new FormData(form);
 
-    // Quietly accept submissions filled by simple bots through the hidden field.
-    if (formData.get("website")) {
-      form.reset();
-      setStatus("success");
-      return;
-    }
-
+    submitting.current = true;
     setStatus("submitting");
 
     try {
@@ -44,17 +36,24 @@ export default function ContactPage() {
           category: formData.get("category"),
           subject: formData.get("subject"),
           message: formData.get("message"),
+          website: formData.get("website"),
           source: "nycu-ee-website",
           submittedAt: new Date().toISOString(),
         }),
       });
 
+      if (response.status === 429) {
+        setStatus("limited");
+        return;
+      }
       if (!response.ok) throw new Error(`Contact form returned ${response.status}`);
 
       form.reset();
       setStatus("success");
     } catch {
       setStatus("error");
+    } finally {
+      submitting.current = false;
     }
   }
 
@@ -95,7 +94,8 @@ export default function ContactPage() {
               <span className="contact-required-note"><i aria-hidden="true">*</i> 為必填欄位</span>
             </div>
 
-            <form className="contact-form" onSubmit={handleSubmit} onChange={() => status !== "idle" && setStatus("idle")}>
+            <form className="contact-form" onSubmit={handleSubmit} onChange={() => !submitting.current && status !== "idle" && setStatus("idle")}>
+              <fieldset disabled={status === "submitting"} className="contact-form-fields">
               <div className="contact-form-row">
                 <label>
                   姓名 <span aria-hidden="true">*</span>
@@ -145,7 +145,8 @@ export default function ContactPage() {
 
               {status === "success" && <p className="contact-form-status is-success" role="status">問題已成功送出，感謝你的來信。</p>}
               {status === "error" && <p className="contact-form-status is-error" role="alert">目前無法送出，請稍後再試，或直接寄信至 <a href={`mailto:${contactEmail}`}>{contactEmail}</a>。</p>}
-              {status === "unavailable" && <p className="contact-form-status is-error" role="alert">線上收件服務尚未啟用，請先直接寄信至 <a href={`mailto:${contactEmail}`}>{contactEmail}</a>。</p>}
+              {status === "limited" && <p className="contact-form-status is-error" role="alert">傳送次數過多，請稍後再試。你填寫的內容已保留。</p>}
+              </fieldset>
             </form>
           </section>
         </div>

@@ -25,3 +25,35 @@
   .admin-header { padding: 18px 16px; flex-wrap: wrap; gap: 8px; }
   .admin-main { margin-block: 32px; }
 }
+.admin-inbox { margin-inline: auto; }
+.admin-main:has(.admin-inbox) { width: min(1040px, calc(100% - 32px)); }
+.admin-inbox > .admin-text-link { margin-top: 0; }
+.admin-inbox-summary { margin: 28px 0; padding: 24px; border: 1px solid var(--line); border-radius: 6px; }
+.admin-inbox-summary h2 { margin-top: 0; }
+.admin-inbox-summary .admin-text-link { margin-top: 8px; }
+.admin-count { color: var(--teal); font-size: 1.4rem; }
+.admin-inbox-toolbar, .admin-pagination { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.admin-inbox-toolbar select { margin-left: 12px; padding: 10px; border: 1px solid var(--line); border-radius: 4px; background: white; color: var(--ink); }
+.admin-message-list { padding: 0; margin: 24px 0; list-style: none; }
+.admin-message-list li { border-bottom: 1px solid var(--line); }
+.admin-message-list a { display: block; padding: 22px 8px; color: var(--navy); text-decoration: none; overflow-wrap: anywhere; }
+.admin-message-list a:hover { background: var(--paper); }
+.admin-message-heading { display: flex; align-items: baseline; gap: 12px; }
+.admin-read-badge { flex-shrink: 0; padding: 3px 8px; border-radius: 4px; background: var(--teal); color: white; font-size: .75rem; }
+.admin-read-badge.is-read { background: var(--paper); color: var(--muted); }
+.admin-message-meta { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 12px; color: var(--muted); font-size: .85rem; line-height: 1.7; }
+.admin-pagination { margin-top: 24px; }
+.admin-pagination button { padding: 10px 16px; border: 1px solid var(--line); border-radius: 4px; background: white; color: var(--navy); }
+.admin-pagination button:disabled { opacity: .5; }
+.admin-empty { padding: 40px 0; color: var(--muted); text-align: center; }
+.admin-message-subject { overflow-wrap: anywhere; line-height: 1.6; }
+.admin-message-details { margin-block: 24px; }
+.admin-message-details > div { display: grid; grid-template-columns: 100px minmax(0, 1fr); gap: 12px; padding-block: 12px; border-bottom: 1px solid var(--line); }
+.admin-message-details dt { color: var(--muted); }
+.admin-message-details dd { margin: 0; overflow-wrap: anywhere; }
+.admin-message-body { white-space: pre-wrap; overflow-wrap: anywhere; padding: 20px; background: var(--paper); line-height: 1.9; }
+@media (max-width: 480px) {
+  .admin-message-details > div { grid-template-columns: 1fr; gap: 6px; }
+  .admin-inbox-toolbar { align-items: stretch; }
+  .admin-message-meta { flex-direction: column; }
+}

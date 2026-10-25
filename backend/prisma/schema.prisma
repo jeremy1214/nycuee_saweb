@@ -40,3 +40,34 @@ model LoginAttempt {
 
   @@index([expiresAt])
 }
+
+enum ContactCategory {
+  association
+  activities
+  teams
+  resources
+  website
+  other
+}
+
+model ContactMessage {
+  id        String          @id @default(cuid())
+  name      String          @db.VarChar(60)
+  email     String          @db.VarChar(120)
+  category  ContactCategory
+  subject   String          @db.VarChar(120)
+  message   String          @db.VarChar(2000)
+  createdAt DateTime        @default(now())
+  readAt    DateTime?
+
+  @@index([createdAt, id])
+  @@index([readAt, createdAt, id])
+}
+
+model ContactSubmissionAttempt {
+  key       String   @id
+  count     Int      @default(1)
+  expiresAt DateTime
+
+  @@index([expiresAt])
+}

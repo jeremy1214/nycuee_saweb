@@ -10,6 +10,7 @@ export const otherActivities: OtherActivity[] = activities
     title: activity.title,
     summary: activity.summary,
     intro: activity.detail!.intro,
+    ...(activity.links === undefined ? {} : { links: activity.links }),
     cover: activity.album!.cover,
     photos: activity.album!.photos,
     groups: activity.detail!.sections.flatMap((section) => section.image ? [{

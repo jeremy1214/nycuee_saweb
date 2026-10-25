@@ -16,6 +16,7 @@
     "summary": { "type": "string", "minLength": 1 },
     "details": { "type": "string", "minLength": 1 },
     "location": { "type": "string", "minLength": 1, "pattern": "\\S" },
+    "links": { "type": "array", "items": { "$ref": "#/$defs/link" } },
     "album": { "$ref": "#/$defs/album" },
     "detail": {
       "type": "object",
@@ -38,6 +39,15 @@
     }
   },
   "$defs": {
+    "link": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "url"],
+      "properties": {
+        "label": { "type": "string", "minLength": 1, "pattern": "\\S" },
+        "url": { "type": "string", "format": "uri", "pattern": "^[Hh][Tt][Tt][Pp][Ss]?://\\S+$" }
+      }
+    },
     "album": {
       "type": "object",
       "additionalProperties": false,

@@ -29,6 +29,11 @@ export interface ActivityDetailTab {
   sections: ActivityDetailSection[];
 }
 
+export interface ActivityLink {
+  label: string;
+  url: string;
+}
+
 export interface ActivityItem {
   id: string;
   title: string;
@@ -38,6 +43,7 @@ export interface ActivityItem {
   summary: string;
   details: string;
   location?: string;
+  links?: ActivityLink[];
   detail?: ActivityDetail;
   album?: ActivityAlbum;
 }
@@ -61,6 +67,7 @@ export interface OtherActivity {
   title: string;
   summary: string;
   intro: string[];
+  links?: ActivityLink[];
   cover: ActivityDetailImage;
   photos: ActivityDetailImage[];
   groups?: {

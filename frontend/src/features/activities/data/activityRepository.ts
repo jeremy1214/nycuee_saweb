@@ -7,6 +7,7 @@ import type {
   ActivityDetailSection,
   ActivityDetailTab,
   ActivityItem,
+  ActivityLink,
 } from "../activityTypes";
 
 type JsonRecord = Record<string, unknown>;
@@ -165,11 +166,32 @@ function parseDate(value: unknown, source: string): string {
   return date;
 }
 
+function parseLinks(value: unknown, source: string): ActivityLink[] {
+  if (!Array.isArray(value)) fail(source, "must be an array");
+  return value.map((value, index) => {
+    const linkSource = `${source}[${index}]`;
+    const link = record(value, linkSource);
+    onlyKeys(link, ["label", "url"], linkSource);
+    const label = string(link.label, `${linkSource}.label`).trim();
+    const url = string(link.url, `${linkSource}.url`).trim();
+    let parsed: URL;
+    try {
+      parsed = new URL(url);
+    } catch {
+      fail(`${linkSource}.url`, "must be an absolute http:// or https:// URL");
+    }
+    if (!/^https?:\/\/\S+$/i.test(url) || !["http:", "https:"].includes(parsed.protocol) || !parsed.hostname) {
+      fail(`${linkSource}.url`, "must be an absolute http:// or https:// URL");
+    }
+    return { label, url };
+  });
+}
+
 function parseActivity(value: unknown, source: string): ParsedActivity {
   const activity = record(value, source);
   onlyKeys(
     activity,
-    ["$schema", "id", "status", "title", "date", "categoryId", "summary", "details", "location", "detail", "album"],
+    ["$schema", "id", "status", "title", "date", "categoryId", "summary", "details", "location", "links", "detail", "album"],
     source,
   );
   const status = string(activity.status, `${source}.status`);
@@ -188,6 +210,7 @@ function parseActivity(value: unknown, source: string): ParsedActivity {
     summary: string(activity.summary, `${source}.summary`),
     details: string(activity.details, `${source}.details`),
     ...(activity.location === undefined ? {} : { location: string(activity.location, `${source}.location`) }),
+    ...(activity.links === undefined ? {} : { links: parseLinks(activity.links, `${source}.links`) }),
     ...(activity.detail === undefined ? {} : { detail: parseDetail(activity.detail, `${source}.detail`) }),
     ...(activity.album === undefined ? {} : { album: parseAlbum(activity.album, `${source}.album`) }),
   };

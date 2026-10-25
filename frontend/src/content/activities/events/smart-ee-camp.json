@@ -8,6 +8,10 @@
   "summary": "透過主題講解與動手實作，認識電機領域如何連結生活中的智慧科技。",
   "details": "活動包含系所導覽、基礎電路實作與學長姐交流，讓參與者從觀察、設計到測試，體驗完整的工程思考過程。",
   "location": "工程四館 101 講堂",
+  "links": [
+    { "label": "電機營官方網站", "url": "https://eesa.dece.nycu.edu.tw/EECAMP/" },
+    { "label": "電機營 Instagram", "url": "https://www.instagram.com/nycueecamp/" }
+  ],
   "detail": {
     "eyebrow": "EE CAMP · CREATE TOGETHER",
     "intro": [

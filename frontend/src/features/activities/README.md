@@ -36,6 +36,7 @@ src/features/activities/
 - `summary`：總覽卡片摘要。
 - `details`：沒有獨立專頁時，顯示於彈窗的完整介紹。
 - `location`：選填，填寫已確認的活動地點；未知時省略。
+- `links`：選填，活動相關連結清單，可自由新增報名、粉專或其他按鈕，詳見下方範例。
 - `detail`：選填；存在時卡片會連到獨立詳細頁，省略時維持彈窗。
 - `album`：選填，相簿順序、封面與全部照片；有設定時必須同時提供 `detail`。
 
@@ -44,6 +45,27 @@ JSON 最上方的 `$schema` 會讓支援 JSON Schema 的編輯器提示欄位及
 ```json
 "$schema": "../activity.schema.json"
 ```
+
+## 新增報名、粉專或其他連結
+
+在對應的 `src/content/activities/events/<活動id>.json` **最外層**加入 `links`（與 `title`、`detail` 同一層）：
+
+```json
+"links": [
+  { "label": "立即報名", "url": "https://forms.gle/你的表單代碼" },
+  { "label": "Facebook 粉專", "url": "https://www.facebook.com/你的粉專帳號" },
+  { "label": "Instagram", "url": "https://www.instagram.com/你的帳號/" }
+]
+```
+
+- 請換成實際網址；以上為格式示意，不會加入正式活動資料。
+- 每筆只需 `label`（按鈕文字）與 `url`（完整 `http://` 或 `https://` 網址）。名稱與數量不限，也能新增活動官網、報名須知等用途，不必修改 React。
+- 按鈕依陣列順序顯示；修改文字或網址即可更新，刪除整筆即可移除。沒有連結時可省略 `links` 或填 `[]`，頁面不留空白區塊。
+- 網址會自動辨識 Instagram、Facebook、Google 表單，套用對應圖示、配色與平台標籤；其他網址顯示網站圖示及網域。Instagram 個人頁還會顯示 `@帳號`，不需另外填寫樣式欄位。電機營已加入官網與 `@nycueecamp`，可直接參考 `events/smart-ee-camp.json`。
+- 連結卡片有依序淡入、滑入浮起、圖示與箭頭位移、點擊回饋；使用者選擇減少動態效果時會停用動畫。
+- 詳細頁會放在活動簡介文字下方。使用獨立分頁的活動只在「活動介紹」頁顯示，共用簡介模式則隨簡介顯示。其他活動相簿介紹、總覽資訊彈窗、首頁行事曆資訊彈窗會使用同一份清單。
+- 連結另開分頁，手機版按鈕會自動排成單欄。載入器會檢查必填文字與完整網址，錯誤會指出活動檔案及 `links` 的欄位位置。
+- 儲存後執行 `npm run validate:content`；正式網站仍須重新建置與部署才會更新。這是 JSON 內容維護方式。
 
 ## 新增活動
 

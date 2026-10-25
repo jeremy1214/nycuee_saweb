@@ -5,6 +5,7 @@ import { HomeHero } from "./components/HomeHero";
 import { HomeAbout } from "./components/HomeAbout";
 import { AddToGoogleCalendar } from "./components/CalendarImport";
 import type { CalendarEvent } from "./homeTypes";
+import { ActivityLinks } from "../activities/components/ActivityLinks";
 
 import "./home.css";
 
@@ -45,6 +46,7 @@ export default function HomePage() {
         <p className="dialog-copy">{selectedEvent?.date}｜{selectedEvent?.category}{selectedEvent?.location && `｜${selectedEvent.location}`}</p>
         <p className="dialog-copy">{selectedEvent?.details}</p>
         {selectedEvent && <>
+          <ActivityLinks links={selectedEvent.links} />
           <AddToGoogleCalendar event={selectedEvent} />
           <p className="calendar-event-import-note">將開啟 Google 日曆，確認後按「儲存」即可加入。活動目前會以全天顯示。</p>
         </>}

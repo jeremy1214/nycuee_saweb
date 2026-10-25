@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Breadcrumb, PageContainer } from "../../shared/components/index";
 import { otherActivities } from "./data/otherActivities";
+import { ActivityLinks } from "./components/ActivityLinks";
 import { useActivityAlbum } from "./hooks/useActivityAlbum";
 import "./activities.css";
 import "./otherActivities.css";
@@ -99,6 +100,7 @@ export default function OtherActivitiesPage() {
               <div className="other-activity-copy">
                 <span className="activity-detail-label">活動介紹</span>
                 {activity.intro.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+                <ActivityLinks links={activity.links} />
                 <Link className="section-more" to={`/activities/${activity.id}`} aria-label={`${activity.title}，查看活動詳細頁`}>查看活動詳細頁 <span aria-hidden="true">↗</span></Link>
               </div>
             </div>

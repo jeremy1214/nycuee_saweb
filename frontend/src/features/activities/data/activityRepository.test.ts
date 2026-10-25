@@ -75,6 +75,47 @@ describe("optional activity dates and shared album validation", () => {
   });
 });
 
+describe("activity link validation", () => {
+  async function loadWith(links: unknown) {
+    vi.resetModules();
+    vi.doMock("../../../content/activities/events/course-selection.json", () => ({
+      default: { ...structuredClone(rawOther), links },
+    }));
+    return import("./activityRepository");
+  }
+
+  it("keeps custom labels, URLs and ordering shared with the album", async () => {
+    const links = [
+      { label: "立即報名", url: "https://forms.gle/example?source=website#signup" },
+      { label: "粉專", url: "https://www.facebook.com/example" },
+      { label: "自訂連結", url: "http://example.com/info" },
+    ];
+    const { activities } = await loadWith(links);
+    expect(activities.find((activity) => activity.id === rawOther.id)?.links).toEqual(links);
+    const { otherActivities } = await import("./otherActivities");
+    expect(otherActivities.find((activity) => activity.id === rawOther.id)?.links).toEqual(links);
+  });
+
+  it.each([[undefined], [[]]])("accepts omitted or empty links (%j)", async (links) => {
+    const { activities } = await loadWith(links);
+    expect(activities.find((activity) => activity.id === rawOther.id)?.links).toEqual(links);
+  });
+
+  it.each<[unknown, string]>([
+    [null, "links: must be an array"],
+    [{}, "links: must be an array"],
+    [[null], "links[0]: must be an object"],
+    [[{ label: " ", url: "https://example.com" }], "links[0].label: must be a non-empty string"],
+    [[{ label: "報名" }], "links[0].url: must be a non-empty string"],
+    [[{ label: "報名", url: "https://example.com", extra: true }], "links[0]: contains unknown field(s): extra"],
+    ...["javascript:alert(1)", "data:text/html,test", "//example.com", "/signup", "example.com", "ftp://example.com", "https://", "https://example.com/a b", "https:example.com"].map((url): [unknown, string] => [
+      [{ label: "報名", url }], "links[0].url: must be an absolute http:// or https:// URL",
+    ]),
+  ])("rejects invalid links %j and identifies the field", async (links, error) => {
+    await expect(loadWith(links)).rejects.toThrow(error);
+  });
+});
+
 describe("activity tab validation", () => {
   it.each<[string, (camp: CampFixture) => void, string]>([
     ["empty tabs", (camp) => { camp.detail.tabs = []; }, "tabs: must be a non-empty array"],

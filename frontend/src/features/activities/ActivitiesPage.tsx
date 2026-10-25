@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { Modal, PageContainer } from "../../shared/components/index";
 import type { ActivityItem } from "./activityTypes";
 import { ActivityOverview, RecentActivities } from "./components/ActivitySections";
+import { ActivityLinks } from "./components/ActivityLinks";
 import { activityCategories } from "./data/activities";
 import "./activities.css";
 
@@ -40,6 +41,7 @@ export default function ActivitiesPage() {
               {selectedActivity.location && <span>{selectedActivity.location}</span>}
             </div>
             <p>{selectedActivity.details}</p>
+            <ActivityLinks links={selectedActivity.links} />
           </div>
         )}
       </Modal>

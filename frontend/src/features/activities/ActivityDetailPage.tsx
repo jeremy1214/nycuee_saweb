@@ -2,6 +2,7 @@ import { Link, Navigate, NavLink, useParams } from "react-router-dom";
 import { Breadcrumb, PageContainer } from "../../shared/components/index";
 import NotFoundPage from "../../shared/pages/NotFoundPage";
 import { activities } from "./data/activities";
+import { ActivityLinks } from "./components/ActivityLinks";
 import "./activities.css";
 
 function scrollToSection(sectionId: string) {
@@ -34,6 +35,7 @@ export default function ActivityDetailPage() {
             <h2>{activity.title}</h2>
             <p>{activity.summary}</p>
             <p>{activity.details}</p>
+            <ActivityLinks links={activity.links} />
           </article>
         </PageContainer>
       </main>
@@ -92,6 +94,7 @@ export default function ActivityDetailPage() {
               <span className="activity-detail-label">活動介紹</span>
               <h2 id="activity-intro-title">從活動認識電機人的另一種日常</h2>
               {detail.intro.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+              <ActivityLinks links={activity.links} />
             </div>
           </section>
         )}

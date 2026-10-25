@@ -1,294 +1,317 @@
 # 系上活動內容維護指南
 
-活動頁採「JSON 內容、資料驗證、React 顯示」三層設計。一般更新只需修改 JSON 與圖片，不必碰 React 元件；新增活動 JSON 後，Vite 會自動載入，不需要另外加入 `import`。
+新增活動主要是「建立一份 JSON → 放入照片 → 預覽 → 驗證與發布」。一般內容維護不用修改 React，也不用手動匯入新檔案；系統會自動讀取 `events/*.json`。
 
-## 檔案分工
+本文的 `src/`、`public/` 路徑皆以專案的 `frontend/` 為起點。正式網站更新後仍需重新建置與部署。
 
-```text
-src/content/activities/
-├─ categories.json                 # 分類、顯示名稱與分類入口連結
-├─ categories.schema.json          # 分類 JSON 編輯提示
-├─ activity.schema.json            # 活動 JSON 編輯提示
-└─ events/                         # 一個活動一個 JSON
-   ├─ smart-ee-camp.json
-   ├─ department-camping-night.json
-   ├─ ee-week-showcase.json
-   └─ ...
+## 快速找到要做的事
 
-src/features/activities/
-├─ data/activityRepository.ts      # 自動載入、驗證、發布狀態與分類名稱轉換
-├─ data/activities.ts              # 對元件提供穩定的匯出入口
-├─ activityTypes.ts                # React 使用的資料型別
-├─ ActivitiesPage.tsx              # 活動總覽
-├─ ActivityDetailPage.tsx          # 共用詳細頁版型
-└─ activities.css                  # 總覽與詳細頁樣式
-```
+| 我要做什麼 | 從哪裡開始 |
+| --- | --- |
+| 新增只有文字與連結的活動 | 下方「新增活動：照這六步做」 |
+| 新增有照片的活動介紹 | 先建立活動，再看「加入照片與詳細介紹」 |
+| 新增到「其他活動」輪播相簿 | 看「新增其他活動相簿」，並留意目前的測試限制 |
+| 加入報名、Instagram 或粉專 | 看「加入官網、社群與報名連結」 |
+| 增加各組介紹等分頁 | 看「需要多個分頁時」 |
+| 修改電機營、系露營、光舞、電機週 | 看[既有活動維護參考](EXISTING_ACTIVITIES.md) |
 
-## 修改既有活動
+## 新增活動：照這六步做
 
-開啟 `src/content/activities/events/` 中對應的 JSON：
+### 1. 決定分類與活動 ID
 
-- `id`：永久識別值，也是網址的一部分；上線後不要隨意修改。
-- `status`：`draft`、`published` 或 `archived`。只有 `published` 會出現在網站。
-- `title`：卡片及詳細頁副標題。
-- `date`：選填，使用有效的 `YYYY-MM-DD`。未確認時省略，不填空字串或 `null`；有日期才會進入總覽近期列表，首頁最新消息再挑出台灣日期今天起最近三筆。
-- `categoryId`：必須對應 `categories.json` 的分類 `id`。
-- `summary`：總覽卡片摘要。
-- `details`：沒有獨立專頁時，顯示於彈窗的完整介紹。
-- `location`：選填，填寫已確認的活動地點；未知時省略。
-- `links`：選填，活動相關連結清單，可自由新增報名、粉專或其他按鈕，詳見下方範例。
-- `detail`：選填；存在時卡片會連到獨立詳細頁，省略時維持彈窗。
-- `album`：選填，相簿順序、封面與全部照片；有設定時必須同時提供 `detail`。
+先從以下現有分類選一個 `categoryId`：
 
-JSON 最上方的 `$schema` 會讓支援 JSON Schema 的編輯器提示欄位及格式錯誤。請保留：
+| categoryId | 顯示分類 |
+| --- | --- |
+| `ee-camp` | 電機營 |
+| `department-camping` | 系露營 |
+| `ee-week` | 電機週 |
+| `light-dance` | 光舞 |
+| `other` | 其他活動 |
 
-```json
-"$schema": "../activity.schema.json"
-```
+活動 `id` 使用英文小寫、數字與連字號，例如 `career-sharing`。每個活動都要有不同的 ID；發布後不要任意修改，避免舊連結失效。
 
-## 新增報名、粉專或其他連結
+同一分類可以有多個活動，不必為每個新活動新增分類。
 
-在對應的 `src/content/activities/events/<活動id>.json` **最外層**加入 `links`（與 `title`、`detail` 同一層）：
+### 2. 建立活動 JSON
 
-```json
-"links": [
-  { "label": "立即報名", "url": "https://forms.gle/你的表單代碼" },
-  { "label": "Facebook 粉專", "url": "https://www.facebook.com/你的粉專帳號" },
-  { "label": "Instagram", "url": "https://www.instagram.com/你的帳號/" }
-]
-```
+在 `frontend/src/content/activities/events/` 建立 `career-sharing.json`，貼上以下完整範例：
 
-- 請換成實際網址；以上為格式示意，不會加入正式活動資料。
-- 每筆只需 `label`（按鈕文字）與 `url`（完整 `http://` 或 `https://` 網址）。名稱與數量不限，也能新增活動官網、報名須知等用途，不必修改 React。
-- 按鈕依陣列順序顯示；修改文字或網址即可更新，刪除整筆即可移除。沒有連結時可省略 `links` 或填 `[]`，頁面不留空白區塊。
-- 網址會自動辨識 Instagram、Facebook、Google 表單，套用對應圖示、配色與平台標籤；其他網址顯示網站圖示及網域。Instagram 個人頁還會顯示 `@帳號`，不需另外填寫樣式欄位。電機營已加入官網與 `@nycueecamp`，可直接參考 `events/smart-ee-camp.json`。
-- 連結卡片有依序淡入、滑入浮起、圖示與箭頭位移、點擊回饋；使用者選擇減少動態效果時會停用動畫。
-- 詳細頁會放在活動簡介文字下方。使用獨立分頁的活動只在「活動介紹」頁顯示，共用簡介模式則隨簡介顯示。其他活動相簿介紹、總覽資訊彈窗、首頁行事曆資訊彈窗會使用同一份清單。
-- 連結另開分頁，手機版按鈕會自動排成單欄。載入器會檢查必填文字與完整網址，錯誤會指出活動檔案及 `links` 的欄位位置。
-- 儲存後執行 `npm run validate:content`；正式網站仍須重新建置與部署才會更新。這是 JSON 內容維護方式。
-
-## 新增活動
-
-1. 複製 `src/content/activities/events/course-selection.json`，或使用下方最小範例建立新檔。
-2. 將檔名與 `id` 改成相同的英文小寫連字號格式，例如 `example-event.json` 與 `example-event`。
-3. 更新分類與文字；日期及地點確認後再填寫。新增其他活動可複製 `events/course-selection.json`，並設定 `album.order`。
-4. 編輯期間使用 `"status": "draft"`；確認後改成 `"published"`。
-5. 執行 `npm run validate:content`。
-
-只有總覽卡片及彈窗的最小範例：
-
-```json
+~~~json
 {
   "$schema": "../activity.schema.json",
-  "id": "example-event",
+  "id": "career-sharing",
   "status": "draft",
-  "title": "活動名稱",
+  "title": "職涯分享會",
   "date": "2027-01-15",
   "categoryId": "other",
-  "summary": "顯示於活動卡片的摘要。",
-  "details": "點擊卡片後顯示的完整介紹。",
-  "location": "活動地點"
+  "summary": "聽學長姐分享電機領域的職涯與求職經驗。",
+  "details": "活動將分享職涯選擇、求職準備與實務經驗，並安排現場交流。",
+  "location": "工程四館",
+  "links": []
 }
-```
+~~~
 
-不需要在 TypeScript 中匯入新檔案；`activityRepository.ts` 會自動掃描 `events/*.json`。
+日期、地點與文字都是範例，請換成實際資訊。日期或地點未確認時，直接刪除該欄位，不填空字串或 `null`。JSON 最後一個欄位後方不能有逗號，也不能加入註解。
 
-## 建立或修改詳細頁
+這份最小範例不需照片即可使用。總覽與行事曆點擊時會開啟資訊彈窗；直接開啟活動網址仍有文字介紹頁。若想從總覽直接進入有照片的專頁，接著加入 `detail`。
 
-在活動 JSON 加入 `detail`：
+也可以複製既有活動：
 
-```json
+| 需要的形式 | 建議複製來源 | 複製後要注意 |
+| --- | --- | --- |
+| 簡介、雙照片與相簿 | [選課大會](../../content/activities/events/course-selection.json) | 不需要相簿時刪除 `album`；更換文字、日期與所有照片路徑 |
+| 活動介紹與獨立分頁 | [電機營](../../content/activities/events/smart-ee-camp.json) | 更新 `links`、各分頁與組別內容 |
+| 每頁共用簡介 | [電機週](../../content/activities/events/ee-week-showcase.json) | 保留 `introMode: "shared"`，調整 `tabs` |
+
+複製後先改檔名、`id`、`status: "draft"`，再改內容。不要留下原活動的報名網址或社群帳號。
+
+### 3. 加入需要的內容
+
+依需求選填下列項目，格式見後面的對應章節：
+
+| 欄位 | 用途 |
+| --- | --- |
+| `links` | 官網、Instagram、Facebook、報名表單等連結 |
+| `detail` | 雙照片簡介與章節式介紹 |
+| `detail.tabs` | 各組介紹等獨立分頁 |
+| `album` | 「其他活動」輪播相簿；必須搭配 `detail` |
+
+只要文字活動就不需增加其他欄位。若要出現在「其他活動」相簿，則必須完成後面的相簿設定，單填 `categoryId: "other"` 不夠。
+
+### 4. 發布並在本機預覽
+
+`draft` 不會出現在前台，直接開啟活動網址也會顯示 404；資料格式仍會被驗證。需要預覽時，在尚未部署的本機版本把 `status` 改成 `published`。
+
+從專案根目錄執行：
+
+~~~powershell
+cd frontend
+npm run dev
+~~~
+
+以終端機顯示的實際網址為準，開啟：
+
+- 活動頁：`http://localhost:5173/#/activities/career-sharing`。
+- 活動總覽：`http://localhost:5173/#/activities/overview`。
+- 其他活動相簿：`http://localhost:5173/#/activities/other`。
+
+檢查照片、文字、連結與小螢幕排版。預覽完若尚未準備公開，請改回 `draft`。
+
+### 5. 驗證內容與建置
+
+在 `frontend/` 執行：
+
+~~~powershell
+npm run validate:content
+npm run build
+~~~
+
+內容驗證會檢查 ID、分類、日期、圖片檔案等；載入器也會檢查連結與分頁欄位。讀取錯誤會指出檔案或欄位位置。加入分頁或調整連結行為時，可再執行相關測試：
+
+~~~powershell
+npm test -- src/features/activities/data/activityRepository.test.ts src/features/activities/ActivityLinks.integration.test.tsx --maxWorkers=1
+~~~
+
+若新增「其他活動相簿」，先處理下方說明的既有測試限制。
+
+### 6. 部署正式網站
+
+確認要公開的活動為 `published`，將 JSON 與照片一併納入版本管理，依專案現有流程部署。前端建置輸出在 `frontend/dist/`；Docker 部署則依根目錄 README 的流程重新建置服務。
+
+只修改本機 JSON 或只執行 `npm run build`，都不會自動更新遠端網站。部署後再次確認正式活動網址與外部連結。
+
+## 加入官網、社群與報名連結
+
+把 `links` 放在 JSON 最外層，與 `title`、`detail` 同一層。以下是欄位片段，加入既有物件時注意逗號：
+
+~~~json
+"links": [
+  { "label": "活動官方網站", "url": "https://example.com/event/" },
+  { "label": "Instagram", "url": "https://www.instagram.com/你的帳號/" },
+  { "label": "Facebook 粉專", "url": "https://www.facebook.com/你的粉專帳號" },
+  { "label": "立即報名", "url": "https://forms.gle/你的表單代碼" }
+]
+~~~
+
+請將示意網址換成實際網址。每筆只有兩個欄位：
+
+| 欄位 | 填寫方式 |
+| --- | --- |
+| `label` | 想顯示的按鈕文字，例如「電機營 Instagram」 |
+| `url` | 完整 `https://` 或 `http://` 網址 |
+
+依陣列順序顯示，新增一筆就多一張卡片；刪除整筆即可移除。`links` 可省略或設為 `[]`。
+
+系統依網域自動辨識 Instagram、Facebook 與 Google 表單，套用圖示、配色與平台名稱；一般網址顯示網站圖示及網域。Instagram 個人頁會顯示 `@帳號`。卡片包含進場、滑入、聚焦及點擊效果，並支援減少動態效果設定，不必另外填樣式欄位。
+
+連結會另開分頁，顯示於活動簡介下方、其他活動相簿介紹，以及總覽／首頁行事曆的資訊彈窗。獨立分頁模式只在活動介紹頁顯示；共用簡介模式則每頁隨簡介顯示。
+
+可直接參考電機營目前的設定：
+
+~~~json
+"links": [
+  { "label": "電機營官方網站", "url": "https://eesa.dece.nycu.edu.tw/EECAMP/" },
+  { "label": "電機營 Instagram", "url": "https://www.instagram.com/nycueecamp/" }
+]
+~~~
+
+## 加入照片與詳細介紹
+
+先放照片，再設定 JSON。以 `career-sharing` 為例：
+
+~~~text
+frontend/public/activities/career-sharing/
+├─ hero-01.webp
+├─ hero-02.webp
+└─ section-01.webp
+~~~
+
+建議用壓縮後的 WebP 或 JPG、英文小寫檔名，保留圖片比例，不放大小圖；既有活動多採長邊最多 1600px。每張圖片填寫描述實際畫面的 `alt`。
+
+在活動 JSON 最外層加入下列 `detail` 片段：
+
+~~~json
 "detail": {
-  "eyebrow": "EVENT NAME · SHORT MESSAGE",
+  "eyebrow": "CAREER SHARING",
   "intro": ["第一段活動介紹。", "第二段補充說明。"],
   "heroImages": [
-    { "src": "/activities/example-event/hero-01.webp", "alt": "第一張照片描述" },
-    { "src": "/activities/example-event/hero-02.webp", "alt": "第二張照片描述" }
+    { "src": "/activities/career-sharing/hero-01.webp", "alt": "學長姐在教室與同學交流職涯經驗" },
+    { "src": "/activities/career-sharing/hero-02.webp", "alt": "參加職涯分享會的同學與講者合照" }
   ],
   "sections": [
     {
-      "id": "first-section",
-      "navLabel": "章節名稱",
-      "eyebrow": "SECTION LABEL",
-      "title": "章節標題",
-      "paragraphs": ["章節第一段。", "章節第二段。"],
+      "id": "schedule",
+      "navLabel": "活動流程",
+      "eyebrow": "SCHEDULE",
+      "title": "分享與交流",
+      "paragraphs": ["介紹講座內容與現場交流安排。"],
       "image": {
-        "src": "/activities/example-event/section-01.webp",
-        "alt": "章節照片描述",
-        "objectPosition": "50% 35%"
+        "src": "/activities/career-sharing/section-01.webp",
+        "alt": "講者在投影片前說明求職準備方式"
       }
     }
   ]
 }
-```
+~~~
 
-- `heroImages` 固定兩張。
-- `sections` 可自由增減、排序；導覽按鈕、圖文順序與編號會自動更新。
-- 每個 section 的 `id` 在同一組 `sections` 內不可重複；不同分頁可使用相同 id。
-- 章節 `image` 選填，省略時顯示單欄文字；`heroImages` 仍須提供兩張圖片。
-- `objectPosition` 選填，可調整照片在裁切框中的焦點，例如 `center top` 或 `50% 35%`。
+- `heroImages` 必須剛好兩張；`intro` 至少一段。
+- `sections` 必須存在，但沒有補充章節時可填 `[]`；章節按陣列順序顯示。
+- 每個章節的 `id` 在同一組 `sections` 中不可重複；避免使用頁面既有的 `activity-intro`、`activity-photos`。
+- 章節的 `image` 可省略，顯示純文字版型；`paragraphs` 至少一段。
+- 圖片 `src` 從 `/activities/` 開始，不包含 `public` 或 `frontend`，大小寫與副檔名須和實際檔案一致。
+- 圖片選填 `objectPosition: "50% 35%"` 調整裁切焦點，或 `fit: "contain"` 保留簡報、海報完整畫面；一般照片使用 `cover`。
+- `details` 與 `detail.intro` 是不同欄位，不會自動同步；修改介紹時請一起檢查。
 
-### 獨立分頁
+## 新增其他活動相簿
 
-若介紹內容需要分頁，可在 `detail` 加入選填的 `tabs`。預設模式（`introMode` 省略或設為 `tab`）的活動介紹使用既有 `intro` 與 `heroImages`，網址為 `/activities/<activity-id>/intro`；`detail.sections` 則作為介紹頁下方的補充章節，不需要時填入 `[]`。每頁共用簡介的 `shared` 模式見下一節。
+最方便的方式是複製選課大會，保留 `detail` 和 `album`，更換活動 ID、內容與照片。相簿顯示條件為 `categoryId: "other"`、`status: "published"`，且同時具有 `detail` 和 `album`。
 
-```json
+以下 `album` 放在最外層，與 `detail` 同一層：
+
+~~~json
+"album": {
+  "order": 8,
+  "cover": {
+    "src": "/activities/career-sharing/hero-01.webp",
+    "alt": "學長姐在教室與同學交流職涯經驗"
+  },
+  "photos": [
+    {
+      "src": "/activities/career-sharing/hero-01.webp",
+      "alt": "學長姐在教室與同學交流職涯經驗"
+    },
+    {
+      "src": "/activities/career-sharing/hero-02.webp",
+      "alt": "參加職涯分享會的同學與講者合照"
+    }
+  ]
+}
+~~~
+
+`order` 是非負整數，由小到大排序，同值按 ID 排序。`cover` 是相簿與首頁卡片封面，`photos` 是完整照片清單且不可為空。建議前兩張與 `detail.heroImages` 相同，文字及 `fit` 等圖片設定也保持一致。同一份 JSON 會供相簿與活動詳細頁共用。
+
+**目前的測試限制：** [otherActivities.test.ts](data/otherActivities.test.ts) 固定檢查既有七筆活動名稱與順序，圖片也只掃描 `public/activities/other/*.webp`。新增、改名或重新排序相簿時，需同步更新預期名單；若照片放在新的活動資料夾，還需調整圖片檢查範圍。該測試另要求前兩張照片與主照片一致、替代文字長於五個字，並保留既有介紹文字的檢查。這些是目前測試的限制，不是 JSON 載入器的通用欄位規則；只改 JSON 與照片可能使 `validate:content` 失敗。
+
+## 需要多個分頁時
+
+在 `detail` 內新增 `tabs`。以下是放在 `detail` 物件內的片段，與 `intro`、`heroImages`、`sections` 同層：
+
+~~~json
 "tabs": [
   {
     "id": "groups",
     "navLabel": "各組介紹",
     "sections": [
       {
-        "id": "recruitment",
-        "navLabel": "招生",
-        "eyebrow": "RECRUITMENT",
-        "title": "招生",
-        "paragraphs": ["招生組的工作介紹。"],
-        "image": {
-          "src": "/activities/example-event/group-recruitment.jpg",
-          "alt": "招生組活動照片"
-        }
+        "id": "activity-team",
+        "navLabel": "活動組",
+        "eyebrow": "ACTIVITY TEAM",
+        "title": "活動組",
+        "paragraphs": ["活動組的工作介紹。"]
       }
     ]
   }
 ]
-```
+~~~
 
-- 預設模式的 `tabs` 依陣列順序顯示在活動介紹按鈕之後；每頁只顯示自己的內容。
-- 分頁網址為 `/activities/<activity-id>/<tab-id>`，可直接分享與重新整理，支援瀏覽器返回及前進；網站使用 HashRouter，實際網址帶有 `#/` 前綴。
-- 預設模式有 `tabs` 時，原本 `/activities/<activity-id>` 會自動導向 `intro`。兩種模式切換分頁時都會回到頁首。
-- `tabs` 必須非空，分頁 `id` 不可重複，且不可使用保留的 `intro`；每頁 `sections` 必須非空，章節格式與原本相同，章節 `id` 在同一分頁內不可重複。
-- 沒有 `tabs` 的活動維持原本的單頁章節捲動方式；不存在的分頁顯示 404。
-
-### 電機營內容維護
-
-電機營使用預設的獨立介紹模式，導覽依序為活動介紹、各組介紹、共練介紹，位於標題下方並標示目前所在分頁。
-
-| 分頁 | 實際網址 | 內容來源 |
+| 模式 | 設定 | 顯示與預設入口 |
 | --- | --- | --- |
-| 活動介紹 | `/#/activities/smart-ee-camp/intro` | `detail.intro`、`detail.heroImages` |
-| 各組介紹 | `/#/activities/smart-ee-camp/groups` | `detail.tabs` 中 `id: "groups"` 的 `sections`：招生、活動、課程、場器、美宣、生活 |
-| 共練介紹 | `/#/activities/smart-ee-camp/practice` | `detail.tabs` 中 `id: "practice"` 的 `sections`：火球、火棍、香扇、小旗、蛇舞 |
+| 單頁 | 不填 `tabs` | 簡介與 `detail.sections` 在同一頁，導覽按鈕捲動到章節 |
+| 獨立介紹 | 有 `tabs`，`introMode` 省略或填 `"tab"` | 活動介紹是獨立頁，基本網址轉到 `/intro`；參考電機營 |
+| 共用簡介 | 有 `tabs`，`introMode: "shared"` | 每頁保留簡介，基本網址與 `/intro` 都轉到第一個分頁；參考電機週 |
 
-- 修改文字時編輯 `src/content/activities/events/smart-ee-camp.json`，`detail.sections` 保持 `[]`，各組與共練放入對應分頁的 `sections`。
-- 基本網址 `/#/activities/smart-ee-camp` 自動導向 `intro`；不存在的分頁顯示 404。每次只顯示該分頁內容，支援直接開啟、重新整理、返回／前進及切換回到頁首。
-- 照片位於 `public/activities/smart-ee-camp/`：`intro-01.jpg`、`intro-02.jpg` 為介紹照片；`group-*.jpg` 為六組代表照片；`practice-*.jpg` 為五項共練代表照片。
-- 文字參考舊網站 `D:/Coding/eesa-web/frontend/src/page/activities/EEcampNew.jsx`，照片取自同目錄的 `imgae/eeCampPic/`，未加入歷屆限定資訊。
-- 共 13 張 JPG，總大小約 2.76 MB，長邊最多 1600px、品質 84，不放大小圖；舊網站原圖保留。更換照片時更新 JSON 的 `image.src` 或 `heroImages`，並提供符合實際畫面的 `alt`。
+使用分頁時，保留必填的 `detail.sections`，不需要可填 `[]`。獨立介紹模式將它顯示於介紹頁；共用簡介模式請把內容放到各 `tabs[].sections`。
 
-版面沿用本站配色及膠囊導覽，活動介紹搭配雙照片，各組與共練在桌機交錯排列、手機上下排列。
+`tabs` 不可為空；分頁 ID 不可重複或使用保留的 `intro`，每頁 `sections` 至少一個章節。分頁網址為 `/#/activities/<活動id>/<分頁id>`，支援直接開啟、重新整理、返回與前進；不存在的分頁顯示 404。
 
-### 系露營內容維護
+## 決定活動出現在哪裡
 
-系露營使用獨立介紹模式，導覽依序為活動介紹、各組介紹，沿用本站膠囊導覽、雙照片簡介與各組圖文交錯版型；手機版改為上下排列。
+| 位置 | 條件／操作 |
+| --- | --- |
+| 直接開啟活動網址 | `status: "published"`；沒有日期也能開啟 |
+| 總覽「近期活動」列表 | 已發布且有 `date`；目前也包含過去日期 |
+| 首頁「最新消息」 | 已發布且日期為台灣今天起，取最近三筆；同日依 ID 排序 |
+| 首頁行事曆及日曆匯出 | 已發布且有日期；包含過去月份，無日期不列入 |
+| 「其他活動」相簿 | 已發布、分類為 `other`，且有 `detail` 與 `album` |
+| 總覽前四個分類圓形 | 修改分類的 `featuredActivityId` 指向想展示的活動 |
 
-| 分頁 | 實際網址 | 內容來源 |
-| --- | --- | --- |
-| 活動介紹 | `/#/activities/department-camping-night/intro` | `detail.intro`、`detail.heroImages`：大一共同籌辦營隊、與學長姐交流的介紹 |
-| 各組介紹 | `/#/activities/department-camping-night/groups` | `detail.tabs` 中 `id: "groups"` 的 `sections`：活動組、場美組、美公組 |
+日期只是排序與顯示資料，不會自動隱藏整個過期活動。要下架時設為 `archived`；如果分類入口仍指向該活動，需先調整分類入口，否則驗證會失敗。
 
-- 修改文字時編輯 `src/content/activities/events/department-camping-night.json`；`detail.sections` 保持 `[]`，三組放在 `groups` 分頁。
-- 基本網址 `/#/activities/department-camping-night` 自動導向 `intro`；各頁可直接開啟、重新整理及返回／前進，切換時回到頁首。不支援的分頁顯示 404。
-- 文字參考舊網站 `D:/Coding/eesa-web/frontend/src/page/activities/SiloCamp.jsx`；照片取自同目錄的 `imgae/siloPic/`，保存於 `public/activities/department-camping/`。
-- 五張 WebP 的長邊最多 1600px、品質 82，不放大小圖：`intro-01.webp`、`intro-02.webp` 對應原本兩張活動介紹照片；`group-activity.webp` 對應 `活動照片_1.jpg`；`group-scenography.webp` 對應 `場美照片_1.jpg`；`group-public-relations.webp` 對應 `美公照片_2.jpg`。替代文字描述實際畫面。
+分類資料在 [categories.json](../../content/activities/categories.json)。`featuredActivityId` 必須指向已發布、有 `detail`、且同分類的活動。`other` 圓形固定開啟相簿，不使用這個欄位切換到單一活動。
 
-### 光舞內容維護
+如需新分類，在 `categories` 陣列新增含 `id`、`label`、`shortLabel` 的物件；`featuredActivityId` 選填。目前分類圓形樣式只替前五項設定位置與配色，增加第六類以上需另調整 `activities.css`。這與在既有分類內新增一個活動不同。
 
-光舞使用 `introMode: "tab"`，沿用電機營的獨立介紹與圖文交錯版型，分為「活動介紹」與「各組介紹」。基本網址 `/#/activities/light-dance-workshop` 自動導向 `/intro`；四組介紹位於 `/#/activities/light-dance-workshop/groups`，依序為系統組、軟體組、服裝與表演組、宣傳組。
+## 常見問題
 
-- 文字編輯 `src/content/activities/events/light-dance-workshop.json`，參考舊網站 `LightDance.jsx`；活動 id 保持不變。標題與摘要採團隊介紹，日期與地點仍為原有示意資料。
-- 六張 JPG 複製自舊站 `imgae/lightDancePic/`，存於 `public/activities/light-dance/`。`intro-01.jpg`、`intro-02.jpg` 對應活動介紹照片 1、2；`group-system.jpg`、`group-software.jpg`、`group-performance.jpg`、`group-publicity.jpg` 分別對應系統、軟體、服裝、宣傳照片 1。宣傳圖片為圖案，替代文字描述實際畫面。
-- 光舞分類的 `featuredActivityId` 指向此活動；分類圓形與近期活動卡片皆連到詳細頁。
+| 狀況 | 優先檢查 |
+| --- | --- |
+| 新增後網站找不到 | 是否仍為 `draft`？網址 ID 是否正確？正式網站是否已重新部署？ |
+| 有活動頁，但總覽列表沒有 | 是否省略了 `date`？未填日期不會進入列表 |
+| 沒出現在首頁最新消息 | 日期是否已過期？是否在最近三筆以外？ |
+| 「其他活動」相簿沒有新項目 | 是否同時設定 `other`、`published`、`detail`、`album`？ |
+| 點卡片只出現彈窗 | 總覽／行事曆在沒有 `detail` 時使用資訊彈窗 |
+| 主標題和 `title` 不同 | `other` 顯示活動名稱；其他分類的主標題使用分類名稱，`title` 顯示為副標題 |
+| 圖片空白或驗證說缺圖 | 實際檔案、大小寫、副檔名、`src` 的路徑是否一致？ |
+| 連結沒有出現 | `links` 是否在最外層？是否在獨立分頁的「活動介紹」頁查看？ |
+| 新增相簿後測試仍要求七筆 | 需同步調整相簿內容測試的固定名單與圖片範圍 |
+| 出現未知欄位錯誤 | 對照 Schema；載入器不接受任意額外欄位 |
+| 封存後整站驗證失敗 | 是否仍被 `featuredActivityId` 引用？先換分類入口或移除引用 |
 
-### 共用簡介與無照片章節
+## 檔案索引與進一步維護
 
-- `detail.introMode` 選填，可使用 `tab` 或 `shared`；未設定時維持既有行為。
-- `shared` 必須搭配非空的 `tabs`。每頁依序呈現共用簡介、分頁導覽及該頁章節，導覽只列 `tabs`，不另設「活動介紹」分頁。
-- 共用簡介模式的活動基本網址及 `/intro` 會導向 `tabs` 的第一頁；不支援的分頁維持 404。
-- 章節 `image` 可省略，省略時使用單欄文字版型，不產生圖片框。若提供圖片，仍須包含有效的 `src` 和 `alt`。
+| 檔案／資料夾 | 用途 |
+| --- | --- |
+| [events](../../content/activities/events) | 一個活動一份 JSON，新增後自動載入 |
+| [activity.schema.json](../../content/activities/activity.schema.json) | 編輯器欄位提示與格式說明 |
+| [categories.json](../../content/activities/categories.json) | 分類與圓形入口 |
+| `frontend/public/activities/` | 活動照片實體檔案 |
+| [activityTypes.ts](activityTypes.ts) | 頁面使用的資料型別 |
+| [activityRepository.ts](data/activityRepository.ts) | 內容解析、驗證與發布篩選 |
+| [ActivityDetailPage.tsx](ActivityDetailPage.tsx) | 共用活動詳細頁 |
+| [ActivityLinks.tsx](components/ActivityLinks.tsx) | 外部連結卡片與平台辨識 |
+| [EXISTING_ACTIVITIES.md](EXISTING_ACTIVITIES.md) | 既有活動配置、照片來源與歷史紀錄 |
 
-電機週使用 `introMode: "shared"`，分頁依序為 `groups`（各組介紹，六組）、`events`（細項活動，八項）及 `performances`（電夜表演，六項）。文字參考舊網站 `EEweek_2.jsx`、`EEweek.jsx` 與 `EEweek_1.jsx`，移除年度限定條件；照片取自 `imgae/eeWeek`，使用每項一張對應照片，簡介共用 Open Lab 與光舞照片。圖片存於 `public/activities/ee-week/`，轉為 WebP，長邊最多 1600px、品質 82；無對應照片的活動只顯示文字。
+`$schema` 請保留 `"../activity.schema.json"`，支援 JSON Schema 的編輯器就能提供提示。所有活動內容（包含草稿與封存）都必須符合資料格式；只有已發布活動會輸出到前台。
 
-| 分頁 | 實際網址 | 章節 |
-| --- | --- | --- |
-| 各組介紹 | `/#/activities/ee-week-showcase/groups` | 公關部、宣傳部、課學部、活動部、場器部、Open Lab |
-| 細項活動 | `/#/activities/ee-week-showcase/events` | 擺攤、圓桌分享、Open Lab、企業參訪、麻將大賽、電競比賽、人氣王、養樂多大賽 |
-| 電夜表演 | `/#/activities/ee-week-showcase/performances` | 儀隊、光球、光棍、光舞、樂團、長劇 |
-
-維護電機週時修改 `events/ee-week-showcase.json`；保持 `tabs` 順序即可維持「各組介紹」為預設入口。共用簡介使用 `intro` 與 `heroImages`，`detail.sections` 保持 `[]`，各頁章節分別放在對應的 `tabs[].sections`。
-
-### 分類入口
-
-若要讓總覽的大型分類圓形直接連到這個詳細頁，請在 `categories.json` 的對應分類設定：
-
-```json
-"featuredActivityId": "example-event"
-```
-
-系統會檢查該活動已發布、有詳細內容，而且屬於同一分類。
-
-## 圖片管理
-
-### 其他活動相簿
-
-`/#/activities/other` 保留原本相簿，由活動總覽「其他活動」圓形進入；原有 `overview?category=other` 篩選網址仍可使用。每個活動也能直接開啟 `/#/activities/<id>`，或從相簿介紹中的「查看活動詳細頁」進入。
-
-- 每個活動都放在 `src/content/activities/events/<id>.json`，由共用載入器驗證；相簿與詳細頁共用同一份文字與照片，沒有額外的相簿內容 JSON。
-- 現有七個活動依序為選課大會、破冰大會、分家大會、新生晚會、宿營、系烤、小畢典。`categoryId` 設為 `other`，`status` 設為 `published` 才會顯示；草稿與封存項目不會出現在相簿或詳細頁。
-- `detail.intro` 是活動介紹，`detail.heroImages` 是兩張主照片，`detail.sections` 放組別介紹；宿營保留五組，一般活動填 `[]`，不必建立分頁。
-- `album.order` 為非負整數，由小到大排序，同值時依 ID 排序。`album.cover` 是輪播與首頁卡片封面，`album.photos` 是相簿及詳細頁完整照片清單，不可為空。
-- 圖片共用 `src`、`alt`，可選填 `objectPosition` 與 `fit: "cover" | "contain"`；選課簡報用 `contain` 保留完整畫面。現有照片仍位於 `public/activities/other/`。
-- 相簿保留自動輪播、暫停、左右方向鍵、觸控切換及減少動態效果支援；切換活動會同步更新介紹、照片、組別與詳細頁連結。
-
-### 讓其他活動出現在最新消息
-
-在該活動 JSON 頂層補上實際日期，例如 `"date": "2027-01-15"`；地點確認後可另加 `location`。保持 `status: "published"`，重新執行驗證、建置與部署後，即自動參與首頁最新消息排序，不需要修改 React 程式。
-
-首頁依台灣日期挑選今天起最近三筆，同日依 ID 排序；其他活動卡片顯示實際活動名稱。無日期與已過期活動不出現在首頁最新消息，仍可從相簿瀏覽介紹；總覽近期列表只排除無日期活動，其餘日期行為維持原有方式。行事曆共用已發布且有日期的活動，包含過去月份與同日多筆活動，依活動分類呈現顏色；有詳細內容時點擊直接前往活動頁，否則顯示活動資訊視窗。Google 日曆與 ICS 匯出亦使用同一來源，帶入日期、介紹、已知地點與活動連結；無日期活動不會匯出。
-
-### 照片檔案規範
-
-既有共用圖片保留在 `public/intro/activities/`。新活動建議使用獨立資料夾：
-
-```text
-public/activities/<activity-id>/hero-01.webp
-public/activities/<activity-id>/hero-02.webp
-public/activities/<activity-id>/section-01.webp
-```
-
-JSON 路徑從 `/activities/` 開始，不包含 `public`。建議使用橫式 WebP 或 JPG，保留比例並壓縮至合適尺寸；電機週採長邊最多 1600px、WebP 品質 82，不放大較小的原圖。每張圖都要有描述實際畫面內容的 `alt`，例如團隊合照、器材或練習場景；檔名只使用英文小寫、數字及連字號。
-
-## 新增或調整分類
-
-只需編輯 `src/content/activities/categories.json`：
-
-```json
-{
-  "id": "new-category",
-  "label": "新分類",
-  "shortLabel": "NEW CATEGORY",
-  "featuredActivityId": "example-event"
-}
-```
-
-`id` 是程式與網址使用的穩定值；`label` 可日後修改顯示文字。`featuredActivityId` 選填：有設定時分類圓形前往詳細頁，沒有設定時作為篩選按鈕。
-
-分類圓形目前針對前五個項目設計位置與顏色。增加第六類以上時，仍需在 `activities.css` 補上版面位置或改用新的排列方式。
-
-## 驗證與發布
-
-在 `frontend` 資料夾執行：
-
-```powershell
-npm run validate:content
-npm test
-npm run build
-```
-
-載入器會在測試及建置時檢查：重複或不合法的 id、日期格式、未知分類、圖片路徑與替代文字、重複章節、分頁資料、`introMode` 合法值與 `shared` 必須搭配分頁，以及錯誤的 `featuredActivityId`。內容測試也會確認所有已提供的詳細頁圖片存在於 `public`。錯誤訊息會指出 JSON 檔案與欄位位置。
-
-分頁變更還需確認預設入口與 `/intro` 轉址、直接開啟及重新整理、目前分頁標示、返回／前進、切換回到頁首、各頁內容隔離，以及未知分頁的 404。桌面與手機皆應檢查圖片裁切、無照片章節與導覽是否正常。
-
-若完整測試平行執行時因資源競爭逾時，可改用 `npm test -- --maxWorkers=1`。
-
-JSON 會被打包到前端，更新內容後仍需重新建置與部署。若未來改接 CMS 或 API，只要讓新的資料來源輸出相同的 `ActivityItem` 格式，React 頁面可保持不變；`activityRepository.ts` 就是預留的資料來源邊界。
+改動 React、導覽、分頁或互動行為時，另執行完整 `npm test -- --maxWorkers=1`，並檢查桌面與手機、分頁切換及直接網址。

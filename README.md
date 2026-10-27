@@ -61,6 +61,34 @@ npm run dev
 
 後台提供登入、登出、目前帳號及聯絡表單收件匣；Google 登入、帳號管理介面、密碼重設與內容編輯依後續階段擴充。
 
+## 活動 CMS 基礎
+
+目前已建立活動分類、活動及內容版本的 Prisma 模型，並抽出前後端共用的 `shared/activity-content.ts`。公開與工作版本分開保存，分類與日期隨版本保存；前台仍從原 JSON 載入，不會因新增 migration 自動切換資料來源。
+
+進度及下一任務見 [CMS 規劃](docs/admin-cms-plan.md)；狀態轉換、權限矩陣及介面見 [CMS 契約](docs/activity-cms-contract.md) 與 [OpenAPI](docs/activity-cms.openapi.json)。OpenAPI 中的活動端點均為待實作，尚未在 API 啟用。
+
+共用原始碼位於專案根目錄，前後端 Docker 建置均以根目錄為 context；使用 `docker compose build backend web`。後端編譯輸出現為 `backend/dist/backend/src` 及 `backend/dist/shared`，仍以 `npm start` 啟動。
+
+在 `backend` 執行 `npm test` 會執行活動內容與契約測試；未設定資料庫時，HTTP 與 migration 整合測試會明確跳過。要完整驗收，在暫時 PostgreSQL 容器建立兩個獨立資料庫：
+
+```powershell
+# 專案根目錄啟動暫時資料庫；完成驗收後停止容器即可移除。
+docker run --rm -d --name nycuee-cms-tests -e POSTGRES_PASSWORD=cms-test-only -p 127.0.0.1:55433:5432 postgres:16-alpine
+# 等待資料庫就緒後：
+docker exec nycuee-cms-tests createdb -U postgres contact_test
+docker exec nycuee-cms-tests createdb -U postgres cms_test
+cd backend
+$env:DATABASE_URL='postgresql://postgres:cms-test-only@127.0.0.1:55433/contact_test'
+$env:TEST_DATABASE_URL=$env:DATABASE_URL
+$env:CMS_TEST_DATABASE_URL='postgresql://postgres:cms-test-only@127.0.0.1:55433/cms_test'
+npm run db:generate
+npm run db:migrate
+npm test
+docker stop nycuee-cms-tests
+```
+
+`contact_test` 的收件測試會清空測試資料；**`cms_test` 的 migration 測試會重設整個 `public` schema**，只能指向專用測試庫。它先建立舊版資料表及帳號、Session、聯絡訊息與限速資料，再套用新 migration、比對資料保存，並驗證公開與工作版本互不影響。測試拒絕其他資料庫名稱。
+
 ## 正式 HTTPS 部署
 
 將網域指向 Linux 主機，開放 80、443 TCP 與 443 UDP，修改根目錄 `.env`：

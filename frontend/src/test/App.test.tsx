@@ -43,23 +43,28 @@ describe("NYCU EE website", () => {
   it("opens the other-activities album from the overview and supports direct access", async () => {
     const user = userEvent.setup();
     const view = renderApp("/activities/overview");
-    await user.click(screen.getByRole("link", { name: "其他活動，查看活動相簿" }));
+    await user.click(within(screen.getByRole("group", { name: "依活動分類篩選" })).getByRole("link", { name: "其他活動，查看活動相簿" }));
     expect(screen.getByRole("heading", { name: "其他活動" })).toBeInTheDocument();
     expect(screen.getByRole("article", { name: "選課大會" })).toBeInTheDocument();
     expect(within(screen.getByRole("navigation", { name: "主要導覽" })).getByRole("link", { name: "系上活動" })).toHaveClass("active");
-    await user.click(screen.getByRole("link", { name: /回到活動總覽/ }));
+    await user.click(within(screen.getByRole("main")).getByRole("link", { name: /回到活動總覽/ }));
     expect(screen.getByRole("heading", { name: "活動總覽" })).toBeInTheDocument();
     view.unmount();
     renderApp("/activities/other");
     expect(screen.getByRole("article", { name: "選課大會" })).toBeInTheDocument();
   });
-  it("renders and advances the hero carousel", async () => {
-    const user = userEvent.setup();
-    renderApp();
-
-    expect(screen.getByRole("heading", { name: "以電機，連結未來。" })).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "下一張" }));
-    expect(screen.getByRole("heading", { name: "探索科技的下一步。" })).toBeInTheDocument();
+  it("renders the current hero and advances automatically", () => {
+    vi.useFakeTimers();
+    const view = renderApp();
+    try {
+      const hero = within(screen.getByRole("region", { name: "交大電機首頁主視覺" }));
+      expect(hero.getByRole("heading", { level: 1 })).toHaveAccessibleName(/以電機，連結未來。/);
+      act(() => vi.advanceTimersByTime(4800));
+      expect(hero.getByRole("heading", { level: 1 })).toHaveAccessibleName(/探索科技的下一步。/);
+    } finally {
+      view.unmount();
+      vi.useRealTimers();
+    }
   });
 
   it("automatically loops through every hero slide", () => {
@@ -168,7 +173,7 @@ describe("NYCU EE website", () => {
 
   it("shows fewer cards when fewer upcoming activities remain", () => {
     vi.useFakeTimers();
-    vi.setSystemTime(new Date("2027-05-21T16:00:00.000Z"));
+    vi.setSystemTime(new Date("2027-05-26T16:00:00.000Z"));
 
     try {
       renderApp();
@@ -182,7 +187,7 @@ describe("NYCU EE website", () => {
 
   it("shows an empty state after the last activity", () => {
     vi.useFakeTimers();
-    vi.setSystemTime(new Date("2027-05-22T16:00:00.000Z"));
+    vi.setSystemTime(new Date("2027-05-27T16:00:00.000Z"));
 
     try {
       renderApp();

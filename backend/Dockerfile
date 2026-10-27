@@ -1,12 +1,13 @@
 FROM node:22-bookworm-slim
-WORKDIR /app
+WORKDIR /app/backend
 RUN apt-get update && apt-get install -y --no-install-recommends openssl && rm -rf /var/lib/apt/lists/*
-COPY package.json package-lock.json ./
-COPY prisma ./prisma
+COPY backend/package.json backend/package-lock.json ./
+COPY backend/prisma ./prisma
 RUN npm ci
 RUN npm run db:generate
-COPY tsconfig.json ./
-COPY src ./src
+COPY backend/tsconfig.json ./
+COPY backend/src ./src
+COPY shared /app/shared
 RUN npm run build
 ENV NODE_ENV=production
 USER node

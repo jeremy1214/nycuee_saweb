@@ -3,6 +3,7 @@ WORKDIR /app
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci --ignore-scripts
 COPY frontend/ ./
+COPY shared /shared
 # Build directly so the existing npm prebuild test hook is not invoked.
 RUN ./node_modules/.bin/tsc -b && ./node_modules/.bin/vite build
 

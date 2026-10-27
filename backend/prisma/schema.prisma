@@ -71,3 +71,67 @@ model ContactSubmissionAttempt {
 
   @@index([expiresAt])
 }
+
+// Workflow and publication are independent: a new draft never replaces the public pointer.
+enum ActivityRevisionStatus {
+  DRAFT
+  SUBMITTED
+  PUBLISHED
+}
+
+model ActivityCategory {
+  id                 String             @id
+  label              String             @unique
+  shortLabel         String
+  order              Int                @default(0)
+  featuredActivityId String?
+  featuredActivity   Activity?          @relation("FeaturedActivity", fields: [featuredActivityId], references: [id], onDelete: Restrict)
+  revisions          ActivityRevision[]
+}
+
+model Activity {
+  // Stable legacy slug, never changed after creation.
+  id                  String             @id
+  version             Int                @default(1)
+  publishedRevisionId String?
+  workingRevisionId   String?
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  revisions           ActivityRevision[] @relation("ActivityRevisions")
+  // Composite foreign keys prevent pointing at another activity's revision.
+  publishedRevision   ActivityRevision?  @relation("PublishedRevision", fields: [id, publishedRevisionId], references: [activityId, id], onDelete: NoAction, onUpdate: NoAction)
+  workingRevision     ActivityRevision?  @relation("WorkingRevision", fields: [id, workingRevisionId], references: [activityId, id], onDelete: NoAction, onUpdate: NoAction)
+  featuredIn          ActivityCategory[] @relation("FeaturedActivity")
+}
+
+model ActivityRevision {
+  id            String                 @id @default(cuid())
+  activityId    String
+  number        Int
+  status        ActivityRevisionStatus @default(DRAFT)
+  title         String
+  categoryId    String
+  // Date-only values, with inclusive endDate; API uses YYYY-MM-DD.
+  date          DateTime?              @db.Date
+  endDate       DateTime?              @db.Date
+  summary       String
+  details       String
+  location      String?
+  links         Json                   @default("[]") @db.JsonB
+  detail        Json?                  @db.JsonB
+  album         Json?                  @db.JsonB
+  rejectionNote String?
+  submittedAt   DateTime?
+  publishedAt   DateTime?
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
+  activity      Activity               @relation("ActivityRevisions", fields: [activityId], references: [id], onDelete: Cascade)
+  category      ActivityCategory       @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  publishedFor  Activity[]             @relation("PublishedRevision")
+  workingFor    Activity[]             @relation("WorkingRevision")
+
+  @@unique([activityId, number])
+  @@unique([activityId, id])
+  @@index([categoryId, date])
+  @@index([status, updatedAt])
+}

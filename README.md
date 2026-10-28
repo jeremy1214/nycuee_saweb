@@ -61,33 +61,78 @@ npm run dev
 
 後台提供登入、登出、目前帳號及聯絡表單收件匣；Google 登入、帳號管理介面、密碼重設與內容編輯依後續階段擴充。
 
-## 活動 CMS 基礎
+## 活動 CMS：A／G 已完成
 
-目前已建立活動分類、活動及內容版本的 Prisma 模型，並抽出前後端共用的 `shared/activity-content.ts`。公開與工作版本分開保存，分類與日期隨版本保存；前台仍從原 JSON 載入，不會因新增 migration 自動切換資料來源。
+前台活動預設使用資料庫公開 API。活動分類、版本、帳號／Google／Token／授權、媒體／引用與操作紀錄模型及契約已建立；帳號管理、Google 登入、活動編輯／發布、媒體服務仍待 C／D／E／F 實作，目前 EDITOR 不能登入後台。
 
-進度及下一任務見 [CMS 規劃](docs/admin-cms-plan.md)；狀態轉換、權限矩陣及介面見 [CMS 契約](docs/activity-cms-contract.md) 與 [OpenAPI](docs/activity-cms.openapi.json)。OpenAPI 中的活動端點均為待實作，尚未在 API 啟用。
+進度及下一任務見 [CMS 規劃](docs/admin-cms-plan.md)；活動流程見 [活動契約](docs/activity-cms-contract.md)，帳號與媒體見 [平台契約](docs/cms-platform-contract.md)，機器介面見 [OpenAPI](docs/activity-cms.openapi.json)。其中 `implemented` 與 `planned` 明確區分可呼叫及待實作的端點。
 
-共用原始碼位於專案根目錄，前後端 Docker 建置均以根目錄為 context；使用 `docker compose build backend web`。後端編譯輸出現為 `backend/dist/backend/src` 及 `backend/dist/shared`，仍以 `npm start` 啟動。
+### 首次匯入舊活動
 
-在 `backend` 執行 `npm test` 會執行活動內容與契約測試；未設定資料庫時，HTTP 與 migration 整合測試會明確跳過。要完整驗收，在暫時 PostgreSQL 容器建立兩個獨立資料庫：
+**首次啟動的空資料庫不會自動匯入活動。** 若更新後活動與分類同時空白，而 API 回傳兩個空陣列，請先試跑確認當前資料庫是否尚未初始化；舊 JSON 與圖片仍保留為匯入基準。 啟動 Docker 後，在專案根目錄依序執行：
 
 ```powershell
-# 專案根目錄啟動暫時資料庫；完成驗收後停止容器即可移除。
-docker run --rm -d --name nycuee-cms-tests -e POSTGRES_PASSWORD=cms-test-only -p 127.0.0.1:55433:5432 postgres:16-alpine
+docker compose exec backend npm run content:import -- --dry-run
+docker compose exec backend npm run content:import
+```
+
+試跑會列出 11 筆活動、5 個分類與 65 張圖片的檢查及預計新增／跳過數量，不寫入資料。正式匯入於單一交易執行，保留 ID、分頁、相簿、日期與圖片設定；相同資料可重跑且不新增版本。已有不同內容、分類設定或工作版本時，整批中止並列出衝突，不覆寫資料庫，也沒有強制覆寫旗標。這是初始化工具，API 模式日後的線上維護需由 D／F 的編輯與發布流程處理。
+
+本機開發請先完成 `db:generate`、`db:migrate`、`db:seed`，再於 `backend` 執行：
+
+```powershell
+npm run content:import -- --dry-run
+npm run content:import
+```
+
+預設讀取 `frontend/src/content/activities` 與 `frontend/public`，可用 `LEGACY_CONTENT_DIR`、`LEGACY_PUBLIC_DIR` 指定其他路徑。本機檢查實際圖片；Docker 建置先驗證圖片並產生大小／SHA-256 清單，後端僅攜帶內容與清單，65 張既有圖片仍由前台靜態路徑供應。前後端應使用同一版來源建置。
+
+### 前台資料來源
+
+`VITE_ACTIVITY_SOURCE` 在建置時決定來源，預設 `api`。同一份公開快照驅動活動頁、相簿、首頁近期活動、行事曆、ICS、導覽及搜尋；載入／錯誤／重試分開顯示，路由切換與回到頁面會重新驗證，API 失敗不回退 JSON。
+
+| API | 用途 |
+|---|---|
+| `GET /api/v1/public/activity-content` | 一致快照 `{ activities, categories }`；空資料庫回空陣列 |
+| `GET /api/v1/public/activities` | 公開活動 `{ items }` |
+| `GET /api/v1/public/activities/:id` | 單筆公開內容；草稿／下架為 404 |
+| `GET /api/v1/public/activity-categories` | 依順序排列的公開分類 `{ items }` |
+
+純靜態部署在 `frontend/.env` 設 `VITE_ACTIVITY_SOURCE=json` 後建置；也可在 PowerShell 執行：
+
+```powershell
+$env:VITE_ACTIVITY_SOURCE='json'
+npm run build
+```
+
+JSON 模式只打包共用驗證產生的公開快照，不包含草稿原文。Docker 則在根目錄 `.env` 設 `VITE_ACTIVITY_SOURCE=json` 後重建 `web`。JSON 模式不反映資料庫後續更新；切回 API 時改回 `api` 並重建。正式遷移前先備份資料庫、凍結舊 JSON 更新、試跑、匯入及逐筆比對；回復內容以資料庫備份／發布程序處理。
+
+### 完整驗收
+
+共用程式碼位於根目錄 `shared/`，兩個 Dockerfile 均以根目錄為 context。後端編譯輸出為 `backend/dist/backend/src` 及 `backend/dist/shared`，以 `npm start` 啟動。`npm test`（backend）執行純驗證／契約測試；未設定測試庫時會明確跳過資料庫整合。
+
+完整測試使用一次性 PostgreSQL 容器及三個隔離資料庫：
+
+```powershell
+docker run --rm -d --name nycuee-cms-tests -e POSTGRES_PASSWORD=cms-test-only -p 127.0.0.1:55434:5432 postgres:16-alpine
 # 等待資料庫就緒後：
 docker exec nycuee-cms-tests createdb -U postgres contact_test
 docker exec nycuee-cms-tests createdb -U postgres cms_test
+docker exec nycuee-cms-tests createdb -U postgres content_test
 cd backend
-$env:DATABASE_URL='postgresql://postgres:cms-test-only@127.0.0.1:55433/contact_test'
-$env:TEST_DATABASE_URL=$env:DATABASE_URL
-$env:CMS_TEST_DATABASE_URL='postgresql://postgres:cms-test-only@127.0.0.1:55433/cms_test'
 npm run db:generate
+$env:DATABASE_URL='postgresql://postgres:cms-test-only@127.0.0.1:55434/content_test'
 npm run db:migrate
+$env:CONTENT_TEST_DATABASE_URL=$env:DATABASE_URL
+$env:DATABASE_URL='postgresql://postgres:cms-test-only@127.0.0.1:55434/contact_test'
+npm run db:migrate
+$env:TEST_DATABASE_URL=$env:DATABASE_URL
+$env:CMS_TEST_DATABASE_URL='postgresql://postgres:cms-test-only@127.0.0.1:55434/cms_test'
 npm test
 docker stop nycuee-cms-tests
 ```
 
-`contact_test` 的收件測試會清空測試資料；**`cms_test` 的 migration 測試會重設整個 `public` schema**，只能指向專用測試庫。它先建立舊版資料表及帳號、Session、聯絡訊息與限速資料，再套用新 migration、比對資料保存，並驗證公開與工作版本互不影響。測試拒絕其他資料庫名稱。
+`contact_test` 會清空收件測試資料；`content_test` 會清空活動、分類、媒體與紀錄測試資料；**`cms_test` 會重設整個 public schema**。僅能使用這些專用測試庫名稱。升級測試先建舊表與既有資料，再套用所有 migrations，驗證登入／收件保留及新模型約束；公開內容測試涵蓋匯入、重跑、衝突、缺圖、私有版本隔離與一致快照。
 
 ## 正式 HTTPS 部署
 
@@ -147,7 +192,7 @@ npm run dev
 
 ## 活動詳細頁與分頁
 
-活動內容由 `frontend/src/content/activities/events/` 的 JSON 管理，照片放在 `frontend/public/activities/`。新增或更新內容後需重新建置與部署。
+活動預設由公開 API 提供；`frontend/src/content/activities/events/` 保留為初始遷移及 JSON 靜態模式的基準，照片仍在 `frontend/public/activities/`。JSON 模式修改後需重建部署；API 模式不直接讀取這些檔案，初次資料請依上方匯入步驟處理。
 
 ### 電機營
 

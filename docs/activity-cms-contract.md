@@ -1,6 +1,6 @@
 # 活動 CMS 基礎契約（v0.1）
 
-> 2026/10/28：已交付資料模型、migration、共用驗證及本契約。OpenAPI 中的活動端點均為 **planned**，尚未註冊至 NestJS；前台仍讀取 JSON。現有登入與聯絡收件 API 不變。
+> 2026/10/29：公開活動 GET 端點與 G 的匯入／前台串接已實作；後台活動寫入、Google、帳號管理與媒體仍為 planned。平台模型與規格見 [A 平台契約](cms-platform-contract.md)。前台預設 API，純靜態部署可明確選 JSON。
 
 機器可讀介面見 [OpenAPI 3.1](activity-cms.openapi.json)。內容驗證的單一實作為 [`shared/activity-content.ts`](../shared/activity-content.ts)，後端透過 `validateActivityRevision` 轉成 400 欄位錯誤。JSON Schema 描述結構，日期先後、重複識別值與跨記錄引用由共用驗證及後續交易服務檢查。
 
@@ -12,7 +12,7 @@
 - 公開 API 只能依公開指標讀取；不能用「最新版本」或工作版本的分類／日期決定公開結果。工作流程服務尚待實作，模型本身不等於完整的公開過濾或發布授權。
 - 日期為 PostgreSQL `DATE`，API 為 `YYYY-MM-DD`；Prisma 轉換時使用 UTC 午夜，輸出取 UTC 日期，不套用主機時區。`endDate` 包含當天，省略為單日；無日期介紹合法。
 - 保留獨立介紹／共用簡介、雙主圖、選填章節圖片、分頁排序、圖片 `fit`／`objectPosition`、活動外部連結與相簿排序。舊 JSON 的 `$schema`／`status` 僅由舊資料解析器接受，CMS 可編輯內容不接受身分或流程欄位。
-- migration 只新增資料表、索引、關聯與檢查，不匯入或切換正式內容。資料庫檢查日期區間、JSONB 容器及版本編號；巢狀格式與引用有效性仍須在寫入與發布時驗證。
+- migration 只更新資料表、索引、關聯與檢查；獨立匯入指令經試跑後載入舊內容，不隨啟動自動匯入。資料庫檢查日期區間、JSONB 容器及版本編號；巢狀格式與引用有效性仍須在寫入與發布時驗證。
 
 ## 未來工作流程與衝突規則
 
@@ -33,9 +33,9 @@
 
 ## API 與權限
 
-公開端點為 `GET /api/v1/public/activities`、`/activities/{id}`、`/activity-categories`；列表統一回 `{ items }`，只含公開內容。活動依 ID 排序，分類依 `order`、ID 排序。草稿／下架活動詳細查詢為 404。
+已實作的公開端點為 `GET /api/v1/public/activities`、`/activities/{id}`、`/activity-categories`；列表統一回 `{ items }`，只含公開內容。活動依 ID 排序，分類依 `order`、ID 排序。草稿／下架活動詳細查詢為 404。另有 `GET /api/v1/public/activity-content` 回 `{ activities, categories }`，於 RepeatableRead 交易中取得同一快照，前台以此統一更新。空資料庫合法回空陣列，所有回應禁止快取。公開分類會省略已失效的精選引用，發布服務仍須按上列規則阻擋不合法變更。
 
-後台使用 `/api/v1/admin/activities`，支援建立、列表及詳情；子路徑為 `draft`、`preview`、`submit`、`withdraw`、`reject`、`publish`、`unpublish`、`restore`、`revisions`。可編輯內容統一包在 `content`，資源身分、版本鎖及狀態留在外層；詳見 OpenAPI。預覽重用前台元件。
+待 D／F 實作的後台介面使用 `/api/v1/admin/activities`，規劃支援建立、列表及詳情；子路徑為 `draft`、`preview`、`submit`、`withdraw`、`reject`、`publish`、`unpublish`、`restore`、`revisions`。可編輯內容統一包在 `content`，資源身分、版本鎖及狀態留在外層；詳見 OpenAPI。預覽重用前台元件。
 
 | 能力 | 訪客 | 編輯者（未來） | 管理員 |
 |---|---|---|---|
@@ -55,5 +55,17 @@
 
 - 共用驗證以現有 11 筆 JSON 為相容性資料，另測無日期、跨日、非法日期、分類引用、重複 ID 與欄位錯誤；沿用前端分頁、相簿、行事曆與 ICS 測試。
 - `npm test`（backend）執行純驗證與契約檢查。設定 `CMS_TEST_DATABASE_URL` 才執行 migration／版本隔離驗收；資料庫必須命名為 `cms_test`，測試會重設其 `public` schema。既有收件測試使用另一個 `contact_test`。
-- migration 驗收先套用前兩個舊 migration，寫入帳號、Session、聯絡訊息及限速資料，再升級並核對保存；同時測公開／工作版本獨立保存、跨活動指標拒絕及非法日期拒絕。
+- migration 驗收先套用前三個舊 migration，寫入帳號、Session、聯絡訊息及限速資料，加入既有活動與公開指標後再升級並核對保存；同時測公開／工作版本獨立保存、跨活動指標拒絕及非法日期拒絕。
 - 下一個任務為「帳號與授權基礎」：管理員建立／停用帳號、短效單次啟用／密碼重設、分類及指定活動授權、編輯者 Guard、權限變更立即生效與操作紀錄。之後才接內容交易服務、媒體及編輯介面；Google 登入另接身分綁定流程。
+
+## G：匯入與前台來源
+
+使用 `npm run content:import -- --dry-run` 試跑，正式匯入執行 `npm run content:import`。工具先驗證 JSON、分類精選及所有圖片，再以 Serializable 單一交易與匯入鎖比對／寫入。相同資料不新增版本；現有內容不同或已有工作版本整批拒絕，不提供覆寫旗標。分類順序使用原陣列順序。
+
+舊 `published` 建立 PUBLISHED 版本及公開指標；`draft` 建立 DRAFT 工作版本；`archived` 建立無公開／工作指標的歷史 DRAFT。既有工作版本會阻擋重跑，因此匯入含 draft 的來源後需先人工確認工作版本，不能拿匯入工具當編輯功能。匯入時間不冒充舊網站的實際發布時間。
+
+本機直接檢查 `frontend/public` 的圖片；Docker 建置先驗證 65 張圖片並產生 SHA-256／大小清單，後端僅攜帶該清單與內容，圖片繼續由前台供應。建置、部署時前後端使用同一版來源。可用 `LEGACY_CONTENT_DIR`、`LEGACY_PUBLIC_DIR` 明確覆寫來源。
+
+前台預設 API；`VITE_ACTIVITY_SOURCE=json` 由建置時共用驗證產生僅含公開內容的模組。API 模式不內嵌舊活動 JSON；服務失敗不偷偷使用 JSON。公開版面共用 Provider，進站、路由、重新取得焦點／可見、手動重試時讀取；同時請求去重、換路由或卸載中止舊請求，15 秒逾時可重試。路由先等待新快照，再決定預設分頁或 404。
+
+活動、相簿、首頁、日曆、ICS、導覽及搜尋以同一快照衍生；其他網站內容保留原資料來源。正式切換需先備份、停止舊 JSON 更新、試跑與逐筆比對；前台 JSON 切回只恢復舊基準，不會包含資料庫後續更新，資料回復應依備份／發布程序處理。

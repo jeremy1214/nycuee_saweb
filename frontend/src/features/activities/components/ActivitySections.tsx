@@ -89,10 +89,6 @@ export function RecentActivities({ selectedCategory, onActivitySelect }: RecentA
           <span className="eyebrow">UPCOMING EVENTS</span>
           <h2 id="recent-activities-title">近期活動</h2>
         </div>
-        <p className="activity-filter-status" aria-live="polite">
-          {selectedCategoryLabel ? `目前顯示：${selectedCategoryLabel}` : "目前顯示：全部活動"}
-          <span>{visibleActivities.length} 項</span>
-        </p>
       </div>
 
       <div className="activity-list">

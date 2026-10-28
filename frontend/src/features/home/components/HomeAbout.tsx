@@ -13,7 +13,6 @@ export function HomeAbout() {
       <div className="home-about-departments" aria-label="系學會四大部門">
         {departmentCards.map((department, index) => (
           <Link className="home-department-card" to={department.link} key={department.link}>
-            <span className="home-department-number">0{index + 1}</span>
             <strong>{department.name}</strong>
             <span aria-hidden="true">↗</span>
           </Link>

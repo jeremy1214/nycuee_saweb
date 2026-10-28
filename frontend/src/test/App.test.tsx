@@ -1,4 +1,5 @@
-import { act, render, screen, waitFor, within } from "@testing-library/react";
+import { render } from "./render";
+import { act, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import App from "../App";
@@ -19,7 +20,7 @@ describe("NYCU EE website", () => {
     const user = userEvent.setup();
     const view = renderApp("/activities/other");
     await user.click(within(screen.getByRole("navigation", { name: "選擇其他活動" })).getByRole("button", { name: activity.title }));
-    await user.click(screen.getByRole("link", { name: `${activity.title}，查看活動詳細頁` }));
+    await user.click(within(screen.getByRole("article", { name: activity.title })).getByRole("link", { name: `${activity.title}，查看活動詳細頁` }));
     expect(screen.getByRole("heading", { level: 1, name: activity.title })).toBeInTheDocument();
     expect(screen.getByRole("region", { name: `${activity.title}活動照片` })).toBeInTheDocument();
     expect(screen.queryAllByRole("time").map((time) => time.getAttribute("datetime")))

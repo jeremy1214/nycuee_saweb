@@ -1,10 +1,11 @@
 import { sectionPages, contactPage } from "./navigation";
 import { siteContact, socialLinks } from "./site";
-import { exploreContent, calendarEvents } from "../../features/home/data/home";
+import { exploreContent } from "../../features/home/data/home";
 import { eesaOverview, departments, departmentCards } from "../../features/eesa/data/eesa";
 import { teams } from "../../features/teams/data/teams";
-import { activities, activityCategories } from "../../features/activities/data/activities";
-import { otherActivities } from "../../features/activities/data/otherActivities";
+import type { PublicActivityContent } from "../../../../shared/activity-content";
+import { deriveOtherActivities } from "../../features/activities/data/contentSelectors";
+import { hasActivityDate } from "../../features/activities/data/activityDates";
 import { resourceCategories, resourceOrder } from "../../features/resources/data/resources";
 
 export interface SearchItem {
@@ -33,7 +34,10 @@ function item(label: string, to: string, description: string, ...content: unknow
   return { label, to, description, content: [label, description, ...content.flatMap(visibleText)].join(" ") };
 }
 
-export const searchItems: SearchItem[] = [
+export function buildSearchItems({ activities, categories: activityCategories }: PublicActivityContent): SearchItem[] {
+  const otherActivities = deriveOtherActivities(activities);
+  const calendarEvents = activities.filter(hasActivityDate);
+  return [
   item("首頁", "/", "探索交大電機、近期活動與電機行事曆", exploreContent, calendarEvents,
     "從交大電機出發 認識電機系學會 探索交大電機",
     "從系學會、活動與系隊出發，找到你需要的學習資訊。", eesaOverview.introduction,
@@ -103,3 +107,6 @@ export const searchItems: SearchItem[] = [
   }),
   item("電機行事曆", "/", "首頁的系上活動與日期", calendarEvents),
 ];
+}
+
+export const searchItems = buildSearchItems({ activities: [], categories: [] });

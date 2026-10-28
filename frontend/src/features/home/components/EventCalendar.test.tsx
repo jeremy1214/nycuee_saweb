@@ -1,23 +1,17 @@
-import { render, screen, within } from "@testing-library/react";
+import { render } from "../../../test/render";
+import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
-import { activities } from "../../activities/data/activities";
-import { calendarEvents } from "../data/home";
+import { activities, activityCategories } from "../../activities/data/activities";
+import { hasActivityDate } from "../../activities/data/activityDates";
 import { EventCalendar } from "./EventCalendar";
-
-vi.mock("../data/home", async (importOriginal) => {
-  const original = await importOriginal<typeof import("../data/home")>();
-  return {
-    ...original,
-    calendarEvents: [...original.calendarEvents, {
-      id: "calendar-fallback", title: "活動資訊測試", date: "2026-10-28",
-      categoryId: "other", category: "其他活動", summary: "摘要", details: "完整活動介紹",
-    }, {
-      id: "cross-month", title: "跨月活動", date: "2026-10-31", endDate: "2026-11-02",
-      categoryId: "other", category: "其他活動", summary: "摘要", details: "跨月介紹",
-    }],
-  };
-});
+const calendarEvents = [...activities.filter(hasActivityDate), {
+  id: "calendar-fallback", title: "活動資訊測試", date: "2026-10-28",
+  categoryId: "other", category: "其他活動", summary: "摘要", details: "完整活動介紹",
+}, {
+  id: "cross-month", title: "跨月活動", date: "2026-10-31", endDate: "2026-11-02",
+  categoryId: "other", category: "其他活動", summary: "摘要", details: "跨月介紹",
+}];
 
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ["Date"] });
@@ -28,7 +22,7 @@ beforeEach(() => {
 afterEach(() => vi.useRealTimers());
 
 function renderCalendar(onEvent = vi.fn()) {
-  return render(<MemoryRouter><EventCalendar onEvent={onEvent} /></MemoryRouter>);
+  return render(<MemoryRouter><EventCalendar onEvent={onEvent} /></MemoryRouter>, { activityContent: { activities: calendarEvents, categories: activityCategories.map((c, order) => ({ ...c, order })) } });
 }
 
 it("shows every published dated activity in the visible month, including multiple events on one day", () => {

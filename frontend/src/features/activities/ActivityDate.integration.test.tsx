@@ -1,4 +1,5 @@
-import { render, screen, within } from "@testing-library/react";
+import { render } from "../../test/render";
+import { screen, within } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import ActivityDetailPage from "./ActivityDetailPage";
 import ActivitiesPage from "./ActivitiesPage";

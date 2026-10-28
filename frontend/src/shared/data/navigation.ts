@@ -1,5 +1,5 @@
 import { departmentCards } from "../../features/eesa/data/eesa";
-import { activityCategories } from "../../features/activities/data/activities";
+import type { ActivityCategoryOption } from "../../features/activities/activityTypes";
 import { resourceCategories, resourceOrder } from "../../features/resources/data/resources";
 import { teams } from "../../features/teams/data/teams";
 
@@ -20,7 +20,8 @@ export const contactPage = {
 export const primaryNavigation = [...sectionPages, contactPage] as const;
 
 
-export const sectionMenus: Record<string, { label: string; to: string }[]> = {
+export function buildSectionMenus(activityCategories: ActivityCategoryOption[]): Record<string, { label: string; to: string }[]> {
+  return {
     "/eesa": [
       { label: "系學會介紹", to: "/eesa" },
       ...departmentCards.filter((department) => department.link).map((department) => ({
@@ -45,3 +46,6 @@ export const sectionMenus: Record<string, { label: string; to: string }[]> = {
       to: `/resources/${slug}`,
     })),
   };
+}
+
+export const sectionMenus = buildSectionMenus([]);

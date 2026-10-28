@@ -1,13 +1,13 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { activityCategories } from "../../activities/data/activities";
+import { useActivityContent, ActivityContentStatus } from "../../activities/data/ActivityContentProvider";
 import { activityOccursOn, formatActivityDateRange, todayInTaiwan } from "../../activities/data/activityDates";
 import { SectionHeading } from "../../../shared/components/index";
 import type { CalendarEvent } from "../homeTypes";
-import { calendarEvents } from "../data/home";
 import CalendarImport from "./CalendarImport";
 
 export function EventCalendar({ onEvent }: { onEvent: (event: CalendarEvent) => void }) {
+  const { activityCategories, calendarEvents, status } = useActivityContent();
   const todayKey = todayInTaiwan();
   const today = new Date(`${todayKey}T00:00:00`);
   const [viewDate, setViewDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
@@ -25,7 +25,7 @@ export function EventCalendar({ onEvent }: { onEvent: (event: CalendarEvent) => 
           <CalendarImport events={calendarEvents} />
         </div>
       } />
-      <div className="calendar">
+      {status !== "ready" ? <ActivityContentStatus /> : <div className="calendar">
         <div className="calendar-toolbar">
           <div className="month-controls">
             <button type="button" onClick={() => changeMonth(-1)} aria-label="上一個月">‹</button>
@@ -51,7 +51,7 @@ export function EventCalendar({ onEvent }: { onEvent: (event: CalendarEvent) => 
             );
           })}
         </div>
-      </div>
+      </div>}
     </section>
   );
 }

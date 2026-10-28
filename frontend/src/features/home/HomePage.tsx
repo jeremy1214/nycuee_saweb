@@ -6,12 +6,16 @@ import { HomeAbout } from "./components/HomeAbout";
 import { AddToGoogleCalendar } from "./components/CalendarImport";
 import type { CalendarEvent } from "./homeTypes";
 import { ActivityLinks } from "../activities/components/ActivityLinks";
+import { useActivityContent } from "../activities/data/ActivityContentProvider";
 import { ActivityDate } from "../activities/components/ActivityDate";
 
 import "./home.css";
 
 export default function HomePage() {
+  const { data } = useActivityContent();
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+
+  useEffect(() => setSelectedEvent(null), [data]);
 
   useEffect(() => {
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches || !window.IntersectionObserver) return;

@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { searchItems } from "../data/search";
+import { buildSearchItems } from "../data/search";
+import { useActivityContent, ActivityContentStatus } from "../../features/activities/data/ActivityContentProvider";
 import { Modal } from "./ui/Modal";
 
 function resultSnippet(content: string, description: string, query: string) {
@@ -13,6 +14,8 @@ function resultSnippet(content: string, description: string, query: string) {
 }
 
 export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const content = useActivityContent();
+  const searchItems = useMemo(() => buildSearchItems(content.data), [content.data]);
   const [query, setQuery] = useState("");
   const normalized = query.trim().toLocaleLowerCase("zh-Hant");
   const results = useMemo(() => {
@@ -23,7 +26,7 @@ export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => 
           : item.description.toLocaleLowerCase("zh-Hant").includes(normalized) ? 1 : 2;
         return rank(first) - rank(second);
       });
-  }, [normalized]);
+  }, [normalized, searchItems]);
 
   return (
     <Modal open={open} title="搜尋系所資訊" onClose={onClose}>
@@ -38,6 +41,7 @@ export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => 
         autoFocus={open}
       />
       <div className="search-results" aria-live="polite">
+        <ActivityContentStatus />
         {results.length > 0 ? results.map((item) => (
           <Link key={`${item.to}-${item.label}`} to={item.to} onClick={onClose}>
             <span><strong>{item.label}</strong><small>{resultSnippet(item.content, item.description, normalized)}</small></span>

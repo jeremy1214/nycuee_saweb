@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Modal } from "../../../shared/components/index";
 import type { CalendarEvent } from "../homeTypes";
 import { downloadCalendar, googleCalendarEventUrl, googleCalendarImportUrl } from "../utils/calendarExport";
@@ -15,6 +15,7 @@ export function AddToGoogleCalendar({ event }: { event: CalendarEvent }) {
 export default function CalendarImport({ events }: { events: CalendarEvent[] }) {
   const [open, setOpen] = useState(false);
   const [downloadStarted, setDownloadStarted] = useState(false);
+  useEffect(() => { if (!events.length) setOpen(false); }, [events]);
 
   return <>
     <button type="button" className={styles.primaryButton} disabled={events.length === 0} onClick={() => { setDownloadStarted(false); setOpen(true); }}>
@@ -28,7 +29,7 @@ export default function CalendarImport({ events }: { events: CalendarEvent[] }) 
         <li><strong>選擇日曆並匯入</strong><span>選擇要加入的日曆，再點擊 Google 頁面上的「匯入」。</span></li>
       </ol>
       <div className={styles.actions}>
-        <button className={styles.primaryButton} type="button" onClick={() => { downloadCalendar(events); setDownloadStarted(true); }}><CalendarIcon />下載全部活動</button>
+        <button className={styles.primaryButton} type="button" disabled={events.length === 0} onClick={() => { downloadCalendar(events); setDownloadStarted(true); }}><CalendarIcon />下載全部活動</button>
         <a className={styles.secondaryButton} href={googleCalendarImportUrl} target="_blank" rel="noopener noreferrer">開啟 Google 匯入頁面<span aria-hidden="true">↗</span></a>
       </div>
       <p className={styles.downloadStatus} role="status">{downloadStarted ? "已開始下載。接著開啟 Google 匯入頁面，選取下載的檔案。" : ""}</p>

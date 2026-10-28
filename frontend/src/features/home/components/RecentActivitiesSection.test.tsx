@@ -1,4 +1,5 @@
-import { render, screen, within } from "@testing-library/react";
+import { render } from "../../../test/render";
+import { screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import rawOther from "../../../content/activities/events/course-selection.json";
 import { activities } from "../../activities/data/activities";

@@ -1,7 +1,9 @@
+import type { CmsRole } from '../../../../shared/cms-contract';
+
 export interface AdminUser {
   id: string;
   username: string;
-  role: "ADMIN" | "EDITOR";
+  role: CmsRole;
 }
 
 export class AuthError extends Error {

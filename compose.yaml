@@ -35,6 +35,8 @@ services:
     build:
       context: .
       dockerfile: deploy/Dockerfile.web
+      args:
+        VITE_ACTIVITY_SOURCE: ${VITE_ACTIVITY_SOURCE:-api}
     environment:
       SITE_ADDRESS: ${SITE_ADDRESS:-http://localhost}
     ports:

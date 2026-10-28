@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom";
-import { activities } from "../../activities/data/activities";
+import { useActivityContent, ActivityContentStatus } from "../../activities/data/ActivityContentProvider";
 import { activityEndDate, compareActivityDates, hasActivityDate, todayInTaiwan } from "../../activities/data/activityDates";
 import { ActivityDate } from "../../activities/components/ActivityDate";
 import { SectionHeading } from "../../../shared/components/index";
 
 export function RecentActivitiesSection() {
+  const { activities, status } = useActivityContent();
   const today = todayInTaiwan();
   const upcomingActivities = activities
     .filter(hasActivityDate)
@@ -19,7 +20,7 @@ export function RecentActivitiesSection() {
         title="最新消息"
         action={<Link className="section-more" to="/activities/overview">查看更多活動 <span aria-hidden="true">↗</span></Link>}
       />
-      {upcomingActivities.length > 0 ? (
+      {status !== "ready" ? <ActivityContentStatus /> : upcomingActivities.length > 0 ? (
         <div className="news-grid">
           {upcomingActivities.map((activity) => {
             const image = activity.album?.cover ?? activity.detail?.heroImages[0];

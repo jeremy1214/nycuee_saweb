@@ -1,7 +1,7 @@
 import { Link, Navigate, NavLink, useParams } from "react-router-dom";
 import { Breadcrumb, PageContainer } from "../../shared/components/index";
 import NotFoundPage from "../../shared/pages/NotFoundPage";
-import { activities } from "./data/activities";
+import { useActivityContent, ActivityContentStatus } from "./data/ActivityContentProvider";
 import { ActivityLinks } from "./components/ActivityLinks";
 import { ActivityDate } from "./components/ActivityDate";
 import "./activities.css";
@@ -11,8 +11,11 @@ function scrollToSection(sectionId: string) {
 }
 
 export default function ActivityDetailPage() {
+  const { activities, status } = useActivityContent();
   const { activityId, tabId } = useParams();
   const activity = activities.find((item) => item.id === activityId);
+
+  if (status !== "ready") return <main className="activity-detail-page"><PageContainer><ActivityContentStatus /></PageContainer></main>;
 
   if (!activity || (tabId && !activity.detail)) return <NotFoundPage />;
 

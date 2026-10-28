@@ -4,12 +4,17 @@ import { SiteHeader } from "./SiteHeader";
 import { SiteFooter } from "./SiteFooter";
 import { Modal } from "../ui/Modal";
 import { SearchDialog } from "../SearchDialog";
+import { ActivityContentProvider } from "../../../features/activities/data/ActivityContentProvider";
 
 export interface AppOutletContext {
   openPlaceholder: (title: string) => void;
 }
 
 export default function AppShell() {
+  return <ActivityContentProvider><PublicShell /></ActivityContentProvider>;
+}
+
+function PublicShell() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [placeholderTitle, setPlaceholderTitle] = useState<string | null>(null);
   const location = useLocation();

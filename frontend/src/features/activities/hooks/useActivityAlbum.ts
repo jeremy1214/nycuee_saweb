@@ -13,7 +13,7 @@ export function useActivityAlbum(count: number, initialIndex = 0) {
   useEffect(() => {
     setCurrent(initialIndex);
     if (initialIndex !== 0) setPlaying(false);
-  }, [initialIndex]);
+  }, [initialIndex, count]);
 
   useEffect(() => {
     const media = window.matchMedia?.("(prefers-reduced-motion: reduce)");
@@ -75,7 +75,7 @@ export function useActivityAlbum(count: number, initialIndex = 0) {
   };
 
   return {
-    current, select, playing: playing && !reducedMotion, rotating, reducedMotion,
+    current: count ? Math.min(current, count - 1) : 0, select, playing: playing && !reducedMotion, rotating, reducedMotion,
     togglePlaying: () => setPlaying((value) => !value),
     pause: () => setPlaying(false),
     hoverHandlers, readingHandlers, touchHandlers, onKeyDown,

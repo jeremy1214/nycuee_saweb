@@ -1,4 +1,5 @@
-import { render, screen, within } from "@testing-library/react";
+import { render } from "../../test/render";
+import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import ActivityDetailPage from "./ActivityDetailPage";
@@ -66,7 +67,7 @@ it("shows links on detail pages without rich introduction content", () => {
 });
 
 it("shows the selected album activity's links", async () => {
-  otherActivities[1].links = [{ label: "第二個活動報名", url: "https://example.com/second" }];
+  activities.find(activity => activity.id === otherActivities[1].id)!.links = [{ label: "第二個活動報名", url: "https://example.com/second" }];
   render(<MemoryRouter><OtherActivitiesPage /></MemoryRouter>);
   expectLinks();
   await userEvent.click(screen.getByRole("button", { name: otherActivities[1].title }));

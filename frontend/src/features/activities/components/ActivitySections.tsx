@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { activities, activityCategories } from "../data/activities";
+import { useActivityContent } from "../data/ActivityContentProvider";
 import { compareActivityDates, hasActivityDate } from "../data/activityDates";
 import type { ActivityItem } from "../activityTypes";
 import { ActivityDate } from "./ActivityDate";
@@ -10,6 +10,7 @@ interface ActivityOverviewProps {
 }
 
 export function ActivityOverview({ selectedCategory, onCategoryChange }: ActivityOverviewProps) {
+  const { activities, activityCategories } = useActivityContent();
   return (
     <section className="activity-overview" aria-labelledby="activity-overview-title">
       <div className="activity-overview-copy">
@@ -76,6 +77,7 @@ interface RecentActivitiesProps {
 }
 
 export function RecentActivities({ selectedCategory, onActivitySelect }: RecentActivitiesProps) {
+  const { activities, activityCategories } = useActivityContent();
   const upcomingActivities = activities.filter(hasActivityDate).sort(compareActivityDates);
   const visibleActivities = selectedCategory
     ? upcomingActivities.filter((activity) => activity.categoryId === selectedCategory)
@@ -91,6 +93,7 @@ export function RecentActivities({ selectedCategory, onActivitySelect }: RecentA
         </div>
       </div>
 
+      {visibleActivities.length === 0 && <p>目前沒有符合條件的活動。</p>}
       <div className="activity-list">
         {visibleActivities.map((activity) => {
           const cardContent = (

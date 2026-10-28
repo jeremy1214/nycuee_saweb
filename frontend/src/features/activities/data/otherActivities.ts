@@ -1,24 +1,5 @@
 import { activities } from "./activities";
-import type { OtherActivity } from "../activityTypes";
+import { deriveOtherActivities } from "./contentSelectors";
 
-/** Keep the album and detail pages on the same published JSON content. */
-export const otherActivities: OtherActivity[] = activities
-  .filter((activity) => activity.categoryId === "other" && activity.album && activity.detail)
-  .sort((first, second) => first.album!.order - second.album!.order || first.id.localeCompare(second.id))
-  .map((activity) => ({
-    id: activity.id,
-    title: activity.title,
-    ...(activity.date === undefined ? {} : { date: activity.date }),
-    ...(activity.endDate === undefined ? {} : { endDate: activity.endDate }),
-    summary: activity.summary,
-    intro: activity.detail!.intro,
-    ...(activity.links === undefined ? {} : { links: activity.links }),
-    cover: activity.album!.cover,
-    photos: activity.album!.photos,
-    groups: activity.detail!.sections.flatMap((section) => section.image ? [{
-      id: section.id,
-      title: section.title,
-      paragraphs: section.paragraphs,
-      image: section.image,
-    }] : []),
-  }));
+/** Legacy JSON adapter, used only by JSON mode and fixture checks. */
+export const otherActivities = deriveOtherActivities(activities);

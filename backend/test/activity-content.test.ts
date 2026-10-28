@@ -4,7 +4,7 @@ import { resolve } from 'node:path';
 import { test } from 'node:test';
 import { BadRequestException } from '@nestjs/common';
 import {
-  ActivityContentError, parseActivityContent, parseActivityDataset,
+  ActivityContentError, parseActivityContent, parseActivityDataset, parsePublicActivityContent,
 } from '../../shared/activity-content';
 import { validateActivityRevision } from '../src/activity-content';
 
@@ -62,4 +62,17 @@ test('dataset rejects invalid category references, duplicate IDs and invalid fea
   const invalid = structuredClone(categories);
   invalid.categories[0].featuredActivityId = 'course-selection';
   assert.throws(() => parseActivityDataset(invalid, modules), /same category/);
+});
+
+test('public snapshots accept empty databases and reject internal fields, invalid labels and references', () => {
+  assert.deepEqual(parsePublicActivityContent({ activities: [], categories: [] }), { activities: [], categories: [] });
+  const content = { activities: dataset.activities, categories: dataset.activityCategories.map((c, order) => ({ ...c, order })) };
+  assert.equal(parsePublicActivityContent(content).activities.length, 11);
+  assert.throws(() => parsePublicActivityContent({ ...content, sessions: [] }), /unknown field/);
+  const leaked = structuredClone(content);
+  (leaked.activities[0] as unknown as Record<string, unknown>).status = 'draft';
+  assert.throws(() => parsePublicActivityContent(leaked), /unknown field/);
+  const invalid = structuredClone(content); invalid.activities[0].category = 'wrong label';
+  assert.throws(() => parsePublicActivityContent(invalid), /must match category label/);
+  assert.throws(() => parsePublicActivityContent({ activities: dataset.activities, categories: [] }), /require categories/);
 });

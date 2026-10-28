@@ -15,11 +15,18 @@ enum Role {
 model User {
   id           String    @id @default(cuid())
   username     String    @unique
-  passwordHash String
+  passwordHash String?
   role         Role      @default(EDITOR)
   enabled      Boolean   @default(true)
+  version      Int       @default(1)
   createdAt    DateTime  @default(now())
   sessions     Session[]
+  googleIdentity GoogleIdentity?
+  passwordTokens PasswordToken[]
+  categoryGrants CategoryGrant[]
+  activityGrants ActivityGrant[]
+  uploadedMedia Media[]
+  auditEntries AuditEntry[]
 }
 
 model Session {
@@ -84,9 +91,12 @@ model ActivityCategory {
   label              String             @unique
   shortLabel         String
   order              Int                @default(0)
+  version            Int                @default(1)
   featuredActivityId String?
   featuredActivity   Activity?          @relation("FeaturedActivity", fields: [featuredActivityId], references: [id], onDelete: Restrict)
   revisions          ActivityRevision[]
+  grants             CategoryGrant[]
+  media              Media[]
 }
 
 model Activity {
@@ -102,6 +112,8 @@ model Activity {
   publishedRevision   ActivityRevision?  @relation("PublishedRevision", fields: [id, publishedRevisionId], references: [activityId, id], onDelete: NoAction, onUpdate: NoAction)
   workingRevision     ActivityRevision?  @relation("WorkingRevision", fields: [id, workingRevisionId], references: [activityId, id], onDelete: NoAction, onUpdate: NoAction)
   featuredIn          ActivityCategory[] @relation("FeaturedActivity")
+  grants              ActivityGrant[]
+  media               Media[]
 }
 
 model ActivityRevision {
@@ -129,9 +141,114 @@ model ActivityRevision {
   category      ActivityCategory       @relation(fields: [categoryId], references: [id], onDelete: Restrict)
   publishedFor  Activity[]             @relation("PublishedRevision")
   workingFor    Activity[]             @relation("WorkingRevision")
+  mediaReferences MediaReference[]
 
   @@unique([activityId, number])
   @@unique([activityId, id])
   @@index([categoryId, date])
   @@index([status, updatedAt])
+}
+
+// Subject mapping is the Google allowlist; email never merges accounts.
+model GoogleIdentity {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  subject   String   @unique
+  email     String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum PasswordTokenPurpose {
+  ACTIVATE
+  RESET
+}
+
+model PasswordToken {
+  id        String               @id @default(cuid())
+  userId    String
+  tokenHash String               @unique @db.VarChar(64)
+  purpose   PasswordTokenPurpose
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime             @default(now())
+  user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, purpose])
+  @@index([expiresAt])
+}
+
+model CategoryGrant {
+  userId     String
+  categoryId String
+  createdAt  DateTime         @default(now())
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category   ActivityCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([userId, categoryId])
+  @@index([categoryId])
+}
+
+model ActivityGrant {
+  userId     String
+  activityId String
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+
+  @@id([userId, activityId])
+  @@index([activityId])
+}
+
+enum MediaVisibility {
+  PRIVATE
+  PUBLIC
+}
+
+model Media {
+  id           String          @id @default(cuid())
+  storageKey   String          @unique
+  originalName String
+  mimeType     String
+  byteSize     Int
+  width        Int
+  height       Int
+  sha256       String          @db.VarChar(64)
+  visibility   MediaVisibility @default(PRIVATE)
+  uploadedById String?
+  activityId   String?
+  categoryId   String?
+  createdAt    DateTime        @default(now())
+  uploadedBy   User?           @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+  activity     Activity?       @relation(fields: [activityId], references: [id], onDelete: Restrict)
+  category     ActivityCategory? @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  references   MediaReference[]
+
+  @@index([uploadedById, createdAt])
+  @@index([sha256])
+}
+
+model MediaReference {
+  revisionId String
+  path       String
+  mediaId    String
+  revision   ActivityRevision @relation(fields: [revisionId], references: [id], onDelete: Cascade)
+  media      Media            @relation(fields: [mediaId], references: [id], onDelete: Restrict)
+
+  @@id([revisionId, path])
+  @@index([mediaId])
+}
+
+model AuditEntry {
+  id         String   @id @default(cuid())
+  actorId    String?
+  action     String
+  entityType String
+  entityId   String
+  details    Json?    @db.JsonB
+  createdAt  DateTime @default(now())
+  actor      User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([entityType, entityId, createdAt])
+  @@index([actorId, createdAt])
 }

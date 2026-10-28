@@ -352,3 +352,52 @@ export function parseActivityDataset(categoryContent: unknown, activityModules: 
   });
   return { activityCategories, parsedActivities, activities };
 }
+
+export interface PublicActivityCategory extends ActivityCategoryOption {
+  order: number;
+}
+
+export interface PublicActivityContent {
+  activities: ActivityItem[];
+  categories: PublicActivityCategory[];
+}
+
+/** Validate a complete public snapshot without accepting workflow/internal fields. */
+export function parsePublicActivityContent(value: unknown): PublicActivityContent {
+  const input = record(value, "publicContent");
+  onlyKeys(input, ["activities", "categories"], "publicContent");
+  if (!Array.isArray(input.activities) || !Array.isArray(input.categories)) {
+    fail("publicContent", "activities and categories must be arrays");
+  }
+  const categories = input.categories.map((value, index) => {
+    const source = `publicContent.categories[${index}]`;
+    const category = record(value, source);
+    onlyKeys(category, ["id", "label", "shortLabel", "order", "featuredActivityId"], source);
+    if (!Number.isInteger(category.order) || (category.order as number) < 0) fail(`${source}.order`, "must be a non-negative integer");
+    const { order, ...legacy } = category;
+    return { order: order as number, legacy };
+  });
+  if (!categories.length) {
+    if (input.activities.length) fail("publicContent.categories", "activities require categories");
+    return { activities: [], categories: [] };
+  }
+  const modules = Object.fromEntries(input.activities.map((value, index) => {
+    const source = `publicContent.activities[${index}]`;
+    const item = record(value, source);
+    onlyKeys(item, ["id", "category", ...contentKeys], source);
+    string(item.category, `${source}.category`);
+    const { category: _category, ...content } = item;
+    return [source, { ...content, status: "published" }];
+  }));
+  const dataset = parseActivityDataset({ categories: categories.map(c => c.legacy) }, modules);
+  dataset.activities.forEach((item, index) => {
+    if ((input.activities as JsonRecord[])[index].category !== item.category) {
+      fail(`publicContent.activities[${index}].category`, "must match category label");
+    }
+  });
+  return {
+    activities: dataset.activities.sort((a, b) => a.id.localeCompare(b.id)),
+    categories: dataset.activityCategories.map((category, index) => ({ ...category, order: categories[index].order }))
+      .sort((a, b) => a.order - b.order || a.id.localeCompare(b.id)),
+  };
+}

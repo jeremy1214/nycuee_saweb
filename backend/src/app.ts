@@ -8,10 +8,11 @@ import express from 'express';
 import { AuthController, AuthService, AdminGuard } from './auth';
 import { Database } from './database';
 import { AdminContactController, ContactService, PublicContactController } from './contact';
+import { PublicActivityController, PublicActivityService } from './public-activities';
 
 @Module({
-  controllers: [AuthController, PublicContactController, AdminContactController],
-  providers: [Database, AuthService, AdminGuard, ContactService],
+  controllers: [AuthController, PublicContactController, AdminContactController, PublicActivityController],
+  providers: [Database, AuthService, AdminGuard, ContactService, PublicActivityService],
 })
 class AppModule {}
 

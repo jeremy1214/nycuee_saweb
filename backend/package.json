@@ -9,7 +9,8 @@
     "test": "npm run build && node --import tsx --test --test-concurrency=1 test/*.test.ts",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate deploy",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:seed": "tsx prisma/seed.ts",
+    "content:import": "tsx src/import-content.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.0",

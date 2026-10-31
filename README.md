@@ -73,13 +73,31 @@ npm run dev
 
 兩個 POST 都必須攜帶 `X-CSRF-Token`，值取自同一 Cookie Session 的 `csrf` 回應，並使用 JSON 請求。登入成功後請重新取得 Token。驗證回應禁止快取，密碼雜湊不會回傳至前端。
 
-後台提供登入、登出、目前帳號及聯絡表單收件匣；Google 登入、帳號管理介面、密碼重設與內容編輯依後續階段擴充。
+後台提供登入、登出及聯絡表單收件匣，F 已加入活動編輯、預覽、審核、媒體、分類、帳號授權與紀錄介面。C／D／E 的 Google、帳號、內容及媒體服務仍待接入，完整介面可透過明確啟用的示範模式驗收。
 
-## 活動 CMS：A／G 已完成
+## 活動 CMS：A／B／G 基礎與 F 介面
 
-前台活動預設使用資料庫公開 API。活動分類、版本、帳號／Google／Token／授權、媒體／引用與操作紀錄模型及契約已建立；帳號管理、Google 登入、活動編輯／發布、媒體服務仍待 C／D／E／F 實作，目前 EDITOR 不能登入後台。
+前台活動預設使用資料庫公開 API。活動分類、版本、帳號／Google／Token／授權、媒體／引用與操作紀錄模型及契約已建立；F 的完整介面與契約 mock 已交付，帳號管理、Google 登入、活動編輯／發布與媒體服務仍待 C／D／E 接入，目前正式 API 的 EDITOR 仍不能登入。
 
 進度及下一任務見 [CMS 規劃](docs/admin-cms-plan.md)；活動流程見 [活動契約](docs/activity-cms-contract.md)，帳號與媒體見 [平台契約](docs/cms-platform-contract.md)，機器介面見 [OpenAPI](docs/activity-cms.openapi.json)。其中 `implemented` 與 `planned` 明確區分可呼叫及待實作的端點。
+
+### 後台示範模式（F）
+
+在 PowerShell 從專案根目錄啟動前端示範模式。
+
+```powershell
+Set-Location frontend
+$env:VITE_ADMIN_SOURCE='mock'
+npm run dev
+```
+
+開啟終端機列出的網址加上 `/#/admin`。預設使用示範管理員，可切換管理員／編輯者或重設示範資料。登出後可使用 `admin` 或 `editor`，密碼填任意非空文字。示範模式持續顯示提示，活動、帳號、Token 與圖片都保存在瀏覽器記憶體，重新整理即重設。
+
+介面包含活動搜尋及篩選、分區表單、共用前台的詳情／相簿預覽、送審／撤回／退回／發布／下架／還原、媒體範圍與選圖、分類設定、帳號及授權、一次顯示的啟用／重設連結與操作紀錄。修改採手動儲存，離開提示與 409 衝突處理會保留目前表單。圖片示範使用本機物件 URL，正式圖片重新編碼、持久化及存取授權由 E 提供。
+
+`VITE_ADMIN_SOURCE` 預設為 `api`。回到 API 模式時設定 `$env:VITE_ADMIN_SOURCE='api'` 並重啟 Vite。正式 API 產物排除示範模組與舊活動快照，API 失敗顯示錯誤及重試。既有登入與收件匣沿用真實 API，其他功能須等 C／D／E 服務完成。
+
+Google 主動綁定的 planned 契約已明確改為 `POST /api/v1/auth/google/link` 攜帶 CSRF，成功回 `200 { url }`，由前端導向 Google。OAuth callback 維持重新導向流程，服務仍由 C 實作。
 
 ### 首次匯入舊活動
 

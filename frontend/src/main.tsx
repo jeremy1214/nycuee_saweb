@@ -1,13 +1,11 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { HashRouter } from "react-router-dom";
+import { createHashRouter, RouterProvider } from "react-router-dom";
 import App from "./App";
 import "./styles.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <HashRouter>
-      <App />
-    </HashRouter>
+    <RouterProvider router={createHashRouter([{ path: "*", element: <App /> }])} />
   </StrictMode>,
 );

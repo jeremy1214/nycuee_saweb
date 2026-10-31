@@ -1,3 +1,4 @@
+import type { OtherActivity } from "./activityTypes";
 import type { CSSProperties } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Breadcrumb, PageContainer } from "../../shared/components/index";
@@ -10,28 +11,34 @@ import "./otherActivities.css";
 
 export default function OtherActivitiesPage() {
   const { otherActivities, status } = useActivityContent();
+  if (status !== "ready") return <main className="other-activities-page"><PageContainer><ActivityContentStatus /></PageContainer></main>;
+  return <OtherActivitiesView otherActivities={otherActivities} />;
+}
+
+export function OtherActivitiesView({ otherActivities, onDetail }: { otherActivities: OtherActivity[]; onDetail?: () => void }) {
+  const Container = onDetail ? 'div' : 'main';
   const [searchParams] = useSearchParams();
   const requestedIndex = otherActivities.findIndex((item) => item.id === searchParams.get("activity"));
   const album = useActivityAlbum(otherActivities.length, Math.max(0, requestedIndex));
   const activity = otherActivities[album.current];
 
-  if (status !== "ready") return <main className="other-activities-page"><PageContainer><ActivityContentStatus /></PageContainer></main>;
+
 
   if (!activity) {
     return (
-      <main className="other-activities-page">
+      <Container className="other-activities-page">
         <PageContainer>
           <Breadcrumb className="activity-detail-breadcrumb" items={[{ label: "系上活動", to: "/activities/overview" }, { label: "其他活動" }]} />
           <header className="other-activities-heading"><h1>其他活動</h1></header>
           <p>目前沒有已發布的活動相簿。</p>
           <div className="activity-detail-back"><Link to="/activities/overview">回到活動總覽</Link></div>
         </PageContainer>
-      </main>
+      </Container>
     );
   }
 
   return (
-    <main className="other-activities-page">
+    <Container className="other-activities-page">
       <PageContainer>
         <Breadcrumb className="activity-detail-breadcrumb" items={[{ label: "系上活動", to: "/activities/overview" }, { label: "其他活動" }]} />
         <header className="other-activities-heading">
@@ -106,7 +113,7 @@ export default function OtherActivitiesPage() {
                 <span className="activity-detail-label">活動介紹</span>
                 {activity.intro.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
                 <ActivityLinks links={activity.links} />
-                <Link className="section-more" to={`/activities/${activity.id}`} aria-label={`${activity.title}，查看活動詳細頁`}>查看活動詳細頁 <span aria-hidden="true">↗</span></Link>
+                {onDetail ? <button type="button" onClick={onDetail}>查看活動詳細頁</button> : <Link className="section-more" to={`/activities/${activity.id}`} aria-label={`${activity.title}，查看活動詳細頁`}>查看活動詳細頁 <span aria-hidden="true">↗</span></Link>}
               </div>
             </div>
             <section className="other-activity-memories" aria-label={`${activity.title}活動照片`}>
@@ -134,8 +141,8 @@ export default function OtherActivitiesPage() {
             )}
           </div>
         </article>
-        <div className="activity-detail-back"><Link to="/activities/overview"><span aria-hidden="true">←</span> 回到活動總覽</Link></div>
+        {!onDetail && <div className="activity-detail-back"><Link to="/activities/overview"><span aria-hidden="true">←</span> 回到活動總覽</Link></div>}
       </PageContainer>
-    </main>
+    </Container>
   );
 }

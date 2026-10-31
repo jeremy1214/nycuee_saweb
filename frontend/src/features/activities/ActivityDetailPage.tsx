@@ -1,3 +1,4 @@
+import type { ActivityItem } from './activityTypes';
 import { Link, Navigate, NavLink, useParams } from "react-router-dom";
 import { Breadcrumb, PageContainer } from "../../shared/components/index";
 import NotFoundPage from "../../shared/pages/NotFoundPage";
@@ -19,6 +20,11 @@ export default function ActivityDetailPage() {
 
   if (!activity || (tabId && !activity.detail)) return <NotFoundPage />;
 
+  return <ActivityDetailView activity={activity} tabId={tabId} />;
+}
+
+export function ActivityDetailView({ activity, tabId, onTabChange }: { activity: ActivityItem; tabId?: string; onTabChange?: (id: string) => void }) {
+  const Container = onTabChange ? 'div' : 'main';
   const activityTitle = activity.categoryId === "other" ? activity.title : activity.category;
   const breadcrumbItems = activity.categoryId === "other"
     ? [{ label: "系上活動", to: "/activities/overview" }, { label: "其他活動", to: "/activities/other" }, { label: activity.title }]
@@ -26,7 +32,7 @@ export default function ActivityDetailPage() {
 
   if (!activity.detail) {
     return (
-      <main className="activity-detail-page">
+      <Container className="activity-detail-page">
         <PageContainer>
           <Breadcrumb className="activity-detail-breadcrumb" items={breadcrumbItems} />
           <header className="activity-detail-titlebar">
@@ -43,7 +49,7 @@ export default function ActivityDetailPage() {
             <ActivityLinks links={activity.links} />
           </article>
         </PageContainer>
-      </main>
+      </Container>
     );
   }
 
@@ -63,17 +69,15 @@ export default function ActivityDetailPage() {
   const sections = selectedTab?.sections ?? detail.sections;
   const tabNavigation = detail.tabs && (
     <nav className="activity-detail-section-nav activity-detail-tab-nav" aria-label="活動內容分頁">
-      {!sharedIntro && <NavLink to={`/activities/${activity.id}/intro`} end>活動介紹</NavLink>}
+      {!sharedIntro && (onTabChange ? <button type="button" aria-pressed={tabId === 'intro'} onClick={() => onTabChange('intro')}>活動介紹</button> : <NavLink to={`/activities/${activity.id}/intro`} end>活動介紹</NavLink>)}
       {detail.tabs.map((tab) => (
-        <NavLink to={`/activities/${activity.id}/${tab.id}`} key={tab.id} end>
-          {tab.navLabel}
-        </NavLink>
+        onTabChange ? <button type="button" key={tab.id} aria-pressed={tabId === tab.id} onClick={() => onTabChange(tab.id)}>{tab.navLabel}</button> : <NavLink to={`/activities/${activity.id}/${tab.id}`} key={tab.id} end>{tab.navLabel}</NavLink>
       ))}
     </nav>
   );
 
   return (
-    <main className={`activity-detail-page${detail.tabs ? " activity-detail-tabbed" : ""}${sharedIntro ? " activity-detail-shared-intro" : ""}`}>
+    <Container className={`activity-detail-page${detail.tabs ? " activity-detail-tabbed" : ""}${sharedIntro ? " activity-detail-shared-intro" : ""}`}>
       <PageContainer>
         <Breadcrumb className="activity-detail-breadcrumb" items={breadcrumbItems} />
 
@@ -164,9 +168,9 @@ export default function ActivityDetailPage() {
         )}
 
         <div className="activity-detail-back">
-          <Link to="/activities/overview"><span aria-hidden="true">←</span> 回到活動總覽</Link>
+          {!onTabChange && <Link to="/activities/overview"><span aria-hidden="true">←</span> 回到活動總覽</Link>}
         </div>
       </PageContainer>
-    </main>
+    </Container>
   );
 }

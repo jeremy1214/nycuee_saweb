@@ -24,7 +24,7 @@
 - `POST /auth/password/consume` 在單一交易確認未使用、未過期及帳號啟用，設定 Argon2id 密碼（12–1024 字元）、標記使用、撤銷該帳號全部 Session；並行使用只能成功一次。未知、過期或重複使用統一回 400，不洩露帳號存在性。
 - `PATCH /admin/users/{userId}` 與 `PUT /admin/users/{userId}/grants` 必須攜帶目前帳號 `version`；成功遞增，過時為 409。管理員停用或降級最後一位啟用中的 ADMIN 回 409，透過 Serializable 交易防止兩位管理員同時繞過檢查。
 - `GET /auth/google/start` 發起 OIDC；callback 必須驗證一次性 state、nonce、issuer、audience、授權碼及 PKCE，暫存流程 10 分鐘到期並綁定發起 Session。登入只接受已對應的 `sub`，未知身分不自動建立帳號。
-- 綁定從已登入的 `POST /auth/google/link` 主動發起，callback 綁到同一個內部 User；`sub` 已被其他帳號使用回 409。不能因 email 一樣自動合併。回跳網址使用設定的同來源，不接收任意外部 return URL。
+- 綁定從已登入的 `POST /auth/google/link` 主動發起，攜帶 CSRF 後回 `200 { url }`，瀏覽器導向該網址；callback 綁到同一個內部 User；`sub` 已被其他帳號使用回 409。不能因 email 一樣自動合併。回跳網址使用設定的同來源，不接收任意外部 return URL。
 - 目前 `GET /auth/me` 及後台仍只支援 ADMIN；C 完成已登入／管理員／內容範圍 Guard 與測試後才開放 EDITOR，不能只移除現有的角色檢查。
 
 ## 授權矩陣與狀態檢查

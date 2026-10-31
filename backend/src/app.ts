@@ -7,11 +7,12 @@ import helmet from 'helmet';
 import express from 'express';
 import { AuthController, AuthService, AdminGuard } from './auth';
 import { Database } from './database';
+import { HealthController } from './health';
 import { AdminContactController, ContactService, PublicContactController } from './contact';
 import { PublicActivityController, PublicActivityService } from './public-activities';
 
 @Module({
-  controllers: [AuthController, PublicContactController, AdminContactController, PublicActivityController],
+  controllers: [HealthController, AuthController, PublicContactController, AdminContactController, PublicActivityController],
   providers: [Database, AuthService, AdminGuard, ContactService, PublicActivityService],
 })
 class AppModule {}

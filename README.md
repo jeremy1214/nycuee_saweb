@@ -17,6 +17,20 @@ docker compose up --build -d
 
 PostgreSQL 資料保存在 `postgres_data` volume，Caddy 憑證保存在 `caddy_data`。一般 `docker compose down` 會保留資料；加上 `-v` 會移除 volumes 與資料。
 
+## API 健康與部署就緒檢查
+
+匿名 `GET /api/v1/health` 使用既有 Prisma 連線執行唯讀 `SELECT 1`，成功回傳 HTTP `200` 與 `{"status":"ok"}`。資料庫查詢失敗或超過 3 秒回傳 HTTP `503` 與 `{"status":"unavailable"}`，回應皆含 `Cache-Control: no-store`。空活動資料庫也能通過檢查。
+
+Compose 每 5 秒從後端容器內探測此端點，單次探測上限 5 秒，啟動寬限期 30 秒，連續失敗 10 次會標為 `unhealthy`。冷啟動依序等待資料庫健康、migration 與 seed 完成、API 健康，再啟動 Caddy。
+
+```bash
+docker compose ps
+docker compose logs --tail=100 backend db
+curl -i http://localhost/api/v1/health
+```
+
+後端顯示 `starting` 時請先查看 migration、seed 與 API 啟動紀錄。顯示 `unhealthy` 或端點回 `503` 時，檢查資料庫容器、連線設定與可用資源。資料庫恢復後，後端會透過後續探測恢復為 `healthy`。Compose 的相依就緒條件作用於啟動階段，執行期間後端變為 `unhealthy` 時，Caddy 會繼續執行，端點可回報 `503`。健康狀態本身不會觸發自動重啟，服務告警由後續 H 維運工作接入。
+
 ## 本機開發登入系統
 
 在根目錄複製 `.env.example` 為 `.env`，先啟動資料庫：

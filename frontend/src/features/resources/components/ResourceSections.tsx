@@ -110,7 +110,6 @@ export function OfficialLinks({ category }: { category: ResourceCategory }) {
           </ExternalLink>
         ))}
       </div>
-      <p className="official-note">詳細規定與申請方式請以官方最新公告為準。</p>
     </section>
   );
 }

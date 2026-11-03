@@ -104,7 +104,6 @@ export function OtherActivitiesView({ otherActivities, onDetail }: { otherActivi
           <div className="other-activity-content" key={activity.id}>
             <div className="other-activity-story">
               <div className="other-activity-title">
-                <span className="eyebrow">THE STORY · {String(album.current + 1).padStart(2, "0")}</span>
                 <h2 id="other-activity-title">{activity.title}</h2>
                 <p>{activity.summary}</p>
                 <ActivityDate activity={activity} />
@@ -117,7 +116,7 @@ export function OtherActivitiesView({ otherActivities, onDetail }: { otherActivi
               </div>
             </div>
             <section className="other-activity-memories" aria-label={`${activity.title}活動照片`}>
-              <div className="other-activity-section-heading"><h3>活動回顧</h3><span>{activity.photos.length} PHOTOS</span></div>
+              <div className="other-activity-section-heading"><h3>活動回顧</h3></div>
               <div className="other-activity-photo-grid">
                 {activity.photos.map((photo, index) => (
                   <figure key={photo.src}>

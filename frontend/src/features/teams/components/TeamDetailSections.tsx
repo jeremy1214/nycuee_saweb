@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { PageContainer, SectionHeading, Breadcrumb } from "../../../shared/components/index";
-import { getTeamImage, teams } from "../data/teams";
+import { teamImage } from "../teamImage";
+import EesaImage from "../../eesa/components/EesaImage";
+import { useTeamContent } from "../../organization/OrganizationContentProvider";
 import type { TeamData, ScheduleBlock } from "../teamTypes";
 
 function ScheduleContent({ block }: { block: ScheduleBlock }) {
@@ -11,6 +13,7 @@ function ScheduleContent({ block }: { block: ScheduleBlock }) {
 }
 
 export function TeamDetails({ team, teamKey }: { team: TeamData; teamKey: string }) {
+  const { teams } = useTeamContent();
   const [searchParams] = useSearchParams();
   const requestedActivity = searchParams.get("activity");
   const [activityId, setActivityId] = useState(() =>
@@ -31,7 +34,7 @@ export function TeamDetails({ team, teamKey }: { team: TeamData; teamKey: string
           <div><span className="eyebrow">DEPARTMENT TEAMS</span><h1>{team.name}</h1></div>
           <Link className="teams-back-link" to="/team">所有系隊 <span aria-hidden="true">↗</span></Link>
         </div>
-        <div className="teams-detail-photo"><img src={getTeamImage(team.photo)} alt={`${team.name}隊伍合照`} /></div>
+        <div className="teams-detail-photo"><EesaImage src={teamImage(team.photo)} alt={`${team.name}隊伍合照`} /></div>
         <section className="teams-detail-section">
           <SectionHeading eyebrow="ABOUT THE TEAM" title="隊伍介紹" />
           <div className="teams-content-panel teams-introduction">{team.intro.map((paragraph, index) => <p key={index}>{paragraph}</p>)}</div>
@@ -40,7 +43,7 @@ export function TeamDetails({ team, teamKey }: { team: TeamData; teamKey: string
           <SectionHeading eyebrow="PRACTICE SCHEDULE" title="練習時間" />
           <div className="teams-content-panel teams-schedule">
             <div>{team.schedule.map((block, index) => <ScheduleContent key={index} block={block} />)}</div>
-            {team.ballIcon && <img className="teams-ball-icon" src={getTeamImage(team.ballIcon)} alt={`${team.name}球類圖示`} />}
+            {team.ballIcon && <EesaImage className="teams-ball-icon" src={teamImage(team.ballIcon)} alt={`${team.name}球類圖示`} />}
           </div>
         </section>
         <section className="teams-detail-section">
@@ -56,11 +59,12 @@ export function TeamDetails({ team, teamKey }: { team: TeamData; teamKey: string
               ))}
             </nav>
             <div className="teams-content-panel teams-activity-detail" aria-live="polite">
+              {!activeActivity && <p>目前沒有活動介紹。</p>}
               {activeActivity && <>
                 <span className="eyebrow">{activeActivity.month}</span>
                 <h3>{activeActivity.name}</h3>
                 <p>{activeActivity.description}</p>
-                {activeActivity.image && <img src={getTeamImage(activeActivity.image)} alt={`${team.name}${activeActivity.name}`} />}
+                {activeActivity.image && <EesaImage src={teamImage(activeActivity.image)} alt={`${team.name}${activeActivity.name}`} />}
               </>}
             </div>
           </div>
@@ -76,7 +80,7 @@ export function TeamDetails({ team, teamKey }: { team: TeamData; teamKey: string
               </div>)}
               {team.contact.note && <p className="teams-contact-note">{team.contact.note}</p>}
             </div>
-            {team.aboutImg && <img className="teams-contact-image" src={getTeamImage(team.aboutImg)} alt={`${team.name}入隊資訊`} />}
+            {team.aboutImg && <EesaImage className="teams-contact-image" src={teamImage(team.aboutImg)} alt={`${team.name}入隊資訊`} />}
           </div>
         </section>
         <nav className="teams-bottom-nav" aria-label="切換系隊">

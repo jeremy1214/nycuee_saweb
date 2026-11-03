@@ -68,6 +68,8 @@ export default function AccountManager() {
   const [grants, setGrants] = useState<GrantsDto>({
     categoryIds: [],
     activityIds: [],
+    departmentIds: [],
+    teamIds: [],
   });
   const [username, setUsername] = useState("");
   const [role, setRole] = useState("EDITOR");
@@ -83,7 +85,7 @@ export default function AccountManager() {
   function toggle(key: keyof GrantsDto, id: string, checked: boolean) {
     setGrants((g) => ({
       ...g,
-      [key]: checked ? [...g[key], id] : g[key].filter((v) => v !== id),
+      [key]: checked ? [...(g[key] ?? []), id] : (g[key] ?? []).filter((v) => v !== id),
     }));
   }
   async function refresh(a: AccountDto) {
@@ -221,6 +223,7 @@ export default function AccountManager() {
                   </label>
                 ))}
               </div>
+              {(['departmentIds', 'teamIds'] as const).map(key => <section key={key}><h3>{key === 'departmentIds' ? '系學會部門授權' : '系隊授權'}</h3><div className="cms-check-grid" role="group" aria-label={key === 'departmentIds' ? '系學會部門授權' : '系隊授權'}>{(key === 'departmentIds' ? resource.data?.departments : resource.data?.teams)?.map(option => <label className="cms-check" key={option.id}><input type="checkbox" checked={(grants[key] ?? []).includes(option.id)} onChange={e => toggle(key, option.id, e.target.checked)} />{option.title}</label>)}</div></section>)}
               <h3>指定活動授權</h3>
               <div
                 className="cms-check-grid"

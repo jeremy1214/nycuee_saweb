@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { buildSearchItems } from "../data/search";
 import { useActivityContent, ActivityContentStatus } from "../../features/activities/data/ActivityContentProvider";
+import { useEesaContent, useTeamContent, OrganizationContentStatus } from "../../features/organization/OrganizationContentProvider";
 import { Modal } from "./ui/Modal";
 
 function resultSnippet(content: string, description: string, query: string) {
@@ -15,7 +16,9 @@ function resultSnippet(content: string, description: string, query: string) {
 
 export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const content = useActivityContent();
-  const searchItems = useMemo(() => buildSearchItems(content.data), [content.data]);
+  const eesa = useEesaContent();
+  const teams = useTeamContent();
+  const searchItems = useMemo(() => buildSearchItems(content.data, eesa.data, teams.data), [content.data, eesa.data, teams.data]);
   const [query, setQuery] = useState("");
   const normalized = query.trim().toLocaleLowerCase("zh-Hant");
   const results = useMemo(() => {
@@ -42,6 +45,8 @@ export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => 
       />
       <div className="search-results" aria-live="polite">
         <ActivityContentStatus />
+        <OrganizationContentStatus kind="eesa" />
+        <OrganizationContentStatus kind="team" />
         {results.length > 0 ? results.map((item) => (
           <Link key={`${item.to}-${item.label}`} to={item.to} onClick={onClose}>
             <span><strong>{item.label}</strong><small>{resultSnippet(item.content, item.description, normalized)}</small></span>

@@ -1,17 +1,21 @@
+import EesaImage from "./components/EesaImage";
 import React, { useState, useEffect } from "react";
 import { DepartmentLayout } from "./components/DepartmentLayout";
-import { useNavigate, useParams } from "react-router-dom";
+
 import styles from "./Activities.module.css";
-import departments from "./data/eesa";
+import { useEesaContent, OrganizationContentStatus, useOrganizationParams, useOrganizationNavigate } from "../organization/OrganizationContentProvider";
 
 export default function DepartmentActivityPage() {
-    const navigate = useNavigate();
-    const { slug, activitySlug } = useParams();
+    const navigate = useOrganizationNavigate();
+    const { slug, activitySlug } = useOrganizationParams();
+    const { departments, status } = useEesaContent();
     const data = departments[slug ?? ""];
     
     // 輪播索引狀態
     const [currentImgIdx, setCurrentImgIdx] = useState(0);
     useEffect(() => setCurrentImgIdx(0), [slug, activitySlug]);
+
+    if (status !== 'ready') return <OrganizationContentStatus kind="eesa" />;
 
     if (!data) {
         return <div style={{ padding: 40 }}>找不到此部門：{slug}</div>;
@@ -32,6 +36,8 @@ export default function DepartmentActivityPage() {
     const isCarousel = slug === "publicity" && (activitySlug === "photography" || activitySlug === "social-posts");
     const detailImages = activity.detailImages || (activity.image ? [activity.image] : []);
 
+    const displayedImgIdx = detailImages.length ? currentImgIdx % detailImages.length : 0;
+
     const handleNextImg = () => {
         setCurrentImgIdx((prevIdx) => (prevIdx + 1) % detailImages.length);
     };
@@ -50,19 +56,19 @@ export default function DepartmentActivityPage() {
                                 <div className={styles.imageContainer}>
                                     {isCarousel ? (
                                         <div className={styles.carouselWrapper}>
-                                            <img
-                                                src={detailImages[currentImgIdx]}
-                                                alt={`${activity.name}-${currentImgIdx}`}
+                                            <EesaImage
+                                                src={detailImages[displayedImgIdx]}
+                                                alt={`${activity.name}-${displayedImgIdx}`}
                                                 className={styles.activityImageCarousel}
-                                                onError={(e) => console.error("Image load error:", detailImages[currentImgIdx])}
+                                                onError={(e) => console.error("Image load error:", detailImages[displayedImgIdx])}
                                             />
                                             {detailImages.length > 1 && (
                                                 <>
                                                     <button className={styles.prevArrow} onClick={handlePrevImg} aria-label="上一張圖片">
-                                                        <img src="/intro/activities/arrow_left.png" alt="Previous" className={styles.arrowImg} />
+                                                        <EesaImage src="/intro/activities/arrow_left.png" alt="Previous" className={styles.arrowImg} />
                                                     </button>
                                                     <button className={styles.nextArrow} onClick={handleNextImg} aria-label="下一張圖片">
-                                                        <img src="/intro/activities/arrow_right.png" alt="Next" className={styles.arrowImg} />
+                                                        <EesaImage src="/intro/activities/arrow_right.png" alt="Next" className={styles.arrowImg} />
                                                     </button>
                                                 </>
                                             )}
@@ -70,7 +76,7 @@ export default function DepartmentActivityPage() {
                                     ) : (
                                         activity.detailImages && activity.detailImages.length > 0 ? (
                                             activity.detailImages.map((img, idx) => (
-                                                <img
+                                                <EesaImage
                                                     key={idx}
                                                     src={img}
                                                     alt={`${activity.name}-${idx}`}
@@ -80,7 +86,7 @@ export default function DepartmentActivityPage() {
                                                 />
                                             ))
                                         ) : (
-                                            <img
+                                            <EesaImage
                                                 src={activity.image}
                                                 alt={activity.name}
                                                 className={styles.activityImage}

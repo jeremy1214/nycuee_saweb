@@ -25,6 +25,8 @@ model User {
   passwordTokens PasswordToken[]
   categoryGrants CategoryGrant[]
   activityGrants ActivityGrant[]
+  departmentGrants DepartmentGrant[]
+  teamGrants TeamGrant[]
   uploadedMedia Media[]
   auditEntries AuditEntry[]
 }
@@ -234,6 +236,15 @@ model Media {
   uploadedById String?
   activityId   String?
   categoryId   String?
+  overviewId   String?
+  departmentId String?
+  teamId       String?
+  overview     EesaOverview? @relation(fields: [overviewId], references: [id], onDelete: Restrict)
+  department   Department? @relation(fields: [departmentId], references: [id], onDelete: Restrict)
+  team         Team? @relation(fields: [teamId], references: [id], onDelete: Restrict)
+  overviewReferences EesaOverviewMediaReference[]
+  departmentReferences DepartmentMediaReference[]
+  teamReferences TeamMediaReference[]
   createdAt    DateTime        @default(now())
   uploadedBy   User?           @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
   activity     Activity?       @relation(fields: [activityId], references: [id], onDelete: Restrict)
@@ -267,4 +278,147 @@ model AuditEntry {
 
   @@index([entityType, entityId, createdAt])
   @@index([actorId, createdAt])
+}
+
+model EesaOverview {
+  id String @id
+  version Int @default(1)
+  publishedRevisionId String?
+  workingRevisionId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  revisions EesaOverviewRevision[] @relation("EesaOverviewRevisions")
+  publishedRevision EesaOverviewRevision? @relation("EesaOverviewPublished", fields: [id, publishedRevisionId], references: [resourceId, id], onDelete: NoAction, onUpdate: NoAction)
+  workingRevision EesaOverviewRevision? @relation("EesaOverviewWorking", fields: [id, workingRevisionId], references: [resourceId, id], onDelete: NoAction, onUpdate: NoAction)
+  media Media[]
+}
+model EesaOverviewRevision {
+  id String @id @default(cuid())
+  resourceId String
+  number Int
+  status ActivityRevisionStatus @default(DRAFT)
+  content Json @db.JsonB
+  rejectionNote String?
+  submittedAt DateTime?
+  publishedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  resource EesaOverview @relation("EesaOverviewRevisions", fields: [resourceId], references: [id], onDelete: Cascade)
+  publishedFor EesaOverview[] @relation("EesaOverviewPublished")
+  workingFor EesaOverview[] @relation("EesaOverviewWorking")
+  mediaReferences EesaOverviewMediaReference[]
+  @@unique([resourceId, number])
+  @@unique([resourceId, id])
+  @@index([status, updatedAt])
+}
+model EesaOverviewMediaReference {
+  revisionId String
+  path String
+  mediaId String
+  revision EesaOverviewRevision @relation(fields: [revisionId], references: [id], onDelete: Cascade)
+  media Media @relation(fields: [mediaId], references: [id], onDelete: Restrict)
+  @@id([revisionId, path])
+  @@index([mediaId])
+}
+
+model Department {
+  id String @id
+  version Int @default(1)
+  publishedRevisionId String?
+  workingRevisionId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  revisions DepartmentRevision[] @relation("DepartmentRevisions")
+  publishedRevision DepartmentRevision? @relation("DepartmentPublished", fields: [id, publishedRevisionId], references: [resourceId, id], onDelete: NoAction, onUpdate: NoAction)
+  workingRevision DepartmentRevision? @relation("DepartmentWorking", fields: [id, workingRevisionId], references: [resourceId, id], onDelete: NoAction, onUpdate: NoAction)
+  media Media[]
+  grants DepartmentGrant[]
+}
+model DepartmentRevision {
+  id String @id @default(cuid())
+  resourceId String
+  number Int
+  status ActivityRevisionStatus @default(DRAFT)
+  content Json @db.JsonB
+  rejectionNote String?
+  submittedAt DateTime?
+  publishedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  resource Department @relation("DepartmentRevisions", fields: [resourceId], references: [id], onDelete: Cascade)
+  publishedFor Department[] @relation("DepartmentPublished")
+  workingFor Department[] @relation("DepartmentWorking")
+  mediaReferences DepartmentMediaReference[]
+  @@unique([resourceId, number])
+  @@unique([resourceId, id])
+  @@index([status, updatedAt])
+}
+model DepartmentMediaReference {
+  revisionId String
+  path String
+  mediaId String
+  revision DepartmentRevision @relation(fields: [revisionId], references: [id], onDelete: Cascade)
+  media Media @relation(fields: [mediaId], references: [id], onDelete: Restrict)
+  @@id([revisionId, path])
+  @@index([mediaId])
+}
+model DepartmentGrant {
+  userId String
+  departmentId String
+  createdAt DateTime @default(now())
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resource Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  @@id([userId, departmentId])
+  @@index([departmentId])
+}
+
+model Team {
+  id String @id
+  version Int @default(1)
+  publishedRevisionId String?
+  workingRevisionId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  revisions TeamRevision[] @relation("TeamRevisions")
+  publishedRevision TeamRevision? @relation("TeamPublished", fields: [id, publishedRevisionId], references: [resourceId, id], onDelete: NoAction, onUpdate: NoAction)
+  workingRevision TeamRevision? @relation("TeamWorking", fields: [id, workingRevisionId], references: [resourceId, id], onDelete: NoAction, onUpdate: NoAction)
+  media Media[]
+  grants TeamGrant[]
+}
+model TeamRevision {
+  id String @id @default(cuid())
+  resourceId String
+  number Int
+  status ActivityRevisionStatus @default(DRAFT)
+  content Json @db.JsonB
+  rejectionNote String?
+  submittedAt DateTime?
+  publishedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  resource Team @relation("TeamRevisions", fields: [resourceId], references: [id], onDelete: Cascade)
+  publishedFor Team[] @relation("TeamPublished")
+  workingFor Team[] @relation("TeamWorking")
+  mediaReferences TeamMediaReference[]
+  @@unique([resourceId, number])
+  @@unique([resourceId, id])
+  @@index([status, updatedAt])
+}
+model TeamMediaReference {
+  revisionId String
+  path String
+  mediaId String
+  revision TeamRevision @relation(fields: [revisionId], references: [id], onDelete: Cascade)
+  media Media @relation(fields: [mediaId], references: [id], onDelete: Restrict)
+  @@id([revisionId, path])
+  @@index([mediaId])
+}
+model TeamGrant {
+  userId String
+  teamId String
+  createdAt DateTime @default(now())
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resource Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  @@id([userId, teamId])
+  @@index([teamId])
 }

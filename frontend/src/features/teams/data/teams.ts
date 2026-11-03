@@ -1,7 +1,8 @@
 import { teams } from "./teamRepository";
 export { teams, teamsData } from "./teamRepository";
 
-export const getTeamImage = (path: string | null) => path ? `/team/${path}` : undefined;
+import { getTeamImage } from "../teamImage";
+export { getTeamImage } from "../teamImage";
 export const teamSlides = teams.map((team) => ({
   title: `${team.name}`,
   image: getTeamImage(team.photo)!,

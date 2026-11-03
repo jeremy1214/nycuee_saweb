@@ -5,6 +5,9 @@
   }
   handle {
     root * /srv
+    # Revalidate the entry document so it references the current hashed assets.
+    @entry path / /index.html
+    header @entry Cache-Control "no-cache"
     file_server
   }
 }

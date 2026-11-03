@@ -1,13 +1,17 @@
+import EesaImage from "./components/EesaImage";
 import React from "react";
 import { DepartmentLayout } from "./components/DepartmentLayout";
-import { useNavigate, useParams } from "react-router-dom";
+
 import styles from "./Activities.module.css";
-import departments from "./data/eesa";
+import { useEesaContent, OrganizationContentStatus, useOrganizationParams, useOrganizationNavigate } from "../organization/OrganizationContentProvider";
 
 export default function DepartmentActivitiesPage() {
-    const navigate = useNavigate();
-    const { slug } = useParams();
+    const navigate = useOrganizationNavigate();
+    const { slug } = useOrganizationParams();
+    const { departments, status } = useEesaContent();
     const data = departments[slug ?? ""];
+
+    if (status !== 'ready') return <OrganizationContentStatus kind="eesa" />;
 
     if (!data) {
         return <div style={{ padding: 40 }}>找不到此部門：{slug}</div>;
@@ -37,7 +41,7 @@ export default function DepartmentActivitiesPage() {
                                 >
                                     <h3 className={styles.activityCardTitle}>{activity.name}</h3>
                                     <div className={styles.imageWrapper}>
-                                        <img
+                                        <EesaImage
                                             src={activity.image}
                                             alt={activity.name}
                                             className={styles.activityCardImage}

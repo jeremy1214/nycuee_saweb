@@ -6,12 +6,14 @@ import { Modal } from "../ui/Modal";
 import { SearchDialog } from "../SearchDialog";
 import { ActivityContentProvider } from "../../../features/activities/data/ActivityContentProvider";
 
+import { OrganizationContentProvider } from "../../../features/organization/OrganizationContentProvider";
+
 export interface AppOutletContext {
   openPlaceholder: (title: string) => void;
 }
 
 export default function AppShell() {
-  return <ActivityContentProvider><PublicShell /></ActivityContentProvider>;
+  return <ActivityContentProvider><OrganizationContentProvider><PublicShell /></OrganizationContentProvider></ActivityContentProvider>;
 }
 
 function PublicShell() {

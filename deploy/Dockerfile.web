@@ -4,6 +4,10 @@ COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci --ignore-scripts
 COPY frontend/ ./
 COPY shared /shared
+ARG VITE_EESA_SOURCE=json
+ARG VITE_TEAM_SOURCE=json
+ENV VITE_EESA_SOURCE=${VITE_EESA_SOURCE}
+ENV VITE_TEAM_SOURCE=${VITE_TEAM_SOURCE}
 ARG VITE_ACTIVITY_SOURCE=api
 ENV VITE_ACTIVITY_SOURCE=${VITE_ACTIVITY_SOURCE}
 # Build directly so the existing npm prebuild test hook is not invoked.

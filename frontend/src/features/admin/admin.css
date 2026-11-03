@@ -168,3 +168,10 @@
   .cms-dialog-backdrop { padding: 12px; }
   .cms-dialog { padding: 18px; }
 }
+
+.cms-table-wrap { width: 100%; overflow-x: auto; }
+.cms-table { width: 100%; border-collapse: collapse; text-align: left; }
+.cms-table th, .cms-table td { padding: 12px; border-bottom: 1px solid var(--line, #ddd); vertical-align: top; }
+.cms-panel [data-field-section] { scroll-margin-top: 90px; }
+.cms-panel textarea { max-width: 100%; }
+.cms-preview fieldset, .admin-main fieldset { min-width: 0; }

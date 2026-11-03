@@ -50,6 +50,8 @@ services:
       dockerfile: deploy/Dockerfile.web
       args:
         VITE_ACTIVITY_SOURCE: ${VITE_ACTIVITY_SOURCE:-api}
+        VITE_EESA_SOURCE: ${VITE_EESA_SOURCE:-json}
+        VITE_TEAM_SOURCE: ${VITE_TEAM_SOURCE:-json}
     environment:
       SITE_ADDRESS: ${SITE_ADDRESS:-http://localhost}
     ports:

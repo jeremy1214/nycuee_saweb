@@ -1,14 +1,17 @@
 import React from "react";
 import EesaImage from "./components/EesaImage";
 import { DepartmentLayout } from "./components/DepartmentLayout";
-import { useNavigate, useParams } from "react-router-dom";
+
 import styles from "./Department.module.css";
-import departments from "./data/eesa";
+import { useEesaContent, OrganizationContentStatus, useOrganizationParams, useOrganizationNavigate } from "../organization/OrganizationContentProvider";
 
 export default function DepartmentExperiencePage() {
-    const navigate = useNavigate();
-    const { slug, expId } = useParams();
+    const navigate = useOrganizationNavigate();
+    const { slug, expId } = useOrganizationParams();
+    const { departments, status } = useEesaContent();
     const data = departments[slug ?? ""];
+
+    if (status !== 'ready') return <OrganizationContentStatus kind="eesa" />;
 
     if (!data || !data.experiences) {
         return <div style={{ padding: 40 }}>找不到此部門的體驗談：{slug}</div>;

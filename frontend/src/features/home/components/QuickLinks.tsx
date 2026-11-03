@@ -4,9 +4,13 @@ import { sectionPages, buildSectionMenus } from "../../../shared/data/navigation
 import { useActivityContent, ActivityContentStatus } from "../../activities/data/ActivityContentProvider";
 import { useCarousel } from "../../../shared/hooks/useCarousel";
 
+import { useEesaContent, useTeamContent, OrganizationContentStatus } from "../../organization/OrganizationContentProvider";
+
 export function QuickLinks() {
+  const eesa = useEesaContent();
+  const teams = useTeamContent();
   const { activityCategories } = useActivityContent();
-  const sectionMenus = buildSectionMenus(activityCategories);
+  const sectionMenus = buildSectionMenus(activityCategories, eesa.data.departments, teams.data.teams);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [showAllTeams, setShowAllTeams] = useState(false);
   const { current, goTo, handlers } = useCarousel(sectionPages.length, 6500);
@@ -67,6 +71,8 @@ export function QuickLinks() {
           </div>
           <nav className="quick-menu" id={`quick-menu-${page.to.slice(1)}`} aria-label={`${page.title}內容連結`}>
             {page.to === "/activities" && <ActivityContentStatus />}
+            {page.to === "/eesa" && <OrganizationContentStatus kind="eesa" />}
+            {page.to === "/team" && <OrganizationContentStatus kind="team" />}
             {(page.to === "/team" && !showAllTeams ? sectionMenus[page.to].slice(0, 5) : sectionMenus[page.to]).map((item) => (
               <Link key={item.to} to={item.to} onClick={() => {
                 setOpenMenu(null);

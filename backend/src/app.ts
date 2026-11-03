@@ -15,13 +15,14 @@ import { GoogleAuthController, GoogleAuthService } from './google-auth';
 import { AdminCategoryReadController, AdminContentReadController, AdminContentReadService, ContentAccess, ContentScopeGuard } from './content-access';
 import { appOrigin } from './account-utils';
 import { MediaService, AdminMediaController, PublicMediaController } from './media';
+import { OrganizationService, OverviewCmsController, DepartmentCmsController, TeamCmsController, PublicOrganizationController } from './organization';
 import { ActivityWorkflow, ActivityWriteController, CategoryService, CategoryWriteController } from './activity-workflow';
 
 @Module({
-  controllers: [HealthController, AuthController, PublicContactController, AdminContactController, PublicActivityController,
+  controllers: [OverviewCmsController, DepartmentCmsController, TeamCmsController, PublicOrganizationController, HealthController, AuthController, PublicContactController, AdminContactController, PublicActivityController,
     AccountController, PasswordController, AuditController, GoogleAuthController, AdminContentReadController, AdminCategoryReadController,
     AdminMediaController, PublicMediaController, ActivityWriteController, CategoryWriteController],
-  providers: [Database, AuthService, AdminGuard, SessionGuard, ContactService, PublicActivityService,
+  providers: [OrganizationService, Database, AuthService, AdminGuard, SessionGuard, ContactService, PublicActivityService,
     AccountService, GoogleAuthService, ContentAccess, ContentScopeGuard, AdminContentReadService,
     MediaService, ActivityWorkflow, CategoryService],
 })

@@ -17,6 +17,9 @@ import {
   Empty,
   useOperation,
 } from "./cmsUi";
+import { apiRequest } from "./api";
+import { listOrganizations } from "./organizationApi";
+import { useCms } from "./cmsUi";
 import { mediaPreview } from "./mediaPreview";
 export function findReferences(records: ActivityRecord[], src: string) {
   const refs: {
@@ -55,11 +58,11 @@ export function MediaBrowser({
   scope: MediaScope;
   onSelect?: (src: string, alt: string) => void;
 }) {
-  const scopeKey = scope.activityId ?? scope.categoryId;
+  const scopeKey = JSON.stringify(scope);
   const resource = useResource(() => listMedia(scope), [scopeKey]);
-  const references = useResource(loadActivities, [scopeKey]);
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<MediaDto>();
+  const references = useResource(() => selected ? apiRequest<{ items: { entityType: string; entityId: string; title: string; number: number; path: string; href: string }[] }>(`admin/media/${encodeURIComponent(selected.id)}/references`) : Promise.resolve({ items: [] }), [scopeKey, selected?.id]);
   const op = useOperation();
   async function upload(file: File) {
     if (
@@ -164,22 +167,12 @@ export function MediaBrowser({
           <h4>可讀取版本中的引用位置</h4>
           <ResourceState {...references} retry={references.reload}>
             {(() => {
-              const id = selected.id;
-              const refs = [
-                ...findReferences(
-                  references.data ?? [],
-                  `/api/v1/admin/media/${id}/file`,
-                ),
-                ...findReferences(
-                  references.data ?? [],
-                  `/api/v1/public/media/${id}`,
-                ),
-              ];
+              const refs = references.data?.items ?? [];
               return refs.length ? (
                 <ul>
                   {refs.map((ref) => (
-                    <li key={`${ref.activityId}-${ref.number}-${ref.path}`}>
-                      <Link to={`/admin/activities/${ref.activityId}`}>
+                    <li key={`${ref.entityType}-${ref.entityId}-${ref.number}-${ref.path}`}>
+                      <Link to={ref.href}>
                         {ref.title}
                       </Link>{" "}
                       · 版本 {ref.number} · {ref.path}
@@ -197,15 +190,21 @@ export function MediaBrowser({
   );
 }
 export default function MediaManager() {
+  const { user } = useCms();
   const choices = useResource(async () => ({
     categories: (await listCategories()).items,
     activities: await loadActivities(),
+    departments: (await listOrganizations("department")).items,
+    teams: (await listOrganizations("team")).items,
   }));
   const [scope, setScope] = useState("");
   const selectedScope: MediaScope | null = scope.startsWith("activity:")
     ? { activityId: scope.slice(9) }
     : scope.startsWith("category:")
       ? { categoryId: scope.slice(9) }
+      : scope.startsWith('department:') ? { departmentId: scope.slice(11) }
+      : scope.startsWith('team:') ? { teamId: scope.slice(5) }
+      : scope === 'overview:overview' ? { overviewId: 'overview' }
       : null;
   return (
     <section>
@@ -217,6 +216,9 @@ export default function MediaManager() {
         <Field label="活動或分類範圍">
           <select value={scope} onChange={(e) => setScope(e.target.value)}>
             <option value="">請選擇範圍</option>
+            {user.role === 'ADMIN' && <option value="overview:overview">系學會總覽</option>}
+            <optgroup label="系學會部門">{choices.data?.departments.map(d => <option key={d.id} value={`department:${d.id}`}>{d.id}</option>)}</optgroup>
+            <optgroup label="系隊">{choices.data?.teams.map(t => <option key={t.id} value={`team:${t.id}`}>{t.id}</option>)}</optgroup>
             <optgroup label="活動">
               {choices.data?.activities.map((a) => (
                 <option key={a.activity.id} value={`activity:${a.activity.id}`}>

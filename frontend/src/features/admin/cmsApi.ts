@@ -145,7 +145,7 @@ export const linkGoogle = () =>
   apiMutation<{ url: string }>("auth/google/link", "POST");
 export const listMedia = (scope: MediaScope) =>
   apiRequest<{ items: MediaDto[] }>(
-    `admin/media?${new URLSearchParams(scope.activityId ? { activityId: scope.activityId } : { categoryId: scope.categoryId! })}`,
+    `admin/media?${new URLSearchParams(Object.entries(scope).filter(([, v]) => v !== undefined) as [string, string][])}`,
   );
 export const uploadMedia = (scope: MediaScope, file: File) => {
   const body = new FormData();

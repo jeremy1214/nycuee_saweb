@@ -1,7 +1,7 @@
-import { departmentCards } from "../../features/eesa/data/eesa";
+import type { DepartmentContent, TeamContent } from "../../../../shared/organization-content";
 import type { ActivityCategoryOption } from "../../features/activities/activityTypes";
 import { resourceCategories, resourceOrder } from "../../features/resources/data/resources";
-import { teams } from "../../features/teams/data/teams";
+
 
 export const sectionPages = [
   { title: "系學會", to: "/eesa", icon: "◎", eyebrow: "STUDENT ASSOCIATION", description: "認識電機系學會、四大部門、活動成果、學習能力與前輩體驗談。" },
@@ -20,13 +20,13 @@ export const contactPage = {
 export const primaryNavigation = [...sectionPages, contactPage] as const;
 
 
-export function buildSectionMenus(activityCategories: ActivityCategoryOption[]): Record<string, { label: string; to: string }[]> {
+export function buildSectionMenus(activityCategories: ActivityCategoryOption[], departments: DepartmentContent[] = [], teams: TeamContent[] = []): Record<string, { label: string; to: string }[]> {
   return {
     "/eesa": [
       { label: "系學會介紹", to: "/eesa" },
-      ...departmentCards.filter((department) => department.link).map((department) => ({
-        label: department.name,
-        to: department.link,
+      ...departments.map((department) => ({
+        label: department.title,
+        to: `/eesa/${department.id}`,
       })),
     ],
     "/activities": [
@@ -40,7 +40,7 @@ export function buildSectionMenus(activityCategories: ActivityCategoryOption[]):
             : `/activities/overview?category=${encodeURIComponent(category.id)}`,
       })),
     ],
-    "/team": teams.map((team) => ({ label: team.name, to: `/team/${team.key}` })),
+    "/team": teams.map((team) => ({ label: team.name, to: `/team/${team.id}` })),
     "/resources": resourceOrder.map((slug) => ({
       label: resourceCategories[slug].tabLabel,
       to: `/resources/${slug}`,

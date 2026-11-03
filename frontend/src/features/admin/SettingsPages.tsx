@@ -199,7 +199,7 @@ export function AuditPage() {
             onChange={(e) => setEntityType(e.target.value)}
           >
             <option value="">全部類型</option>
-            {["Activity", "ActivityCategory", "User", "Media"].map((v) => (
+            {["Activity", "ActivityCategory", "EesaOverview", "Department", "Team", "User", "Media"].map((v) => (
               <option key={v}>{v}</option>
             ))}
           </select>

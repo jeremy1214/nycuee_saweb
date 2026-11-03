@@ -5,9 +5,10 @@ import {
 import { Prisma, ActivityRevision } from '@prisma/client';
 import { AuthRequest, SessionGuard } from './auth';
 import { Database } from './database';
+import type { OrganizationKind } from '../../shared/organization-content';
 import { revisionContent } from './public-activities';
 
-const userScope = { categoryGrants: true, activityGrants: true } as const;
+const userScope = { categoryGrants: true, activityGrants: true, departmentGrants: true, teamGrants: true } as const;
 export type ContentScope = Prisma.UserGetPayload<{ include: typeof userScope }>;
 const activityIncludes = { workingRevision: true, publishedRevision: true } as const;
 type ScopedActivity = Prisma.ActivityGetPayload<{ include: typeof activityIncludes }>;
@@ -20,6 +21,14 @@ export class ContentAccess {
     const user = await tx.user.findUnique({ where: { id: userId }, include: userScope });
     if (!user?.enabled) throw new UnauthorizedException('請先登入。');
     return user;
+  }
+
+  organization(scope: ContentScope, kind: OrganizationKind, id: string) {
+    return scope.role === 'ADMIN' || (kind === 'department' && scope.departmentGrants.some(g => g.departmentId === id))
+      || (kind === 'team' && scope.teamGrants.some(g => g.teamId === id));
+  }
+  requireOrganization(scope: ContentScope, kind: OrganizationKind, id: string) {
+    if (!this.organization(scope, kind, id)) throw new ForbiddenException('沒有此內容的編輯授權。');
   }
 
   category(scope: ContentScope, categoryId: string) {
@@ -63,6 +72,9 @@ export class ContentAccess {
     if (!media) throw new NotFoundException('找不到此圖片。');
     if (media.activityId) await this.requireActivity(tx, scope, media.activityId);
     else if (media.categoryId) this.requireCategory(scope, media.categoryId);
+    else if (media.overviewId) this.requireOrganization(scope, 'overview', media.overviewId);
+    else if (media.departmentId) this.requireOrganization(scope, 'department', media.departmentId);
+    else if (media.teamId) this.requireOrganization(scope, 'team', media.teamId);
     else throw new ForbiddenException('圖片缺少有效授權範圍。');
     return media;
   }

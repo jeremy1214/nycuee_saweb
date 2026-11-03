@@ -1947,9 +1947,34 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "overviewId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "departmentId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "teamId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
-        "x-verification-status": "build-and-isolated-smoke-2026-11-03"
+        "x-verification-status": "build-and-isolated-smoke-2026-11-03",
+        "description": "Exactly one activityId, categoryId, overviewId, departmentId or teamId query scope is required. Fresh resource authorization applies."
       },
       "post": {
         "operationId": "uploadMedia",
@@ -3392,6 +3417,22 @@
             "items": {
               "type": "string"
             }
+          },
+          "departmentIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true,
+            "maxItems": 1000
+          },
+          "teamIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true,
+            "maxItems": 1000
           }
         },
         "required": [
@@ -3420,6 +3461,22 @@
             "items": {
               "type": "string"
             }
+          },
+          "departmentIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true,
+            "maxItems": 1000
+          },
+          "teamIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true,
+            "maxItems": 1000
           }
         },
         "required": [
@@ -3639,6 +3696,15 @@
           "createdAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "overviewId": {
+            "type": "string"
+          },
+          "departmentId": {
+            "type": "string"
+          },
+          "teamId": {
+            "type": "string"
           }
         },
         "required": [
@@ -3655,22 +3721,27 @@
           {
             "required": [
               "activityId"
-            ],
-            "not": {
-              "required": [
-                "categoryId"
-              ]
-            }
+            ]
           },
           {
             "required": [
               "categoryId"
-            ],
-            "not": {
-              "required": [
-                "activityId"
-              ]
-            }
+            ]
+          },
+          {
+            "required": [
+              "overviewId"
+            ]
+          },
+          {
+            "required": [
+              "departmentId"
+            ]
+          },
+          {
+            "required": [
+              "teamId"
+            ]
           }
         ]
       },
@@ -3774,6 +3845,15 @@
           },
           "categoryId": {
             "type": "string"
+          },
+          "overviewId": {
+            "type": "string"
+          },
+          "departmentId": {
+            "type": "string"
+          },
+          "teamId": {
+            "type": "string"
           }
         },
         "required": [
@@ -3783,22 +3863,27 @@
           {
             "required": [
               "activityId"
-            ],
-            "not": {
-              "required": [
-                "categoryId"
-              ]
-            }
+            ]
           },
           {
             "required": [
               "categoryId"
-            ],
-            "not": {
-              "required": [
-                "activityId"
-              ]
-            }
+            ]
+          },
+          {
+            "required": [
+              "overviewId"
+            ]
+          },
+          {
+            "required": [
+              "departmentId"
+            ]
+          },
+          {
+            "required": [
+              "teamId"
+            ]
           }
         ]
       },
@@ -3862,6 +3947,46 @@
                 }
               }
             }
+          },
+          "departments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "title"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                }
+              }
+            },
+            "maxItems": 300
+          },
+          "teams": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "title"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                }
+              }
+            },
+            "maxItems": 300
           }
         }
       }

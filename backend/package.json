@@ -10,7 +10,8 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
-    "content:import": "tsx src/import-content.ts"
+    "content:import": "tsx src/import-content.ts",
+    "organization:import": "tsx src/import-organization.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.0",

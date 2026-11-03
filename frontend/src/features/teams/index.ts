@@ -1,4 +1,4 @@
 export { default } from "./TeamPage";
 export { default as TeamDetailPage } from "./TeamDetailPage";
-export { teams, teamsData } from "./data/teams";
+export { useTeamContent } from "../organization/OrganizationContentProvider";
 export type { TeamData, TeamItem, ScheduleBlock } from "./teamTypes";

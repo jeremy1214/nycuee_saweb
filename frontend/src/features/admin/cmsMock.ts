@@ -1,3 +1,5 @@
+import { resetOrganizationMock, organizationMockOptions, organizationMockUsages, organizationMockMediaUsed, organizationMockRequest, OrganizationMockError } from './organizationMock';
+import { OrganizationValidationError, type OrganizationKind } from '../../../../shared/organization-content';
 import rawSnapshot from "virtual:legacy-activity-content";
 import {
   ActivityContentError,
@@ -34,6 +36,7 @@ const now = () => new Date().toISOString();
 const next = () => `demo-${++sequence}`;
 export function resetMock() {
   clearPreviews();
+  resetOrganizationMock();
   inboxReadAt = null;
   sequence = 0;
   currentId = "demo-admin";
@@ -120,6 +123,8 @@ export function resetMock() {
     "demo-editor": {
       categoryIds: [categories.find((c) => c.id !== "other")!.id, "other"],
       activityIds: [],
+      departmentIds: ["technical"],
+      teamIds: ["basketball-men"],
     },
   };
   media = [];
@@ -151,6 +156,19 @@ function admin() {
 function categoryAllowed(id: string) {
   const u = user();
   return u.role === "ADMIN" || grants[u.id]?.categoryIds.includes(id);
+}
+function organizationAllowed(kind: OrganizationKind, id: string) {
+  const u = user();
+  return u.role === 'ADMIN' || (kind === 'department' && !!grants[u.id]?.departmentIds?.includes(id)) || (kind === 'team' && !!grants[u.id]?.teamIds?.includes(id));
+}
+function mediaScopeAllowed(scope: Record<string, unknown>) {
+  const keys = ['activityId', 'categoryId', 'overviewId', 'departmentId', 'teamId'].filter(k => scope[k] !== undefined);
+  if (keys.length !== 1) fail(400, '請選擇且只選擇一個內容範圍。');
+  const selected = keys[0]; const id = String(scope[selected]);
+  if (selected === 'activityId') activity(id);
+  else if (selected === 'categoryId') { if (!categoryAllowed(id)) fail(403, '沒有分類授權。'); }
+  else if (!organizationAllowed(selected === 'overviewId' ? 'overview' : selected === 'departmentId' ? 'department' : 'team', id)) fail(403, '沒有內容授權。');
+  return { [selected]: id };
 }
 function contentOf(a: StoredActivity) {
   return (
@@ -214,7 +232,7 @@ function featuredValid(id: string, categoryId: string) {
     fail(409, "精選入口必須指向同分類且有詳細頁的公開活動。");
 }
 function used(src: string) {
-  return activities.some((a) =>
+  return organizationMockMediaUsed(src) || activities.some((a) =>
     a.revisions.some((v) => JSON.stringify(v.content).includes(src)),
   );
 }
@@ -224,6 +242,8 @@ async function dispatch(
   body: Record<string, any>,
   url: URL,
 ): Promise<unknown> {
+  const organization = organizationMockRequest(path, method, body, { allowed: organizationAllowed, admin, role: () => user().role, audit: record, media });
+  if (organization !== undefined) return organization;
   if (path === "auth/csrf") return { csrfToken: "d".repeat(64) };
   if (path === "auth/login") {
     if (!["admin", "editor"].includes(body.username))
@@ -494,6 +514,8 @@ async function dispatch(
   if (path === "admin/users/grant-options" && method === "GET") {
     admin();
     return {
+      departments: organizationMockOptions("department"),
+      teams: organizationMockOptions("team"),
       categories: categories.map(c => ({ id: c.id, label: c.label })),
       activities: activities.map(a => ({ id: a.id, title: (a.revisions.find(r => r.id === a.workingRevisionId)
         ?? a.revisions.find(r => r.id === a.publishedRevisionId) ?? a.revisions[0])?.content.title ?? a.id })),
@@ -514,6 +536,8 @@ async function dispatch(
       grants[id] = {
         categoryIds: body.categoryIds,
         activityIds: body.activityIds,
+        departmentIds: body.departmentIds ?? grants[id]?.departmentIds ?? [],
+        teamIds: body.teamIds ?? grants[id]?.teamIds ?? [],
       };
       u.version++;
     } else {
@@ -536,19 +560,12 @@ async function dispatch(
   if (path === "admin/media") {
     const scope =
       method === "GET" ? Object.fromEntries(url.searchParams) : body;
-    if (!!scope.activityId === !!scope.categoryId)
-      fail(400, "請選擇一個活動或分類範圍。");
-    if (scope.activityId) activity(scope.activityId);
-    else if (!categoryAllowed(scope.categoryId)) fail(403, "沒有分類授權。");
+    const selectedScope = mediaScopeAllowed(scope);
     if (method === "GET")
       return {
         items: copy(
           media
-            .filter((m) =>
-              scope.activityId
-                ? m.activityId === scope.activityId
-                : m.categoryId === scope.categoryId,
-            )
+            .filter(m => Object.entries(selectedScope).every(([key, value]) => (m as unknown as Record<string, unknown>)[key] === value))
             .map(({ uploaderId: _u, ...dto }) => dto),
         ),
       };
@@ -575,9 +592,7 @@ async function dispatch(
       visibility: "PRIVATE",
       createdAt: now(),
       uploaderId: user().id,
-      ...(scope.activityId
-        ? { activityId: scope.activityId }
-        : { categoryId: scope.categoryId }),
+      ...selectedScope,
     } as (typeof media)[number];
     media.push(m);
     registerPreview(m.id, file);
@@ -585,11 +600,21 @@ async function dispatch(
     const { uploaderId: _u, ...dto } = m;
     return dto;
   }
+  if (/^admin\/media\/[^/]+\/references$/.test(path) && method === 'GET') {
+    const id = path.split('/')[2];
+    const m = media.find(m => m.id === id) ?? fail(404, '圖片不存在。');
+    mediaScopeAllowed(Object.fromEntries(['activityId','categoryId','overviewId','departmentId','teamId'].flatMap(key => { const value = (m as unknown as Record<string, unknown>)[key]; return value ? [[key,value]] : []; })));
+    const activityRefs = activities.filter(allowed).flatMap(a => a.revisions.flatMap(v => {
+      const refs: { entityType: string; entityId: string; title: string; number: number; path: string; href: string }[] = [];
+      function walk(value: unknown, path: string) { if (!value || typeof value !== 'object') return; if ('src' in value && (value.src === `/api/v1/admin/media/${id}/file` || value.src === `/api/v1/public/media/${id}`)) refs.push({ entityType: 'Activity', entityId: a.id, title: contentOf(a).title, number: v.number, path, href: `/admin/activities/${a.id}` }); Object.entries(value).forEach(([key, child]) => walk(child, `${path}.${key}`)); }
+      walk(v.content, 'content'); return refs;
+    }));
+    return { items: [...activityRefs, ...organizationMockUsages(id, organizationAllowed)] };
+  }
   if (path.startsWith("admin/media/") && method === "DELETE") {
     const id = path.split("/")[2];
     const m = media.find((m) => m.id === id) ?? fail(404, "圖片不存在。");
-    if (m.activityId) activity(m.activityId);
-    else if (!categoryAllowed(m.categoryId!)) fail(403, "沒有分類授權。");
+    mediaScopeAllowed(Object.fromEntries(["activityId", "categoryId", "overviewId", "departmentId", "teamId"].flatMap(key => { const value = (m as unknown as Record<string, unknown>)[key]; return value ? [[key, value]] : []; })));
     if (user().role !== "ADMIN" && m.uploaderId !== user().id)
       fail(403, "只能刪除自己上傳的圖片。");
     if (
@@ -675,6 +700,8 @@ export async function mockRequest(
     );
     return Response.json(data, { headers: { "Cache-Control": "no-store" } });
   } catch (e) {
+    if (e instanceof OrganizationValidationError) return Response.json({ message: e.message, fieldErrors: e.fieldErrors }, { status: 400 });
+    if (e instanceof OrganizationMockError) return Response.json({ message: e.message }, { status: e.status });
     if (e instanceof ActivityContentError)
       return Response.json(
         {

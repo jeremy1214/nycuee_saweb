@@ -23,6 +23,7 @@ import {
   ContactMessageDetail,
   InboxSummary,
 } from "./ContactInbox";
+import { OrganizationManager, OrganizationEditor, OrganizationWorkSummary } from "./OrganizationManager";
 import ActivityManager, { WorkOverview } from "./ActivityManager";
 import ActivityEditor from "./ActivityEditor";
 import MediaManager from "./MediaManager";
@@ -186,6 +187,8 @@ export default function AdminRoutes() {
     ["/admin", "工作總覽", false],
     ["/admin/activities", "活動管理", false],
     ["/admin/other", "其他活動介紹", false],
+    ["/admin/eesa", "系學會管理", false],
+    ["/admin/teams", "系隊管理", false],
     ["/admin/media", "媒體管理", false],
     ["/admin/categories", "分類設定", true],
     ["/admin/users", "帳號與授權", true],
@@ -371,6 +374,7 @@ export default function AdminRoutes() {
                 element={guard(
                   <>
                     <WorkOverview />
+                    <OrganizationWorkSummary />
                     {user?.role === "ADMIN" && (
                       <InboxSummary onSessionExpired={sessionExpired} />
                     )}
@@ -383,6 +387,11 @@ export default function AdminRoutes() {
                 element={guard(<ActivityEditor />)}
               />
               <Route path="other" element={guard(<ActivityManager other />)} />
+              <Route path="eesa" element={guard(<OrganizationManager kind="department" />)} />
+              <Route path="eesa/overview" element={guard(<OrganizationEditor kind="overview" />, true)} />
+              <Route path="eesa/departments/:id" element={guard(<OrganizationEditor kind="department" />)} />
+              <Route path="teams" element={guard(<OrganizationManager kind="team" />)} />
+              <Route path="teams/:id" element={guard(<OrganizationEditor kind="team" />)} />
               <Route path="media" element={guard(<MediaManager />)} />
               <Route
                 path="categories"

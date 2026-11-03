@@ -1,8 +1,8 @@
 import { sectionPages, contactPage } from "./navigation";
 import { siteContact, socialLinks } from "./site";
 import { exploreContent } from "../../features/home/data/home";
-import { eesaOverview, departments, departmentCards } from "../../features/eesa/data/eesa";
-import { teams } from "../../features/teams/data/teams";
+import type { PublicEesaContent, PublicTeamContent } from "../../../../shared/organization-content";
+
 import type { PublicActivityContent } from "../../../../shared/activity-content";
 import { deriveOtherActivities } from "../../features/activities/data/contentSelectors";
 import { hasActivityDate } from "../../features/activities/data/activityDates";
@@ -34,20 +34,24 @@ function item(label: string, to: string, description: string, ...content: unknow
   return { label, to, description, content: [label, description, ...content.flatMap(visibleText)].join(" ") };
 }
 
-export function buildSearchItems({ activities, categories: activityCategories }: PublicActivityContent): SearchItem[] {
+export function buildSearchItems({ activities, categories: activityCategories }: PublicActivityContent, eesa: PublicEesaContent = { overview: null, departments: [] }, teamContent: PublicTeamContent = { teams: [] }): SearchItem[] {
+  const eesaOverview = eesa.overview;
+  const departments = Object.fromEntries(eesa.departments.map(d => [d.id, d]));
+  const departmentCards = eesa.departments.map(d => ({ name: d.title, link: `/eesa/${d.id}`, description: d.cardDescription }));
+  const teams = teamContent.teams.map(t => ({ ...t, key: t.id }));
   const otherActivities = deriveOtherActivities(activities);
   const calendarEvents = activities.filter(hasActivityDate);
   return [
   item("首頁", "/", "探索交大電機、近期活動與電機行事曆", exploreContent, calendarEvents,
     "從交大電機出發 認識電機系學會 探索交大電機",
-    "從系學會、活動與系隊出發，找到你需要的學習資訊。", eesaOverview.introduction,
+    "從系學會、活動與系隊出發，找到你需要的學習資訊。", (eesaOverview?.introduction ?? ""),
     "近期活動 活動資訊為示意，正式時間與報名方式請以系所公告為準。",
     "電機行事曆 匯入 Google 日曆 下載活動檔案 活動目前會以全天顯示。"),
   ...sectionPages.map((page) => item(page.title, page.to, page.description)),
   item(contactPage.title, contactPage.to, contactPage.description, siteContact, socialLinks,
     "有問題嗎？讓我們協助你。不論是系學會活動、學習資源或網站內容，都歡迎留下問題。我們會將訊息交給合適的窗口處理。",
     "提交前的小提醒 選擇問題類別 提供完整資訊 留意電子信箱 也可以直接寄信 提交問題 姓名 Email 問題類別 主旨 問題內容 系學會相關 系上活動 系隊相關 學習資料 網站問題或建議"),
-  item("系學會介紹", "/eesa", eesaOverview.introduction, eesaOverview, departmentCards,
+  item("系學會介紹", "/eesa", (eesaOverview?.introduction ?? ""), eesaOverview, departmentCards,
     siteContact, socialLinks, "聯絡資訊 電子信箱 Facebook Instagram 辦公室"),
   item("系隊介紹", "/team", "點選系隊，認識球場上的夥伴", teams.map((team) => team.name)),
   ...teams.flatMap((team) => [

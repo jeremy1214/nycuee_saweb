@@ -7,6 +7,7 @@ import { argon2id, hash, verify } from 'argon2';
 import { Request } from 'express';
 import type { AccountDto, GrantsDto } from '../../shared/cms-contract';
 import { AdminGuard, AuthRequest, AuthService, SessionGuard } from './auth';
+import { organizationStore } from './organization-store';
 import { Database } from './database';
 import {
   appOrigin, digest, inputObject, invalid, passwordOf, roleOf, secret,
@@ -58,7 +59,8 @@ export class AccountService {
         include: { workingRevision: { select: { title: true } }, publishedRevision: { select: { title: true } } },
         orderBy: { id: 'asc' },
       });
-      return { categories, activities: activities.map(a => ({
+      const options = async (kind: 'department' | 'team') => (await organizationStore(tx, kind).resources.findMany({ include: { workingRevision: true, publishedRevision: true } })).map(r => ({ id: r.id, title: ((r.workingRevision ?? r.publishedRevision)?.content as { title?: string; name?: string } | undefined)?.title ?? ((r.workingRevision ?? r.publishedRevision)?.content as { name?: string } | undefined)?.name ?? r.id }));
+      return { categories, departments: await options('department'), teams: await options('team'), activities: activities.map(a => ({
         id: a.id, title: a.workingRevision?.title ?? a.publishedRevision?.title ?? a.id,
       })) };
     }, { isolationLevel: 'RepeatableRead' });
@@ -123,30 +125,44 @@ export class AccountService {
   async grants(id: string): Promise<GrantsDto> {
     return this.db.$transaction(async tx => {
       await this.target(tx, id);
-      const [categories, activities] = await Promise.all([
+      const [categories, activities, departments, teams] = await Promise.all([
         tx.categoryGrant.findMany({ where: { userId: id }, orderBy: { categoryId: 'asc' } }),
         tx.activityGrant.findMany({ where: { userId: id }, orderBy: { activityId: 'asc' } }),
+        tx.departmentGrant.findMany({ where: { userId: id }, orderBy: { departmentId: 'asc' } }),
+        tx.teamGrant.findMany({ where: { userId: id }, orderBy: { teamId: 'asc' } }),
       ]);
-      return { categoryIds: categories.map(g => g.categoryId), activityIds: activities.map(g => g.activityId) };
+      return { categoryIds: categories.map(g => g.categoryId), activityIds: activities.map(g => g.activityId), departmentIds: departments.map(g => g.departmentId), teamIds: teams.map(g => g.teamId) };
     }, { isolationLevel: 'RepeatableRead' });
   }
 
   async replaceGrants(actorId: string, id: string, body: unknown) {
-    const input = inputObject(body, ['version', 'categoryIds', 'activityIds']);
+    const input = inputObject(body, ['version', 'categoryIds', 'activityIds', 'departmentIds', 'teamIds']);
     const version = versionOf(input.version);
     const categoryIds = ids(input.categoryIds, 'categoryIds');
     const activityIds = ids(input.activityIds, 'activityIds');
+    const departmentIds = input.departmentIds === undefined ? undefined : ids(input.departmentIds, 'departmentIds');
+    const teamIds = input.teamIds === undefined ? undefined : ids(input.teamIds, 'teamIds');
     return serializable(this.db, async tx => {
       await this.actor(tx, actorId);
       await this.target(tx, id, version);
       if (await tx.activityCategory.count({ where: { id: { in: categoryIds } } }) !== categoryIds.length) invalid('categoryIds', '包含不存在的分類。');
       if (await tx.activity.count({ where: { id: { in: activityIds } } }) !== activityIds.length) invalid('activityIds', '包含不存在的活動。');
+      if (departmentIds !== undefined) {
+        if (await tx.department.count({ where: { id: { in: departmentIds } } }) !== departmentIds.length) invalid('departmentIds', '包含不存在的部門。');
+        await tx.departmentGrant.deleteMany({ where: { userId: id } });
+        if (departmentIds.length) await tx.departmentGrant.createMany({ data: departmentIds.map(departmentId => ({ userId: id, departmentId })) });
+      }
+      if (teamIds !== undefined) {
+        if (await tx.team.count({ where: { id: { in: teamIds } } }) !== teamIds.length) invalid('teamIds', '包含不存在的系隊。');
+        await tx.teamGrant.deleteMany({ where: { userId: id } });
+        if (teamIds.length) await tx.teamGrant.createMany({ data: teamIds.map(teamId => ({ userId: id, teamId })) });
+      }
       await tx.categoryGrant.deleteMany({ where: { userId: id } });
       await tx.activityGrant.deleteMany({ where: { userId: id } });
       if (categoryIds.length) await tx.categoryGrant.createMany({ data: categoryIds.map(categoryId => ({ userId: id, categoryId })) });
       if (activityIds.length) await tx.activityGrant.createMany({ data: activityIds.map(activityId => ({ userId: id, activityId })) });
       const user = await tx.user.update({ where: { id, version }, data: { version: { increment: 1 } }, include: includeIdentity });
-      await writeAudit(tx, actorId, 'account.grants-replaced', id, { categoryIds, activityIds });
+      await writeAudit(tx, actorId, 'account.grants-replaced', id, { categoryIds, activityIds, ...(departmentIds ? { departmentIds } : {}), ...(teamIds ? { teamIds } : {}) });
       return accountDto(user);
     });
   }

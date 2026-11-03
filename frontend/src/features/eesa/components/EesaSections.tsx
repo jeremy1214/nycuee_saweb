@@ -1,11 +1,12 @@
-import { useNavigate } from "react-router-dom";
+import { useOrganizationNavigate } from "../../organization/OrganizationContentProvider";
 import { siteContact, socialLinks } from "../../../shared/data/site";
-import { eesaOverview } from "../data/eesa";
-import { departmentCards as departments } from "../data/eesa";
+import { useEesaContent } from "../../organization/OrganizationContentProvider";
+import EesaImage from "./EesaImage";
 import styles from "../EesaIntro.module.css";
 
 export function DepartmentCards() {
-  const navigate = useNavigate();
+  const navigate = useOrganizationNavigate();
+  const { departmentCards: departments } = useEesaContent();
   return (
                     <div className={styles.departmentsGrid}>
                         {departments.map((dept, idx) => (
@@ -17,7 +18,7 @@ export function DepartmentCards() {
                             >
                                 <div className={styles.cardInner}>
                                     <div className={styles.imageWrapper}>
-                                        <img
+                                        <EesaImage
                                             src={dept.image}
                                             alt={dept.name}
                                             className={styles.departmentImage}
@@ -35,6 +36,8 @@ export function DepartmentCards() {
 }
 
 export function AssociationIntroduction() {
+  const { eesaOverview } = useEesaContent();
+  if (!eesaOverview) return null;
   return <>
     <div className={styles.section}>
       <h2 className={styles.sectionTitle}>{eesaOverview.title}</h2>
@@ -49,6 +52,8 @@ export function AssociationIntroduction() {
 }
 
 export function PresidentMessage() {
+  const { eesaOverview } = useEesaContent();
+  if (!eesaOverview) return null;
   return <div className={styles.section}>
     <div className={styles.divider} />
     <h2 className={styles.sectionTitle}>{eesaOverview.presidentTitle}</h2>

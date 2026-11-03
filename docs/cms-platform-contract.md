@@ -83,3 +83,10 @@ ActivityWorkflow、CategoryService 與 MediaService 已接入真實活動及媒�
 ### 後續簡單驗證結果（2026/11/03）
 
 使用者後續同意簡單驗證。前後端編譯、隔離 PostgreSQL 全新 migration 與 47 項主要 HTTP 流程檢查通過；取代本次實作初期的未驗證狀態。未跑完整測試、瀏覽器及實際 Google OAuth，未變更目前網站資料庫或更新容器。細項見 admin-cms-plan.md 第 14 節。
+
+
+## 系學會／系隊擴充（2026/11/03，程式已加入、未驗證）
+
+共同 DTO 及表單規格見 `shared/organization-content.ts`，完整規格見 [Organization CMS 契約](organization-cms-contract.md)及 [OpenAPI](organization-cms.openapi.json)。EesaOverview、Department、Team 各自保存資源、版本與媒體引用；共用原 Session、CSRF、工作流狀態及 AuditEntry。
+
+帳號授權增加 departmentIds、teamIds，舊 PUT 若省略新欄位保留原授權；grant-options 增加 departments、teams。媒體上傳／列表 scope 擴為 activityId、categoryId、overviewId、departmentId、teamId 五選一。可讀引用位置由 GET `/admin/media/{id}/references` 提供，刪除保護涵蓋全部版本引用表。

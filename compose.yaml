@@ -26,6 +26,13 @@ services:
       NODE_ENV: ${NODE_ENV:-development}
       COOKIE_SECURE: ${COOKIE_SECURE:-false}
       TRUST_PROXY: "true"
+      APP_ORIGIN: ${APP_ORIGIN:-http://localhost}
+      ADMIN_INITIAL_PASSWORD: ${ADMIN_INITIAL_PASSWORD:-}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      MEDIA_ROOT: /var/lib/nycuee/media
+    volumes:
+      - media_data:/var/lib/nycuee/media
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/v1/health', { signal: AbortSignal.timeout(4000) }).then(r => process.exit(r.status === 200 ? 0 : 1)).catch(() => process.exit(1))"]
       interval: 5s
@@ -58,6 +65,7 @@ services:
     restart: unless-stopped
 
 volumes:
+  media_data:
   postgres_data:
   caddy_data:
   caddy_config:

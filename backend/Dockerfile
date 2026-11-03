@@ -19,6 +19,8 @@ COPY --from=legacy /legacy/content ./legacy-content
 RUN npm run build
 ENV NODE_ENV=production
 ENV LEGACY_CONTENT_DIR=/app/backend/legacy-content
+ENV MEDIA_ROOT=/var/lib/nycuee/media
+RUN mkdir -p /var/lib/nycuee/media && chown node:node /var/lib/nycuee/media
 USER node
 EXPOSE 3000
 CMD ["sh", "-c", "npm run db:migrate && npm run db:seed && npm start"]

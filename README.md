@@ -59,8 +59,8 @@ npm run dev
 
 - 密碼以 Argon2id 雜湊保存；Session 使用隨機識別值，資料庫僅保存其 SHA-256 雜湊，固定有效期限為 8 小時。重新登入會更換識別值，登出會刪除 Session 並清除 Cookie。
 - Cookie 使用 HttpOnly、SameSite=Lax 與 `/api` 路徑，正式 HTTPS 環境啟用 Secure。Session 及登入限速保存在 PostgreSQL，後端重啟不會清除登入狀態或限速紀錄。
-- 後端每次受保護請求都重新讀取帳號啟用狀態與角色。目前僅 `ADMIN` 可以登入後台，資料模型保留 `EDITOR` 角色。
-- `AdminGuard` 提供後續管理 API 共用：檢查登入、角色，以及寫入請求的 CSRF Token。前端隱藏頁面不作為授權依據。
+- 後端每次受保護請求都重新讀取帳號啟用狀態與角色。`ADMIN` 與已設定密碼的 `EDITOR` 都可登入；編輯者僅能讀取授權分類或指定活動，歷史版本也逐筆檢查分類。
+- `SessionGuard` 檢查登入與寫入 CSRF，`AdminGuard` 限定管理員，`ContentScopeGuard`／`ContentAccess` 檢查活動與目的分類。管理帳號、授權、操作紀錄與聯絡收件匣僅限管理員。前端隱藏頁面不作為授權依據。
 - 登入限速為每 IP、每個固定的一分鐘區間最多 5 次；第 6 次回傳 429。錯誤帳密與停用帳號使用相同訊息。
 - 過期 Session 每 15 分鐘清理；到期當下即停止接受該 Session，不等待清理。
 
@@ -68,16 +68,69 @@ npm run dev
 | --- | --- |
 | `GET /api/v1/auth/csrf` | 取得綁定目前 Session 的 CSRF Token；未登入時建立短效匿名 Session |
 | `POST /api/v1/auth/login` | JSON `{ "username": "admin", "password": "admin" }`，成功回傳 `{ "user": { "id", "username", "role" } }` |
-| `GET /api/v1/auth/me` | 回傳目前管理員資料；未登入或停用為 401，無管理權限為 403 |
+| `GET /api/v1/auth/me` | 回傳目前使用者資料（ADMIN 或 EDITOR）；未登入或停用為 401 |
 | `POST /api/v1/auth/logout` | 刪除目前 Session，回傳 `{ "ok": true }` |
 
 兩個 POST 都必須攜帶 `X-CSRF-Token`，值取自同一 Cookie Session 的 `csrf` 回應，並使用 JSON 請求。登入成功後請重新取得 Token。驗證回應禁止快取，密碼雜湊不會回傳至前端。
 
-後台提供登入、登出及聯絡表單收件匣，F 已加入活動編輯、預覽、審核、媒體、分類、帳號授權與紀錄介面。C／D／E 的 Google、帳號、內容及媒體服務仍待接入，完整介面可透過明確啟用的示範模式驗收。
+後台提供登入、登出、聯絡收件匣、真實帳號授權與紀錄管理。C／D／E 的真實 API 已加入，F 的既有介面可呼叫活動編輯、預覽、審核、媒體與分類服務；本次已通過編譯與隔離環境主要流程檢查，尚未部署至目前運行中的服務。
+
+## C：帳號、授權與密碼管理
+
+管理員從「帳號與授權」建立帳號，透過既有聯絡方式交付一次顯示的啟用連結；密碼由使用者自行設定。連結預設 30 分鐘有效、只能使用一次，資料庫只保存 Token 雜湊；重發同用途連結會使舊連結失效。
+
+新增帳號不開放自行註冊。管理員可變更角色、停用帳號、替換分類／指定活動授權、產生重設連結。帳號與授權更新帶入目前 `version`，遇到其他人先更新則回 409。停用或降級時會以 Serializable 交易保護最後一位可登入的管理員，未設定密碼也未綁定 Google 的待啟用帳號不作為替代管理員。停用會撤銷現有 Session 與未使用的密碼連結；撤銷範圍或改角色則在下一次 API 請求生效。
+
+「我的帳號」提供自行變更密碼，需輸入目前密碼，新密碼為 12–1024 字元。透過啟用／重設或自行變更密碼，都會作廢未使用的密碼連結並撤銷該帳號所有裝置的 Session，完成後重新登入。不強制首次改密碼；本機預設 `admin/admin` 維持原設定。
+
+| API | 用途 |
+| --- | --- |
+| `GET/POST /api/v1/admin/users` | 列出帳號／建立帳號並回傳一次性啟用連結 |
+| `GET /api/v1/admin/users/grant-options` | 授權選單所需的分類與活動名稱；不依賴 D 的編輯服務 |
+| `PATCH /api/v1/admin/users/:id` | 變更角色或啟用狀態，帶入 `version` |
+| `GET/PUT /api/v1/admin/users/:id/grants` | 讀取／整份替換分類與指定活動授權 |
+| `POST /api/v1/admin/users/:id/password-token` | 產生啟用或重設連結，帶入 `version` 與 `purpose` |
+| `POST /api/v1/auth/password/consume` | 匿名 CSRF 加有效 Token 設定密碼 |
+| `POST /api/v1/auth/password/change` | 已登入使用者驗證目前密碼後變更密碼 |
+| `GET /api/v1/admin/audit-entries` | 操作紀錄；支援 `page`、`entityType`、`entityId`，每頁 20 筆 |
+
+帳號、授權、密碼及 Google 綁定的操作紀錄與業務資料一起寫入交易，不保存明文密碼、憑證、Session、Token 或啟用連結。所有第一方寫入皆須 CSRF；密碼設置／變更與 Google 發起流程另有限速。
+
+## Google 登入設定
+
+使用 Google Cloud 的 Web application OAuth 用戶端，設定後端環境變數：
+
+```dotenv
+APP_ORIGIN=http://localhost
+GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-client-secret
+```
+
+授權重新導向 URI 必須精確設定為 `APP_ORIGIN` 加 `/api/v1/auth/google/callback`。Docker 本機使用 `http://localhost/api/v1/auth/google/callback`；Vite 開發使用 `http://localhost:5173/api/v1/auth/google/callback`，其 `/api` 代理至後端。`APP_ORIGIN` 只填協定與網域／連接埠，不填路徑或 `#`，不從請求 Host 推導；正式環境必須 HTTPS。
+
+先以帳密登入，在「我的帳號」選「綁定 Google」，之後才可用該 Google 身分登入。帳號採 `sub` 唯一對應，不因 email 相同合併、不自動註冊，也不允許直接替換既有綁定。未配置 OAuth 憑證時帳密登入仍可使用，Google 端點回傳設定未完成的錯誤。
+
+流程使用授權碼、PKCE、綁定發起 Session 的一次性 state，以及 nonce；暫存 10 分鐘到期。ID Token 的簽章、issuer、audience 與有效期限交由 Google 官方 `google-auth-library` 驗證，回跳網址固定為 `APP_ORIGIN`。
+
+本次 C／D／E 程式碼已加入，**前後端編譯及隔離資料庫 47 項主要流程檢查通過；未跑完整測試、瀏覽器或實際 Google OAuth，也未更新執行中的 Docker 服務**。套用時需安裝新依賴、重新產生 Prisma Client 並套用新增 migration；Docker 重新建置及啟動會執行這些步驟。正式環境首次建立管理員需設定 `ADMIN_INITIAL_PASSWORD`（12–1024 字元）；已存在的 admin 不會被覆寫。
+
+## D／E：活動審核與媒體服務
+
+活動管理使用真實 `/api/v1/admin/activities` API。編輯者須具原活動及目的分類的必要授權，所有寫入帶入資源 `version`；版本過時回 409，保留前端表單供重新載入。建立／儲存草稿不改動原公開快照，送審後凍結，撤回或管理員退回後才能繼續編輯。
+
+管理員發布時，在同一 Serializable 交易重新驗證內容、分類、精選入口及圖片引用，公開引用媒體，再切換公開指標並清空工作指標。已發布內容不原地修改；歷史還原會建立新草稿，已有工作版本時回 409。下架保留歷史與已公開圖片，精選入口仍引用該活動時須先調整入口。
+
+圖片上傳使用 multipart，接受實際可解碼的 JPEG、PNG、WebP；單檔最多 10 MiB、40MP，拒絕動畫。後端重新編碼為 WebP，長邊最多 4096px，檔名由伺服器產生，並移除輸入中繼資料。Docker 保存於 `media_data` volume，本機預設在 `backend/media`（已忽略）；可用 `MEDIA_ROOT` 指定持久化目錄。
+
+未公開圖片須登入並通過範圍檢查，檔案回應禁止快取。發布後內容改用公開媒體 URL，私人圖片不會由公開端點取得。媒體引用在儲存及發布交易建立，已被任何版本引用或已公開的圖片不可刪除；編輯者還須是上傳者才可刪除。既有 65 張靜態圖片保留原路徑，新的內容圖片只接受媒體庫或既有內容中的圖片路徑。
+
+上傳失敗會清除尚未登錄的檔案。媒體目錄不直接交給 Caddy，檔案由 API 按權限提供；正式備份必須同時保存 PostgreSQL 與媒體 volume。異機備份、還原演練及告警仍屬 H 的待辦。
+
+本次已通過前後端編譯、隔離資料庫 migration 及 47 項主要 HTTP 流程檢查；未更新目前容器與資料庫。Google 實際授權需設定 OAuth 憑證，完整回歸、瀏覽器與正式部署驗收仍待完成。
 
 ## 活動 CMS：A／B／G 基礎與 F 介面
 
-前台活動預設使用資料庫公開 API。活動分類、版本、帳號／Google／Token／授權、媒體／引用與操作紀錄模型及契約已建立；F 的完整介面與契約 mock 已交付，帳號管理、Google 登入、活動編輯／發布與媒體服務仍待 C／D／E 接入，目前正式 API 的 EDITOR 仍不能登入。
+前台活動預設使用資料庫公開 API。A／B／G 基礎及 F 的介面與 mock 已交付；C／D／E 已新增帳號、Google、授權、審核發布與媒體服務程式碼，本次編譯與隔離主要流程檢查通過，尚未部署至目前服務。
 
 進度及下一任務見 [CMS 規劃](docs/admin-cms-plan.md)；活動流程見 [活動契約](docs/activity-cms-contract.md)，帳號與媒體見 [平台契約](docs/cms-platform-contract.md)，機器介面見 [OpenAPI](docs/activity-cms.openapi.json)。其中 `implemented` 與 `planned` 明確區分可呼叫及待實作的端點。
 
@@ -95,9 +148,9 @@ npm run dev
 
 介面包含活動搜尋及篩選、分區表單、共用前台的詳情／相簿預覽、送審／撤回／退回／發布／下架／還原、媒體範圍與選圖、分類設定、帳號及授權、一次顯示的啟用／重設連結與操作紀錄。修改採手動儲存，離開提示與 409 衝突處理會保留目前表單。圖片示範使用本機物件 URL，正式圖片重新編碼、持久化及存取授權由 E 提供。
 
-`VITE_ADMIN_SOURCE` 預設為 `api`。回到 API 模式時設定 `$env:VITE_ADMIN_SOURCE='api'` 並重啟 Vite。正式 API 產物排除示範模組與舊活動快照，API 失敗顯示錯誤及重試。既有登入與收件匣沿用真實 API，其他功能須等 C／D／E 服務完成。
+`VITE_ADMIN_SOURCE` 預設為 `api`。回到 API 模式時設定 `$env:VITE_ADMIN_SOURCE='api'` 並重啟 Vite。API 失敗顯示錯誤及重試；本次 C／D／E 的服務均由真實 API 提供，需重新建置與 migration 後才能在執行環境使用。
 
-Google 主動綁定的 planned 契約已明確改為 `POST /api/v1/auth/google/link` 攜帶 CSRF，成功回 `200 { url }`，由前端導向 Google。OAuth callback 維持重新導向流程，服務仍由 C 實作。
+Google 主動綁定使用 `POST /api/v1/auth/google/link` 攜帶 CSRF，成功回 `200 { url }`，由前端導向 Google。OAuth callback 成功後重新導向我的帳號頁。
 
 ### 首次匯入舊活動
 
@@ -173,8 +226,10 @@ docker stop nycuee-cms-tests
 ```dotenv
 POSTGRES_PASSWORD=replace-with-a-long-url-safe-password
 SITE_ADDRESS=admin.example.com
+APP_ORIGIN=https://admin.example.com
 NODE_ENV=production
 COOKIE_SECURE=true
+ADMIN_INITIAL_PASSWORD=replace-with-a-long-initial-password
 ```
 
 執行 `docker compose up --build -d`，Caddy 會申請 HTTPS 憑證，同網域提供前台及 `/api`。後端在 production 模式要求 Secure Cookie。後端連接埠不對外發布，僅信任緊鄰的 Caddy 一層代理；本機直接啟動後端使用 `TRUST_PROXY=false`。資料庫連接埠僅綁定主機回環位址。

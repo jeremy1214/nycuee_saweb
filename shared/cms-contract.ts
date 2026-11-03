@@ -1,4 +1,4 @@
-/** Planned C/E interfaces; their runtime routes are not enabled by the A/G work. */
+/** Shared account, content-scope and media contracts. Media writes still await E. */
 export type CmsRole = 'ADMIN' | 'EDITOR';
 export type PasswordTokenPurpose = 'ACTIVATE' | 'RESET';
 export interface FieldError { path: string; message: string }
@@ -8,6 +8,10 @@ export interface AccountDto {
   googleLinked: boolean; hasPassword: boolean;
 }
 export interface GrantsDto { categoryIds: string[]; activityIds: string[] }
+export interface GrantOptionsDto {
+  categories: { id: string; label: string }[];
+  activities: { id: string; title: string }[];
+}
 export interface PasswordTokenLinkDto { url: string; expiresAt: string }
 export type MediaScope = { activityId: string; categoryId?: never } | { categoryId: string; activityId?: never };
 export type MediaDto = MediaScope & {

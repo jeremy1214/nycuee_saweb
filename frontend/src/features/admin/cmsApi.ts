@@ -10,6 +10,7 @@ import type {
   MediaScope,
   AuditEntryDto,
   PasswordTokenLinkDto,
+  GrantOptionsDto,
 } from "../../../../shared/cms-contract";
 export type { AccountDto, GrantsDto, MediaDto, MediaScope, AuditEntryDto };
 export interface Revision {
@@ -102,6 +103,8 @@ export const saveCategory = (category: Category, create = false) => {
 };
 export const listAccounts = () =>
   apiRequest<{ items: AccountDto[] }>("admin/users");
+export const getGrantOptions = () =>
+  apiRequest<GrantOptionsDto>("admin/users/grant-options");
 export const createAccount = (username: string, role: string) =>
   apiMutation<{ user: AccountDto; activation: PasswordTokenLinkDto }>(
     "admin/users",
@@ -136,6 +139,8 @@ export const consumeToken = (token: string, password: string) =>
     token,
     password,
   });
+export const changePassword = (currentPassword: string, password: string) =>
+  apiMutation<{ ok: boolean }>("auth/password/change", "POST", { currentPassword, password });
 export const linkGoogle = () =>
   apiMutation<{ url: string }>("auth/google/link", "POST");
 export const listMedia = (scope: MediaScope) =>

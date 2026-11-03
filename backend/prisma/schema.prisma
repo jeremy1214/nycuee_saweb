@@ -35,9 +35,25 @@ model Session {
   userId    String?
   user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   expiresAt DateTime
+  googleFlows GoogleAuthFlow[]
 
   @@index([expiresAt])
   @@index([userId])
+}
+
+// Short-lived, one-use OIDC flows are bound to the initiating browser Session.
+model GoogleAuthFlow {
+  stateHash   String   @id @db.VarChar(64)
+  sessionId   String
+  session     Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  nonceHash   String   @db.VarChar(64)
+  verifier    String
+  linkUserId  String?
+  userVersion Int?
+  expiresAt   DateTime
+
+  @@index([sessionId])
+  @@index([expiresAt])
 }
 
 model LoginAttempt {

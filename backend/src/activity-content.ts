@@ -3,11 +3,11 @@ import {
   ActivityContentError, parseActivityContent, requireActivityCategory,
 } from '../../shared/activity-content';
 
-/** Shared validation adapter for future CMS writes. No HTTP endpoints are enabled yet. */
+/** Shared validation adapter for CMS writes and publication. */
 export function validateActivityRevision(input: unknown, categoryIds: Iterable<string>) {
   try {
-    const content = parseActivityContent(input);
-    requireActivityCategory(content, categoryIds);
+    const content = parseActivityContent(input, 'content');
+    requireActivityCategory(content, categoryIds, 'content');
     return content;
   } catch (error) {
     if (!(error instanceof ActivityContentError)) throw error;

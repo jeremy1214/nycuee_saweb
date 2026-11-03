@@ -7,10 +7,10 @@ import {
   getGrants,
   saveGrants,
   issueToken,
-  listCategories,
-  loadActivities,
+  getGrantOptions,
   consumeToken,
   linkGoogle,
+  changePassword,
 } from "./cmsApi";
 import type { AccountDto, GrantsDto } from "./cmsApi";
 import type { PasswordTokenLinkDto } from "../../../../shared/cms-contract";
@@ -62,8 +62,7 @@ function TokenLink({
 export default function AccountManager() {
   const resource = useResource(async () => ({
     users: (await listAccounts()).items,
-    categories: (await listCategories()).items,
-    activities: await loadActivities(),
+    ...await getGrantOptions(),
   }));
   const [selected, setSelected] = useState<AccountDto>();
   const [grants, setGrants] = useState<GrantsDto>({
@@ -229,15 +228,15 @@ export default function AccountManager() {
                 aria-label="指定活動授權"
               >
                 {resource.data?.activities.map((a) => (
-                  <label className="cms-check" key={a.activity.id}>
+                  <label className="cms-check" key={a.id}>
                     <input
                       type="checkbox"
-                      checked={grants.activityIds.includes(a.activity.id)}
+                      checked={grants.activityIds.includes(a.id)}
                       onChange={(e) =>
-                        toggle("activityIds", a.activity.id, e.target.checked)
+                        toggle("activityIds", a.id, e.target.checked)
                       }
                     />
-                    {a.content.title}
+                    {a.title}
                   </label>
                 ))}
               </div>
@@ -284,6 +283,7 @@ export function SetPassword() {
   const [confirmation, setConfirmation] = useState("");
   const [done, setDone] = useState(false);
   const op = useOperation();
+  const { expired } = useCms();
   return (
     <section className="admin-card admin-login">
       <h1>設定密碼</h1>
@@ -302,6 +302,7 @@ export function SetPassword() {
               if (password !== confirmation)
                 throw new Error("兩次密碼不一致。");
               await consumeToken(params.get("token") ?? "", password);
+              expired();
               setPassword("");
               setConfirmation("");
               navigate("/admin/set-password", { replace: true });
@@ -342,9 +343,13 @@ export function SetPassword() {
   );
 }
 export function Profile() {
-  const { user } = useCms();
+  const { user, expired } = useCms();
   const [params] = useSearchParams();
   const op = useOperation();
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmation, setConfirmation] = useState("");
+  const passwordOp = useOperation();
   return (
     <section>
       <h1>我的帳號</h1>
@@ -372,6 +377,28 @@ export function Profile() {
         </button>
         <p role="status">{op.message}</p>
       </div>
+      <form className="cms-panel" onSubmit={(event) => {
+        event.preventDefault();
+        void passwordOp.run(async () => {
+          if (password !== confirmation) throw new Error("兩次密碼不一致。");
+          await changePassword(currentPassword, password);
+          setCurrentPassword(""); setPassword(""); setConfirmation("");
+          expired();
+        });
+      }}>
+        <h2>變更密碼</h2>
+        <p>變更後會登出所有裝置，請使用新密碼重新登入。</p>
+        <fieldset disabled={passwordOp.pending}>
+          <Field label="目前密碼"><input type="password" autoComplete="current-password" required
+            maxLength={1024} value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} /></Field>
+          <Field label="新密碼（12–1024 字元）"><input type="password" autoComplete="new-password" required
+            minLength={12} maxLength={1024} value={password} onChange={(e) => setPassword(e.target.value)} /></Field>
+          <Field label="確認新密碼"><input type="password" autoComplete="new-password" required
+            minLength={12} maxLength={1024} value={confirmation} onChange={(e) => setConfirmation(e.target.value)} /></Field>
+          <ErrorNotice error={passwordOp.error} />
+          <button className="admin-button" disabled={passwordOp.pending}>變更密碼並重新登入</button>
+        </fieldset>
+      </form>
     </section>
   );
 }

@@ -262,6 +262,16 @@ async function dispatch(
     record("GOOGLE_LINK", "User", user().id);
     return { url: "/#/admin/profile?linked=1" };
   }
+  if (path === "auth/password/change" && method === "POST") {
+    const u = user();
+    if (!body.currentPassword || typeof body.password !== "string" || body.password.length < 12 || body.password.length > 1024)
+      fail(400, "請提供目前密碼及 12–1024 字元的新密碼。");
+    u.hasPassword = true;
+    u.version++;
+    record("PASSWORD_CHANGE", "User", u.id);
+    currentId = null;
+    return { ok: true };
+  }
   user();
   if (path === "admin/activities" && method === "GET")
     return { items: activities.filter(allowed).map(envelope) };
@@ -480,6 +490,14 @@ async function dispatch(
     grants[u.id] = { categoryIds: [], activityIds: [] };
     record("CREATE", "User", u.id);
     return { user: copy(u), activation: tokenLink(u, "ACTIVATE") };
+  }
+  if (path === "admin/users/grant-options" && method === "GET") {
+    admin();
+    return {
+      categories: categories.map(c => ({ id: c.id, label: c.label })),
+      activities: activities.map(a => ({ id: a.id, title: (a.revisions.find(r => r.id === a.workingRevisionId)
+        ?? a.revisions.find(r => r.id === a.publishedRevisionId) ?? a.revisions[0])?.content.title ?? a.id })),
+    };
   }
   if (path.startsWith("admin/users/")) {
     admin();

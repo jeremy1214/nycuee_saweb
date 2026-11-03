@@ -1,6 +1,6 @@
 # A：帳號、授權、媒體與紀錄契約
 
-> 2026/10/29：此文件、OpenAPI、共用 DTO 及 Prisma 模型為 A 的交付。帳號管理／Google／媒體服務尚未啟用，由 C、E、F 實作。G 僅啟用公開活動查詢；`EDITOR` 仍不能登入。介面完整定義見 [OpenAPI](activity-cms.openapi.json)，活動工作流程見[活動契約](activity-cms-contract.md)。
+> 2026/11/03：A 的模型／契約與 C 的帳號、Google、密碼、操作紀錄及範圍授權程式碼已加入；C 本次未執行驗證或 migration。D／E 的寫入／發布與媒體服務程式碼亦已加入，本次未驗證，機器契約見 OpenAPI。
 
 ## 資料模型與邊界
 
@@ -17,7 +17,7 @@
 
 這些新增結構不變更既有登入者的角色或啟用狀態。migration 保留帳號、Session、聯絡訊息及限速資料，不自動設定授權或綁定。現有 65 張公開圖片沿用靜態路徑，不建立虛假的媒體記錄；E 之後才處理上傳、磁碟持久化及舊媒體搬移。
 
-## 帳號與 Google 流程（待 C）
+## 帳號與 Google 流程（C 已加入程式碼，未驗證）
 
 - 不開放公開註冊。管理員透過 `POST /admin/users` 建立使用者名稱及角色，回傳帳號與一次顯示的啟用連結。未設定密碼時，既有帳密登入驗證使用 dummy hash，不能登入。
 - 啟用／重設 Token 使用 32 bytes 安全亂數，明文為 64 個十六進位字元；只保存 SHA-256 雜湊，預設 30 分鐘有效。發行新 Token 時作廢同帳號同用途的舊 Token。連結使用同來源 `/#/admin/set-password?token=...`，經既有聯絡方式交付。
@@ -25,11 +25,11 @@
 - `PATCH /admin/users/{userId}` 與 `PUT /admin/users/{userId}/grants` 必須攜帶目前帳號 `version`；成功遞增，過時為 409。管理員停用或降級最後一位啟用中的 ADMIN 回 409，透過 Serializable 交易防止兩位管理員同時繞過檢查。
 - `GET /auth/google/start` 發起 OIDC；callback 必須驗證一次性 state、nonce、issuer、audience、授權碼及 PKCE，暫存流程 10 分鐘到期並綁定發起 Session。登入只接受已對應的 `sub`，未知身分不自動建立帳號。
 - 綁定從已登入的 `POST /auth/google/link` 主動發起，攜帶 CSRF 後回 `200 { url }`，瀏覽器導向該網址；callback 綁到同一個內部 User；`sub` 已被其他帳號使用回 409。不能因 email 一樣自動合併。回跳網址使用設定的同來源，不接收任意外部 return URL。
-- 目前 `GET /auth/me` 及後台仍只支援 ADMIN；C 完成已登入／管理員／內容範圍 Guard 與測試後才開放 EDITOR，不能只移除現有的角色檢查。
+- `GET /auth/me` 及帳密登入已支援 ADMIN／EDITOR。SessionGuard、AdminGuard 與 ContentScopeGuard 已分離；活動列表、工作版本與歷史皆依最新範圍過濾。本次依使用者指示未執行測試。
 
 ## 授權矩陣與狀態檢查
 
-| 能力 | 訪客 | 範圍內 EDITOR（待 C） | ADMIN |
+| 能力 | 訪客 | 範圍內 EDITOR | ADMIN |
 |---|---|---|---|
 | 公開活動查詢 | 可 | 可 | 可 |
 | 建立活動 | 不可 | 需目標分類授權 | 可 |
@@ -42,7 +42,7 @@
 
 每次受保護請求重新讀取 User 與範圍授權，停用、改角色或撤銷範圍於下一次請求生效。列表、歷史、預覽與檔案串流也要檢查，不能只限制寫入。新建活動沒有指定活動授權，必須有分類授權。
 
-## 媒體與操作紀錄（待 E／D）
+## 媒體與操作紀錄（E／D 已加入程式碼，未驗證）
 
 - `POST /admin/media` 使用 multipart，`file` 與 `activityId`／`categoryId` 二擇一；伺服器檢查實際 JPEG、PNG、WebP 格式，原檔最多 10 MiB，拒絕超過 40MP 的解碼尺寸，重新編碼並將長邊縮到最多 4096px。儲存鍵由伺服器產生，不能使用訪客檔名作磁碟路徑。
 - 上傳先為 PRIVATE。私有列表需指定一個活動或分類範圍，讀取檔案走 `/admin/media/{mediaId}/file`；公開檔案走 `/public/media/{mediaId}`，私有或不存在回 404。檔案回應設定正確 MIME 與 `nosniff`；私有回應禁止快取。
@@ -57,3 +57,29 @@
 所有第一方寫入使用 Session 與 CSRF，包括匿名啟用／重設表單先取得匿名 CSRF；公開聯絡收件沿用既有限速流程。Token 設密碼另須有效 Token，Google callback 使用 OIDC state 保護。所有 JSON 管理回應禁止快取。
 
 A 驗收模型、migration、唯一性／引用約束與契約完整性；C 驗收 Token 競爭、Google 綁定及即時授權；D 驗收審核交易與紀錄；E 驗收實際影像解碼、檔案存取及引用清理。未完成服務不能僅因模型／契約存在就標為可用。
+
+
+## C 補充介面與設定（2026/11/03）
+
+- `GET /admin/users/grant-options` 僅限管理員，回傳 `{ categories: [{ id, label }], activities: [{ id, title }] }`，供帳號授權選單獨立載入。
+- `POST /auth/password/change` 使用登入 Session、CSRF、`currentPassword` 與 `password`，新密碼 12–1024 字元。成功回 `{ ok: true }`，撤銷所有裝置的 Session 及未使用密碼連結。此為可選操作，不強制首次改密碼。
+- `APP_ORIGIN` 為固定前端來源，正式環境須 HTTPS；不接受請求中的外部 return URL。Google callback 固定為 `${APP_ORIGIN}/api/v1/auth/google/callback`；只有同時設定 GOOGLE_CLIENT_ID 與 GOOGLE_CLIENT_SECRET 才啟用 Google 流程。
+- GoogleAuthFlow 保存 state 雜湊、nonce 雜湊、PKCE verifier、發起 Session、綁定目標及版本，10 分鐘到期、callback 一次性消耗。Session 刪除會連帶作廢所有流程。ID Token 交由 Google 官方 google-auth-library 驗證，另檢查 nonce。
+- 最後管理員保護同時要求替代管理員已具密碼或 Google 綁定，避免待啟用帳號造成鎖死。停用帳號同時撤銷 Session 及未使用的密碼連結，角色與範圍變更於下一次請求生效。
+- 後台活動與分類的 GET 已加入，歷史版本另檢查各版本分類；帳號授權選單不依賴這些內容 API。D／E 已於業務交易／檔案路由呼叫 ContentAccess，不能只依靠前置 Guard。
+
+本次未執行測試、建置或 migration，不能據此宣稱已完成驗收或上線。OIDC 實作參考 [Google 官方 OpenID Connect 文件](https://developers.google.com/identity/openid-connect/openid-connect)。
+
+
+## D／E 接入（2026/11/03，未驗證）
+
+ActivityWorkflow、CategoryService 與 MediaService 已接入真實活動及媒體路由；Multipart 檔案超過 10 MiB 可回 413。實際解碼格式白名單為 JPEG／PNG／WebP，額外拒絕動畫，統一輸出 WebP。磁碟儲存使用 MEDIA_ROOT，Docker 為 media_data volume；公開檔案與私有檔案均走 API。
+
+儲存及發布會在同一交易檢查媒體所屬活動／分類並更新引用；發布時把受管圖片改為公開 URL 並將媒體設為 PUBLIC。刪除只能在 PRIVATE 且無任何版本引用時進行，編輯者還需是上傳者。
+
+本輪未執行測試、建置、migration 或服務更新，不能將程式碼狀態當作正式部署及驗收通過。
+
+
+### 後續簡單驗證結果（2026/11/03）
+
+使用者後續同意簡單驗證。前後端編譯、隔離 PostgreSQL 全新 migration 與 47 項主要 HTTP 流程檢查通過；取代本次實作初期的未驗證狀態。未跑完整測試、瀏覽器及實際 Google OAuth，未變更目前網站資料庫或更新容器。細項見 admin-cms-plan.md 第 14 節。

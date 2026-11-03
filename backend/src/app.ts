@@ -5,26 +5,37 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import express from 'express';
-import { AuthController, AuthService, AdminGuard } from './auth';
+import { AuthController, AuthService, AdminGuard, SessionGuard } from './auth';
 import { Database } from './database';
 import { HealthController } from './health';
 import { AdminContactController, ContactService, PublicContactController } from './contact';
 import { PublicActivityController, PublicActivityService } from './public-activities';
+import { AccountController, AccountService, AuditController, PasswordController } from './accounts';
+import { GoogleAuthController, GoogleAuthService } from './google-auth';
+import { AdminCategoryReadController, AdminContentReadController, AdminContentReadService, ContentAccess, ContentScopeGuard } from './content-access';
+import { appOrigin } from './account-utils';
+import { MediaService, AdminMediaController, PublicMediaController } from './media';
+import { ActivityWorkflow, ActivityWriteController, CategoryService, CategoryWriteController } from './activity-workflow';
 
 @Module({
-  controllers: [HealthController, AuthController, PublicContactController, AdminContactController, PublicActivityController],
-  providers: [Database, AuthService, AdminGuard, ContactService, PublicActivityService],
+  controllers: [HealthController, AuthController, PublicContactController, AdminContactController, PublicActivityController,
+    AccountController, PasswordController, AuditController, GoogleAuthController, AdminContentReadController, AdminCategoryReadController,
+    AdminMediaController, PublicMediaController, ActivityWriteController, CategoryWriteController],
+  providers: [Database, AuthService, AdminGuard, SessionGuard, ContactService, PublicActivityService,
+    AccountService, GoogleAuthService, ContentAccess, ContentScopeGuard, AdminContentReadService,
+    MediaService, ActivityWorkflow, CategoryService],
 })
 class AppModule {}
 
 export async function createApp() {
+  appOrigin();
   if (process.env.NODE_ENV === 'production' && process.env.COOKIE_SECURE !== 'true') {
     throw new Error('Production requires COOKIE_SECURE=true and HTTPS.');
   }
   const app = await NestFactory.create<NestExpressApplication>(AppModule, { bodyParser: false });
   app.set('trust proxy', process.env.TRUST_PROXY === 'true' ? 1 : false);
   app.use(helmet());
-  app.use(express.json({ limit: '32kb' }));
+  app.use(express.json({ limit: '1mb' }));
   app.use(cookieParser());
   app.use('/api', (_req: express.Request, res: express.Response, next: express.NextFunction) => {
     res.setHeader('Cache-Control', 'no-store');

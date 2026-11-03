@@ -381,7 +381,7 @@ npm test -- --maxWorkers=1
 
 2026/11/03 加入程式，依指示尚未執行測試、建置驗證、Prisma generate、migration 或資料匯入。後台入口為 `/#/admin/eesa`、`/#/admin/teams`，總覽僅 ADMIN，編輯者依部門／系隊授權。詳見 [契約](docs/organization-cms-contract.md)、[API](docs/organization-cms.openapi.json)與[遠端切換／回復](docs/organization-cms-rollout.md)。
 
-新增的 migration 需隨更新後端套用；首次內容匯入獨立執行，不在服務啟動時自動匯入。在 backend 目錄可用 `npm run organization:import -- --inventory` 盤點、`--dry-run` 試跑、無參數匯入、`--compare` 核對資料庫、`--compare-public` 核對 APP_ORIGIN 的公開 API。相同內容重跑跳過，差異整批停止。
+新增的 migration 需隨更新後端套用。Docker 啟動時會在活動與系學會／系隊資料表皆為空的情況下，匯入內建內容一次；之後重啟會保留後台編輯。已有資料的環境可在 backend 目錄用 `npm run organization:import -- --inventory` 盤點、`--dry-run` 試跑、無參數匯入、`--compare` 核對資料庫、`--compare-public` 核對 APP_ORIGIN 的公開 API。相同內容重跑跳過，差異整批停止。
 
 `VITE_EESA_SOURCE=json`、`VITE_TEAM_SOURCE=json` 為導入預設。完成備份、匯入及資料核對後設為 api 並重建 web，系學會／系隊、首頁入口、輪播、導覽和搜尋即共用公開快照。新增部署腳本 `bash deploy/organization-cutover.sh switch /absolute/new-backup-directory`；正式站資訊尚未提供，目前未執行。
 

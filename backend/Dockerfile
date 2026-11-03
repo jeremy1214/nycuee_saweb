@@ -33,4 +33,4 @@ ENV MEDIA_ROOT=/var/lib/nycuee/media
 RUN mkdir -p /var/lib/nycuee/media && chown node:node /var/lib/nycuee/media
 USER node
 EXPOSE 3000
-CMD ["sh", "-c", "npm run db:migrate && npm run db:seed && npm start"]
+CMD ["sh", "-c", "npm run db:migrate && npm run db:seed && npm run content:bootstrap && npm start"]

@@ -13,10 +13,18 @@ fi
 compose_file=compose.yaml
 if [[ ! -f "$compose_file" ]]; then compose_file=docker-compose.yml; fi
 compose=(docker compose -f "$compose_file")
+# Preserve the production overlay across backup, switch and automatic rollback.
+existing_backend=$("${compose[@]}" ps -aq backend)
+if [[ -n "$existing_backend" ]]; then
+  config_files=$(docker inspect --format '{{ index .Config.Labels "com.docker.compose.project.config_files" }}' "$existing_backend")
+  if [[ "$config_files" == *compose.production.yaml* ]]; then
+    compose+=(-f compose.production.yaml)
+  fi
+fi
 rollback() {
   [[ -s "$snapshot/compose.rollback.yaml" && -s "$snapshot/environment" ]] || { echo 'Missing rollback metadata.' >&2; return 1; }
   cp "$snapshot/environment" .env
-  docker compose -f "$compose_file" -f "$snapshot/compose.rollback.yaml" up -d --no-build backend web
+  "${compose[@]}" -f "$snapshot/compose.rollback.yaml" up -d --no-build backend web
 }
 if [[ "$mode" == rollback ]]; then rollback; exit; fi
 [[ -f .env ]] || { echo 'Existing .env is required.' >&2; exit 1; }
@@ -60,7 +68,7 @@ stopped=true
 [[ -s "$snapshot/database.dump" && -s "$snapshot/media.tgz" ]] || { echo 'Backup files are empty.' >&2; exit 1; }
 sha256sum "$snapshot/database.dump" "$snapshot/media.tgz" > "$snapshot/SHA256SUMS"
 if [[ "$mode" == backup ]]; then
-  docker compose -f "$compose_file" -f "$snapshot/compose.rollback.yaml" up -d --no-build backend web
+  "${compose[@]}" -f "$snapshot/compose.rollback.yaml" up -d --no-build backend web
   finished=true
   echo "Backup saved: $snapshot"
   exit

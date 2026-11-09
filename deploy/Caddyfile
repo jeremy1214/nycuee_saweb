@@ -1,13 +1,34 @@
+(frontend_security) {
+  header {
+    X-Frame-Options "DENY"
+    X-Content-Type-Options "nosniff"
+    Referrer-Policy "strict-origin-when-cross-origin"
+    Content-Security-Policy "frame-ancestors 'none'"
+    Content-Security-Policy-Report-Only "default-src 'self'; script-src 'self'; connect-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+  }
+}
+
 {$SITE_ADDRESS:http://localhost} {
   encode zstd gzip
+  @https protocol https
+  header @https >Strict-Transport-Security "max-age=31536000"
   handle /api/* {
-    reverse_proxy backend:3000
+    reverse_proxy backend:3000 {
+      # This deployment has one edge proxy. Ignore client-supplied forwarding chains.
+      header_up X-Forwarded-For {remote_host}
+    }
   }
   handle {
     root * /srv
+    import frontend_security
     # Revalidate the entry document so it references the current hashed assets.
     @entry path / /index.html
     header @entry Cache-Control "no-cache"
     file_server
+  }
+  handle_errors {
+    header @https >Strict-Transport-Security "max-age=31536000"
+    import frontend_security
+    respond "{err.status_text}" {err.status_code}
   }
 }

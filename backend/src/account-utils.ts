@@ -34,11 +34,19 @@ export function roleOf(value: unknown): 'ADMIN' | 'EDITOR' {
 }
 
 export function appOrigin(): string {
-  const url = new URL(process.env.APP_ORIGIN || 'http://localhost:5173');
+  const configured = process.env.APP_ORIGIN;
+  const message = 'APP_ORIGIN must be an explicit frontend origin using HTTPS in production.';
+  if (process.env.NODE_ENV === 'production' && !configured) throw new Error(message);
+  let url: URL;
+  try {
+    url = new URL(configured || 'http://localhost:5173');
+  } catch {
+    throw new Error(message);
+  }
   if (url.username || url.password || url.pathname !== '/' || url.search || url.hash
     || !['http:', 'https:'].includes(url.protocol)
     || (process.env.NODE_ENV === 'production' && url.protocol !== 'https:')) {
-    throw new Error('APP_ORIGIN must be the frontend origin, using HTTPS in production.');
+    throw new Error(message);
   }
   return url.origin;
 }

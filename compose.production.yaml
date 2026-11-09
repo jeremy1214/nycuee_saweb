@@ -1,0 +1,10 @@
+# docker compose -f compose.yaml -f compose.production.yaml --env-file <production-env> up -d --build
+services:
+  backend:
+    environment:
+      NODE_ENV: production
+      COOKIE_SECURE: "true"
+      APP_ORIGIN: ${APP_ORIGIN:?Set an explicit HTTPS APP_ORIGIN for production}
+  web:
+    environment:
+      SITE_ADDRESS: ${APP_ORIGIN:?Set an explicit HTTPS APP_ORIGIN for production}

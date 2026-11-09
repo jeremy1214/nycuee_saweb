@@ -14,6 +14,7 @@ import { AccountController, AccountService, AuditController, PasswordController 
 import { GoogleAuthController, GoogleAuthService } from './google-auth';
 import { AdminCategoryReadController, AdminContentReadController, AdminContentReadService, ContentAccess, ContentScopeGuard } from './content-access';
 import { appOrigin } from './account-utils';
+import { anonymousSessionLimits } from './security-config';
 import { MediaService, AdminMediaController, PublicMediaController } from './media';
 import { OrganizationService, OverviewCmsController, DepartmentCmsController, TeamCmsController, PublicOrganizationController } from './organization';
 import { ActivityWorkflow, ActivityWriteController, CategoryService, CategoryWriteController } from './activity-workflow';
@@ -30,12 +31,13 @@ class AppModule {}
 
 export async function createApp() {
   appOrigin();
+  anonymousSessionLimits();
   if (process.env.NODE_ENV === 'production' && process.env.COOKIE_SECURE !== 'true') {
     throw new Error('Production requires COOKIE_SECURE=true and HTTPS.');
   }
   const app = await NestFactory.create<NestExpressApplication>(AppModule, { bodyParser: false });
   app.set('trust proxy', process.env.TRUST_PROXY === 'true' ? 1 : false);
-  app.use(helmet());
+  app.use(helmet({ strictTransportSecurity: false }));
   app.use(express.json({ limit: '1mb' }));
   app.use(cookieParser());
   app.use('/api', (_req: express.Request, res: express.Response, next: express.NextFunction) => {

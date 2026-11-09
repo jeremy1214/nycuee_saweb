@@ -8,6 +8,7 @@ import { hash, verify, argon2id } from 'argon2';
 import { Request, Response } from 'express';
 import { Database } from './database';
 import { digest, secret, serializable } from './account-utils';
+import { anonymousSessionLimits } from './security-config';
 
 const cookieName = 'nycuee_session';
 const sessionLifetime = 8 * 60 * 60 * 1000;
@@ -24,6 +25,7 @@ export type AuthRequest = Request & { authUser?: User };
 @Injectable()
 export class AuthService implements OnModuleInit {
   private dummyHash!: string;
+  private readonly anonymousLimits = anonymousSessionLimits();
   constructor(@Inject(Database) private readonly db: Database) {}
 
   async onModuleInit() {
@@ -44,6 +46,7 @@ export class AuthService implements OnModuleInit {
     if (current) {
       return { csrfToken: digest(`csrf:${req.cookies[cookieName]}`) };
     } else {
+      await this.limitAnonymousSession(req, res);
       const token = secret();
       const csrfToken = digest(`csrf:${token}`);
       // Anonymous sessions only support acquiring a token for the login form.
@@ -54,6 +57,28 @@ export class AuthService implements OnModuleInit {
       res.cookie(cookieName, token, { ...cookieOptions(), maxAge: lifetime });
       req.cookies = { ...req.cookies, [cookieName]: token };
       return { csrfToken };
+    }
+  }
+
+  private async limitAnonymousSession(req: Request, res: Response) {
+    const now = Date.now();
+    const minute = Math.floor(now / 60000);
+    const expiresAt = new Date((minute + 1) * 60000);
+    const ip = req.ip ?? req.socket.remoteAddress ?? 'unknown';
+    const budgets = [
+      { key: digest(`anonymous-session:ip:${ip}:${minute}`), limit: this.anonymousLimits.perIp },
+      { key: digest(`anonymous-session:global:${minute}`), limit: this.anonymousLimits.global },
+    ];
+    for (const budget of budgets) {
+      const attempt = await this.db.loginAttempt.upsert({
+        where: { key: budget.key },
+        create: { key: budget.key, expiresAt },
+        update: { count: { increment: 1 } },
+      });
+      if (attempt.count > budget.limit) {
+        res.setHeader('Retry-After', String(Math.max(1, Math.ceil((expiresAt.getTime() - Date.now()) / 1000))));
+        throw new HttpException('登入頁面請求過多，請稍後再試。', 429);
+      }
     }
   }
 
@@ -132,6 +157,7 @@ export class AuthService implements OnModuleInit {
   }
 
   async cleanup() {
+    await this.db.loginAttempt.deleteMany({ where: { expiresAt: { lte: new Date() } } });
     await this.db.session.deleteMany({ where: { expiresAt: { lte: new Date() } } });
     await this.db.googleAuthFlow.deleteMany({ where: { expiresAt: { lte: new Date() } } });
     await this.db.passwordToken.deleteMany({ where: { expiresAt: { lte: new Date() } } });

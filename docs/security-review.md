@@ -1,6 +1,6 @@
 # 網站與 CMS 資安檢視
 
-檢視日期為 2026/11/10（台灣時間），原始碼基準為 `a834118`。**僅靜態檢視，未執行動態安全驗證。** 本文件交付 [任務 J](admin-cms-plan.md#18-j資安與網站安全檢查任務規格僅撰寫-markdown) 的風險登錄及修補計畫。表列修補與驗證皆待辦。歷史測試與本機切換結果以[計畫第 14、16 節](admin-cms-plan.md)為準。
+初始檢視日期為 2026/11/10（台灣時間），原始碼基準為 `a834118`。初始 J 文件為靜態檢視。後續已完成第一批 SEC-001 至 SEC-003 程式修補與隔離驗收，結果及限制見本文件末節。 本文件交付 [任務 J](admin-cms-plan.md#18-j資安與網站安全檢查任務規格僅撰寫-markdown) 的風險登錄及修補計畫。下列風險表保留初始觀察，最新修補與驗證狀態以末節為準。歷史測試與本機切換結果以[計畫第 14、16 節](admin-cms-plan.md)為準。
 
 ## J-1　資料流與信任邊界
 
@@ -58,3 +58,51 @@
 | 4．維運與供應鏈 | SEC-006／007／008。影響快照、金鑰、日誌、告警及映像更新程序 | 異機加密及還原演練在正式遷移前完成，與 H-4／H-5 並行。由維運確認可接受 RPO／RTO、收件及紀錄期限，指定備份、告警、事件與依賴更新負責人 | 新備份無法還原或告警未送達時，保留上一套可還原備份及金鑰並停止正式資料切換。映像更新遇相容性回歸時，保留已驗收摘要並記錄待修風險 |
 
 上述測試先使用隔離環境、合成資料及獨立 Google 測試設定。正式主機、網域、代理拓撲、憑證設定、容量門檻、保存期限與負責人仍待 H／I 取得。未執行建置、依賴或映像掃描、HTTP／瀏覽器檢查、壓力測試、還原演練及部署。
+
+## 第一批修補與隔離驗收（2026/11/10）
+
+本節為 SEC-001 至 SEC-003 的後續實作紀錄，前述 J-1 至 J-7 保留初始靜態盤點。使用者已授權程式修補、建置與隔離動態驗證。
+
+| 項目 | 程式交付 | 本機隔離驗收 | 正式環境待辦 |
+|---|---|---|---|
+| SEC-001 | [正式 Compose](../compose.production.yaml) 固定 production 與 Secure Cookie，API／Caddy 共用必填 APP_ORIGIN。[origin 檢查](../backend/src/account-utils.ts) 回傳去敏感資訊錯誤。[seed](../backend/prisma/seed.ts) 檢查所有啟用 ADMIN 是否仍使用已知開發預設密碼 | 正式覆寫及缺少 origin 拒絕通過。以隔離 CA 驗證正式模式的 HTTPS 登入、登出、Session 撤銷及 Secure／HttpOnly／SameSite=Lax Cookie。新帳號初始化、重跑保留安全密碼、其他啟用管理員的預設密碼拒絕、停用／EDITOR 排除均通過 | 既有管理員實際輪替、正式 origin／憑證與 Google callback、遠端切換待 H-2／H-3 |
+| SEC-002 | [Caddyfile](../deploy/Caddyfile) 對前台及靜態錯誤回應設定 nosniff、防嵌框、Referrer-Policy、強制 frame-ancestors 與完整 Report-Only CSP。HTTPS 正常／錯誤回應設定一年 HSTS，後端停用重複 HSTS | HTTP／HTTPS 各五種路徑通過，涵蓋首頁、靜態 404、健康端點、401、API 404。HTTPS 憑證由隔離 Caddy CA 驗證，HSTS 單一且 HTTP 無 HSTS。瀏覽器確認登入、編輯、預覽、圖片載入、字型設定與嵌框拒絕 | 正式 TLS 及完整 Google OAuth 待驗證。完整 CSP 保留 Report-Only，待完整站點流程覆蓋再升級 |
+| SEC-003 | [匿名 Session 限額](../backend/src/auth.ts) 在新建前依序檢查 IP 與全站資料庫原子計數，429 帶 Retry-After。有效 Session 重用，Google start 共用限制，到期計數器納入清理 | 第 31／301 次拒絕、多 service instance 併發、API 重建保留額度、分鐘切換、無效／到期 Cookie、資料庫失敗拒絕、改密碼與登出通過。經 Caddy 使用不同偽造 X-Forwarded-For 仍於第 31 次被拒 | 校園 NAT 的真實流量門檻、正式代理鏈與流量監控待 H-3／H-5 |
+
+初始門檻由 `ANONYMOUS_SESSION_IP_LIMIT=30` 與 `ANONYMOUS_SESSION_GLOBAL_LIMIT=300` 控制，以固定一分鐘計數。兩者必須為正安全整數，且全站不得小於單 IP。有效 Session 取得 CSRF Token 不計入新建額度。限額限制新增 Session 數量，請求仍會抵達 API 並存取計數資料庫，外部大量流量保護仍屬維運容量工作。
+
+已知預設密碼檢查只辨識專案開發預設值。其他既有密碼的長度與強度無法從雜湊還原，仍須完成正式密碼輪替。任何啟用 ADMIN 命中檢查時，seed 以固定訊息拒絕啟動，既有資料保持可供受控管理流程處理。
+
+### 部署與回復操作
+
+1. 正式切換前，在既有受控環境透過「我的帳號」改密碼或管理員重設流程輪替既有管理員密碼。這兩條流程會撤銷舊 Session。已有安全帳號時，重跑 seed 保留其雜湊。
+2. 將正式值放入已被 Git 與 Docker build context 忽略的 `.env`，包含資料庫密碼、明確的 `APP_ORIGIN=https://正式網域` 與所需 Google 設定。首次建立 admin 才需要 `ADMIN_INITIAL_PASSWORD`，完成後移除並重建 backend 容器以移除其環境值。
+3. 由維運完成備份及 H-3 設定確認後，使用下列正式命令。先以 `config --quiet` 驗證組合設定，避免把含機密的展開設定輸出到紀錄。
+
+```sh
+docker compose --env-file .env -f compose.yaml -f compose.production.yaml config --quiet
+docker compose --env-file .env -f compose.yaml -f compose.production.yaml up -d --build --wait
+```
+
+4. 正式 Compose 固定安全模式，並用 APP_ORIGIN 作為 Caddy SITE_ADDRESS。API 維持無主機映射。此設定以 Caddy 直接接收訪客請求的一跳拓撲為基準，加入 CDN／上游代理時應重新設定及驗證來源識別。
+5. 正式維運及回復指令應保留兩個 Compose 檔案。既有 [organization-cutover.sh](../deploy/organization-cutover.sh) 已增加從現有 backend 的 Compose 標籤辨識正式覆寫，備份、切換及自動回復均沿用它。此變更已檢查 shell 語法，實際切換／回復演練仍列 H／I 待辦。
+6. 回復使用上一版已驗收的映像及 HTTPS 安全設定，保留已輪替的密碼。CSP 若有相容性問題，先調整 Report-Only 規則並重驗，正式切換遇安全驗收失敗即停止。
+
+### 測試紀錄與重跑入口
+
+- 兩端 TypeScript／Vite 建置通過。後端缺少的套件已依既有 lockfile 以 npm ci 補齊，Prisma Client 已依既有 schema 重新產生。
+- [security.test.ts](../backend/test/security.test.ts) 共 10 項通過，含 8 項 PostgreSQL 子案例、設定案例與整合父案例。測試使用獨立 `security_test`，會清理其中的合成使用者、票券、Session、流程及稽核資料。
+- 既有聯絡收件、活動模型及公開內容整合另用 `contact_test`、`cms_test`、`content_test`，共 17 項通過。測試資料庫位於專用容器，與既有站台資料庫分離。
+- 後端無資料庫環境的完整測試輪次為 8 通過、2 失敗、4 跳過。失敗分別是 activity-content 的舊欄位路徑 `activity.categoryId` 與實作 `content.categoryId` 不符，以及 activity-contract 仍預期帳號／媒體狀態為 planned。相關程式與契約在本批未修改，列 H-1 同步。
+- 前端完整回歸為 216 通過、8 失敗。相關後台三個測試檔以單 worker 重跑為 22 通過、1 失敗，仍為 AdminCms 新增活動案例在非同步畫面就緒前查詢欄位。首頁系隊選單等完整回歸失敗仍列 H-1，整套回歸保持未全數通過。
+- 瀏覽器使用合成帳號操作 HTTP 隔離站，確認登入、活動文字編輯與預覽、首頁圖片載入、Noto Sans TC 字型設定及 iframe 被拒絕。該操作範圍的控制台未觀察到 CSP 違規。HTTPS 回應另外以信任隔離 CA 的 HTTP client 驗證，正式瀏覽器 TLS 與完整 Google OAuth 待 H-2／H-3。
+- npm ci 的自動 audit 摘要回報 6 項 high 級依賴告警。本批依賴版本維持鎖檔內容，漏洞適用性與修補追蹤併入 SEC-008。
+- 暫存測試紀錄位於 Git 忽略的 `backend/node_modules/.tmp/security-batch`，其中包含合成資料設定及隔離驗證腳本。這些紀錄僅供本機追查。
+
+在獨立資料庫套用既有 migrations 後，從 backend 目錄設定 `SECURITY_TEST_DATABASE_URL` 指向資料庫名稱 `security_test` 並執行下列命令。測試會檢查名稱，正式資料庫不得使用此名稱或傳入此測試入口。
+
+```sh
+node --import tsx --test test/security.test.ts
+```
+
+本批驗收使用專用 `nycuee-security-batch` Compose project、暫存資料庫、HTTP／HTTPS 測試埠及合成帳號。驗收後已關閉隔離 API 並移除測試容器、網路及暫存資料庫。正式密碼輪替、遠端部署、全面 CSP、SEC-004 至 SEC-009 的後續修補與 H／I 完整驗收繼續列待辦。

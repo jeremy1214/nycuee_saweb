@@ -1,10 +1,22 @@
 import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
-import { hash, argon2id } from 'argon2';
+import { hash, verify, argon2id } from 'argon2';
 
 const prisma = new PrismaClient();
 
 async function main() {
+  if (process.env.NODE_ENV === 'production') {
+    const administrators = await prisma.user.findMany({
+      where: { enabled: true, role: 'ADMIN', passwordHash: { not: null } },
+      select: { passwordHash: true },
+    });
+    for (const administrator of administrators) {
+      if (await verify(administrator.passwordHash!, 'admin')) {
+        console.error('Rotate the development default password using the password change/reset flow before production startup.');
+        throw new Error('Unsafe bootstrap credentials.');
+      }
+    }
+  }
   if (await prisma.user.findUnique({ where: { username: 'admin' } })) {
     console.log('Existing admin account preserved.');
     return;

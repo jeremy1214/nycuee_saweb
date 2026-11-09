@@ -31,6 +31,8 @@ services:
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
       MEDIA_ROOT: /var/lib/nycuee/media
+      ANONYMOUS_SESSION_IP_LIMIT: ${ANONYMOUS_SESSION_IP_LIMIT-30}
+      ANONYMOUS_SESSION_GLOBAL_LIMIT: ${ANONYMOUS_SESSION_GLOBAL_LIMIT-300}
     volumes:
       - media_data:/var/lib/nycuee/media
     healthcheck:

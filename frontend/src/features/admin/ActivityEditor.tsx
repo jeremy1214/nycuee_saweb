@@ -33,8 +33,8 @@ import {
   Field,
   useCms,
   useOperation,
+  RevisionBadges,
 } from "./cmsUi";
-import { ActivityBadges } from "./ActivityManager";
 import {
   ImageField,
   ListEditor,
@@ -308,7 +308,7 @@ function ActivityForm({
             {record ? id : "先設定活動識別值與內容，儲存後建立草稿。"}
           </p>
         </div>
-        {record && <ActivityBadges activity={record.activity} />}
+        {record && <RevisionBadges resource={record.activity} />}
       </div>
       <div className="cms-editor-actions">
         <span role="status">

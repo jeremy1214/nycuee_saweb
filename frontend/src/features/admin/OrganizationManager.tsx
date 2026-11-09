@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { organizationFields, defaultField, parseOrganization, OrganizationValidationError, imageSrc, type ContentField, type ContentImage, type OrganizationContent, type OrganizationKind, type OrganizationRevision } from '../../../../shared/organization-content';
 import { AuthError } from './api';
-import { useCms, useResource, ResourceState, ErrorNotice, Field, useOperation } from './cmsUi';
+import { useCms, useResource, ResourceState, ErrorNotice, Field, useOperation, Empty, RevisionBadges } from './cmsUi';
 import { listOrganizations, loadOrganization, organizationAdminLink, organizationMediaScope, saveOrganization, organizationCommand } from './organizationApi';
 import { MediaBrowser } from './MediaManager';
 import { Modal } from '../../shared/components/ui/Modal';
@@ -11,11 +11,52 @@ import { OrganizationPreview } from './OrganizationPreview';
 const labels = { overview: '系學會總覽', department: '系學會部門', team: '系隊' };
 export function OrganizationManager({ kind }: { kind: 'department' | 'team' }) {
   const { user } = useCms();
-  const list = useResource(async () => Promise.all((await listOrganizations(kind)).items.map(item => loadOrganization(kind, item.id))), [kind]);
-  return <section><h1>{labels[kind]}管理</h1>{kind === 'department' && user.role === 'ADMIN' && <Link className="admin-button" to="/admin/eesa/overview">編輯系學會總覽</Link>}
-    <ResourceState {...list} retry={list.reload}>{!list.data?.length && <p>目前沒有可編輯的內容。請確認授權，或先執行內容匯入。</p>}
-      <div className="cms-table-wrap"><table className="cms-table"><thead><tr><th>內容</th><th>公開狀態</th><th>工作版本</th><th>操作</th></tr></thead><tbody>{list.data?.map(({ resource, content }) => <tr key={resource.id}><td>{'title' in content ? content.title : 'name' in content ? content.name : resource.id}</td><td>{resource.publishedRevisionId ? '已公開' : '未公開'}</td><td>{resource.workingRevision?.status ?? '沒有草稿'}{resource.workingRevision?.rejectionNote && <p>{resource.workingRevision.rejectionNote}</p>}</td><td><Link to={organizationAdminLink(kind, resource.id)}>編輯與審核</Link></td></tr>)}</tbody></table></div>
-    </ResourceState></section>;
+  const list = useResource(async () => {
+    const { items } = await listOrganizations(kind);
+    return Promise.all(items.map(({ id }) => loadOrganization(kind, id)));
+  }, [kind]);
+  const records = list.data ?? [];
+  const isDepartment = kind === 'department';
+
+  return (
+    <section>
+      <div className="cms-page-heading">
+        <div>
+          <span className="eyebrow">{isDepartment ? 'STUDENT ASSOCIATION' : 'SPORTS TEAMS'}</span>
+          <h1>{labels[kind]}管理</h1>
+        </div>
+        {isDepartment && user.role === 'ADMIN' && (
+          <Link className="admin-button" to="/admin/eesa/overview">編輯系學會總覽</Link>
+        )}
+      </div>
+      <ResourceState {...list} retry={list.reload}>
+        <p className="cms-muted">共 {records.length} 筆{labels[kind]}</p>
+        {records.length ? (
+          <div className="cms-records">
+            {records.map(({ resource, content }) => {
+              const to = organizationAdminLink(kind, resource.id);
+              const title = 'title' in content ? content.title : 'name' in content ? content.name : resource.id;
+              const working = resource.workingRevision;
+
+              return (
+                <article className="cms-record" key={resource.id}>
+                  <div>
+                    <Link className="cms-record-title" to={to}>{title}</Link>
+                    <p className="cms-muted">{resource.id}</p>
+                    {working?.rejectionNote && <p className="cms-muted">退回原因：{working.rejectionNote}</p>}
+                  </div>
+                  <RevisionBadges resource={resource} />
+                  <Link to={to}>{working?.status === 'SUBMITTED' ? '檢視送審版本' : '開啟編輯'} →</Link>
+                </article>
+              );
+            })}
+          </div>
+        ) : (
+          <Empty>目前沒有可編輯的內容。請確認授權，或先執行內容匯入。</Empty>
+        )}
+      </ResourceState>
+    </section>
+  );
 }
 export function OrganizationWorkSummary() {
   const { user } = useCms();

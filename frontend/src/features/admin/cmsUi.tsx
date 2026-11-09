@@ -123,6 +123,33 @@ export function Field({
 export function Empty({ children }: { children: ReactNode }) {
   return <p className="admin-empty">{children}</p>;
 }
+export function RevisionBadges({
+  resource: { publishedRevisionId, workingRevision },
+}: {
+  resource: {
+    publishedRevisionId: string | null;
+    workingRevision: { status: string; rejectionNote?: string | null } | null;
+  };
+}) {
+  return (
+    <span className="cms-badges">
+      <span className={`cms-badge ${publishedRevisionId ? "cms-published" : ""}`}>
+        {publishedRevisionId ? "已公開" : "未公開"}
+      </span>
+      {workingRevision && (
+        <span
+          className={`cms-badge ${workingRevision.status === "SUBMITTED" ? "cms-review" : ""}`}
+        >
+          {workingRevision.status === "SUBMITTED"
+            ? "待審核"
+            : workingRevision.rejectionNote
+              ? "已退回"
+              : "草稿"}
+        </span>
+      )}
+    </span>
+  );
+}
 function NavigationBlocker({ dirty }: { dirty: boolean }) {
   const blocker = useBlocker(dirty);
   useEffect(() => {

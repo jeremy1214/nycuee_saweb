@@ -1,30 +1,14 @@
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { loadActivities, listCategories } from "./cmsApi";
-import type { AdminActivity } from "./cmsApi";
-import { useResource, ResourceState, Field, Empty, useCms } from "./cmsUi";
-export function ActivityBadges({ activity: a }: { activity: AdminActivity }) {
-  return (
-    <span className="cms-badges">
-      <span
-        className={`cms-badge ${a.publishedRevisionId ? "cms-published" : ""}`}
-      >
-        {a.publishedRevisionId ? "已公開" : "未公開"}
-      </span>
-      {a.workingRevision && (
-        <span
-          className={`cms-badge ${a.workingRevision.status === "SUBMITTED" ? "cms-review" : ""}`}
-        >
-          {a.workingRevision.status === "SUBMITTED"
-            ? "待審核"
-            : a.workingRevision.rejectionNote
-              ? "已退回"
-              : "草稿"}
-        </span>
-      )}
-    </span>
-  );
-}
+import {
+  useResource,
+  ResourceState,
+  Field,
+  Empty,
+  useCms,
+  RevisionBadges,
+} from "./cmsUi";
 export function WorkOverview() {
   const { user } = useCms();
   const resource = useResource(loadActivities);
@@ -198,7 +182,7 @@ export default function ActivityManager({
                     : "無日期介紹"}
                 </p>
               </div>
-              <ActivityBadges activity={a.activity} />
+              <RevisionBadges resource={a.activity} />
               <Link to={`/admin/activities/${a.activity.id}`}>
                 {a.activity.workingRevision?.status === "SUBMITTED"
                   ? "檢視送審版本"

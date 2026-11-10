@@ -42,6 +42,6 @@ test('OpenAPI references resolve, implementation status is explicit and writes r
   assert.ok(!('status' in contract.components.schemas.ActivityContent.properties));
   assert.ok(!('id' in contract.components.schemas.ActivityContent.properties));
   assert.equal(contract.paths['/api/v1/public/activity-content'].get['x-implementation-status'], 'implemented');
-  assert.equal(contract.paths['/api/v1/admin/users'].post['x-implementation-status'], 'planned');
-  assert.equal(contract.paths['/api/v1/admin/media'].post['x-implementation-status'], 'planned');
+  assert.equal(contract.paths['/api/v1/admin/users'].post['x-implementation-status'], 'implemented');
+  assert.equal(contract.paths['/api/v1/admin/media'].post['x-implementation-status'], 'implemented');
 });

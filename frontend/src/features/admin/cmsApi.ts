@@ -165,6 +165,6 @@ export const listAudit = (page: number, entityType: string, entityId: string) =>
     `admin/audit-entries?${new URLSearchParams({ page: String(page), entityType, entityId })}`,
   );
 export const mediaPath = (m: MediaDto) =>
-  m.visibility === "PUBLIC"
+  m.visibility === "PUBLIC" && !m.revokedAt
     ? `/api/v1/public/media/${key(m.id)}`
     : `/api/v1/admin/media/${key(m.id)}/file`;

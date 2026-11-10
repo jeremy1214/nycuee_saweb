@@ -1,0 +1,12 @@
+[Unit]
+Description=NYCU EE CMS service, backup and disk alerts
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/srv/nycuee
+EnvironmentFile=/etc/nycuee/operations.env
+ExecStart=/usr/bin/python3 /srv/nycuee/deploy/monitor.py
+UMask=0077
+TimeoutStartSec=60

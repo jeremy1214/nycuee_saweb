@@ -2,7 +2,7 @@
 
 使用 Vite、React 19、TypeScript 及 Hash Router 的前端網站，包含首頁、系學會、系上活動、系隊、學習資料與聯絡頁。
 
-另提供 NestJS、PostgreSQL 與 Prisma 的管理員帳密登入系統及聯絡表單收件匣。後台入口為 `/#/admin`，登入頁為 `/#/admin/login`；網站頁首的 Sign in 可開啟登入頁。
+另提供 NestJS、PostgreSQL 與 Prisma 的帳密／Google 雙登入、帳號授權、活動與系學會／系隊內容後台、媒體庫及聯絡表單收件匣。後台入口為 `/#/admin`，登入頁為 `/#/admin/login`；網站頁首的 Sign in 可開啟登入頁。
 
 ## 啟動登入系統（Docker）
 
@@ -13,15 +13,17 @@ cp .env.example .env
 docker compose up --build -d
 ```
 
-開啟 `http://localhost/#/admin/login`，初始帳號為 **admin**，密碼為 **admin**。後端啟動時會執行 migration，並僅在帳號不存在時建立初始管理員；重啟不會覆寫密碼、角色或啟用狀態。
+開啟 `http://localhost/#/admin/login`。開發環境未設定 `ADMIN_INITIAL_PASSWORD` 時，初始帳號與密碼為 **admin/admin**。後端依序執行 migration、管理員 seed、`content:bootstrap` 與 API 啟動；seed 僅在帳號不存在時建立初始管理員，重啟不會覆寫密碼、角色或啟用狀態。
 
-PostgreSQL 資料保存在 `postgres_data` volume，Caddy 憑證保存在 `caddy_data`。一般 `docker compose down` 會保留資料；加上 `-v` 會移除 volumes 與資料。
+`content:bootstrap` 分別判斷兩組資料：活動與分類兩表皆空時匯入 11 筆活動／5 分類；總覽、部門與系隊三表皆空時匯入 1 份總覽／4 部門／9 系隊。任一組已有部分資料就略過該組，請改依下方手動匯入及切換手冊處理。初始化失敗會阻止 API 啟動，不會以空資料繼續提供服務。
+
+PostgreSQL 資料保存在 `postgres_data` volume，上傳圖片保存在 `media_data`，Caddy 憑證保存在 `caddy_data`。一般 `docker compose down` 會保留資料；加上 `-v` 會移除 volumes 與資料。
 
 ## API 健康與部署就緒檢查
 
 匿名 `GET /api/v1/health` 使用既有 Prisma 連線執行唯讀 `SELECT 1`，成功回傳 HTTP `200` 與 `{"status":"ok"}`。資料庫查詢失敗或超過 3 秒回傳 HTTP `503` 與 `{"status":"unavailable"}`，回應皆含 `Cache-Control: no-store`。空活動資料庫也能通過檢查。
 
-Compose 每 5 秒從後端容器內探測此端點，單次探測上限 5 秒，啟動寬限期 30 秒，連續失敗 10 次會標為 `unhealthy`。冷啟動依序等待資料庫健康、migration 與 seed 完成、API 健康，再啟動 Caddy。
+Compose 每 5 秒從後端容器內探測此端點，單次探測上限 5 秒，啟動寬限期 30 秒，連續失敗 10 次會標為 `unhealthy`。冷啟動依序等待資料庫健康、migration、seed 與空庫內容初始化完成、API 健康，再啟動 Caddy。
 
 ```bash
 docker compose ps
@@ -73,7 +75,7 @@ npm run dev
 
 兩個 POST 都必須攜帶 `X-CSRF-Token`，值取自同一 Cookie Session 的 `csrf` 回應，並使用 JSON 請求。登入成功後請重新取得 Token。驗證回應禁止快取，密碼雜湊不會回傳至前端。
 
-後台提供登入、登出、聯絡收件匣、真實帳號授權與紀錄管理。C／D／E 的真實 API 已加入，F 的既有介面可呼叫活動編輯、預覽、審核、媒體與分類服務；本次已通過編譯與隔離環境主要流程檢查，尚未部署至目前運行中的服務。
+後台提供登入、登出、聯絡收件匣、帳號授權、紀錄、活動及系學會／系隊內容管理。C／D／E／I 的真實 API 與介面已接入，本機 Docker 更新及資料切換見 [CMS 計畫第 16 節](docs/admin-cms-plan.md#16-20261103-使用者要求直接在本機容器執行)。完整回歸、真實瀏覽器流程、Google OAuth 與正式部署仍待完成。
 
 ## C：帳號、授權與密碼管理
 
@@ -81,7 +83,7 @@ npm run dev
 
 新增帳號不開放自行註冊。管理員可變更角色、停用帳號、替換分類／指定活動授權、產生重設連結。帳號與授權更新帶入目前 `version`，遇到其他人先更新則回 409。停用或降級時會以 Serializable 交易保護最後一位可登入的管理員，未設定密碼也未綁定 Google 的待啟用帳號不作為替代管理員。停用會撤銷現有 Session 與未使用的密碼連結；撤銷範圍或改角色則在下一次 API 請求生效。
 
-「我的帳號」提供自行變更密碼，需輸入目前密碼，新密碼為 12–1024 字元。透過啟用／重設或自行變更密碼，都會作廢未使用的密碼連結並撤銷該帳號所有裝置的 Session，完成後重新登入。不強制首次改密碼；本機預設 `admin/admin` 維持原設定。
+「我的帳號」提供自行變更密碼，需輸入目前密碼，新密碼為 12–1024 字元。透過啟用／重設或自行變更密碼，都會作廢未使用的密碼連結並撤銷該帳號所有裝置的 Session，完成後重新登入。不強制首次改密碼；開發環境可使用預設 `admin/admin`。正式啟動前須透過改密碼／重設流程輪替既有預設密碼；production seed 會拒絕仍使用 `admin` 密碼且啟用中的管理員，不會自動改寫既有帳號。
 
 | API | 用途 |
 | --- | --- |
@@ -112,7 +114,7 @@ GOOGLE_CLIENT_SECRET=your-client-secret
 
 流程使用授權碼、PKCE、綁定發起 Session 的一次性 state，以及 nonce；暫存 10 分鐘到期。ID Token 的簽章、issuer、audience 與有效期限交由 Google 官方 `google-auth-library` 驗證，回跳網址固定為 `APP_ORIGIN`。
 
-本次 C／D／E 程式碼已加入，**前後端編譯及隔離資料庫 47 項主要流程檢查通過；未跑完整測試、瀏覽器或實際 Google OAuth，也未更新執行中的 Docker 服務**。套用時需安裝新依賴、重新產生 Prisma Client 並套用新增 migration；Docker 重新建置及啟動會執行這些步驟。正式環境首次建立管理員需設定 `ADMIN_INITIAL_PASSWORD`（12–1024 字元）；已存在的 admin 不會被覆寫。
+C／D／E 已接入本機服務。2026/11/03 的隔離資料庫 47 項主要流程檢查僅涵蓋當時版本，**完整回歸、真實瀏覽器及實際 Google OAuth 仍未驗收**。套用時需安裝新依賴、重新產生 Prisma Client 並套用新增 migration；Docker 重新建置及啟動會執行這些步驟。正式環境首次建立管理員需設定 `ADMIN_INITIAL_PASSWORD`（12–1024 字元）；已存在的 admin 不會被覆寫。
 
 ## D／E：活動審核與媒體服務
 
@@ -126,11 +128,11 @@ GOOGLE_CLIENT_SECRET=your-client-secret
 
 上傳失敗會清除尚未登錄的檔案。媒體目錄不直接交給 Caddy，檔案由 API 按權限提供；正式備份必須同時保存 PostgreSQL 與媒體 volume。異機備份、還原演練及告警仍屬 H 的待辦。
 
-本次已通過前後端編譯、隔離資料庫 migration 及 47 項主要 HTTP 流程檢查；未更新目前容器與資料庫。Google 實際授權需設定 OAuth 憑證，完整回歸、瀏覽器與正式部署驗收仍待完成。
+2026/11/03 有前後端編譯、隔離資料庫 migration 及 47 項主要 HTTP 流程檢查紀錄，後續本機容器已更新。這些紀錄不代表目前版本完整回歸通過；Google 實際授權、瀏覽器與正式部署驗收仍待完成。
 
 ## 活動 CMS：A／B／G 基礎與 F 介面
 
-前台活動預設使用資料庫公開 API。A／B／G 基礎及 F 的介面與 mock 已交付；C／D／E 已新增帳號、Google、授權、審核發布與媒體服務程式碼，本次編譯與隔離主要流程檢查通過，尚未部署至目前服務。
+前台活動預設使用資料庫公開 API。A／B／G 基礎及 F 的介面與 mock 已交付；C／D／E 的帳號、Google、授權、審核發布與媒體服務已接入本機，正式環境配置及完整驗收列入 H。
 
 進度及下一任務見 [CMS 規劃](docs/admin-cms-plan.md)；活動流程見 [活動契約](docs/activity-cms-contract.md)，帳號與媒體見 [平台契約](docs/cms-platform-contract.md)，機器介面見 [OpenAPI](docs/activity-cms.openapi.json)。其中 `implemented` 與 `planned` 明確區分可呼叫及待實作的端點。
 
@@ -154,7 +156,7 @@ Google 主動綁定使用 `POST /api/v1/auth/google/link` 攜帶 CSRF，成功�
 
 ### 首次匯入舊活動
 
-**首次啟動的空資料庫不會自動匯入活動。** 若更新後活動與分類同時空白，而 API 回傳兩個空陣列，請先試跑確認當前資料庫是否尚未初始化；舊 JSON 與圖片仍保留為匯入基準。 啟動 Docker 後，在專案根目錄依序執行：
+**Docker 啟動會在活動與分類兩表皆空時自動匯入活動。** 本機直接啟動後端不會自動匯入；已有部分資料或需要人工處理的環境，先備份，再於專案根目錄試跑及匯入：
 
 ```powershell
 docker compose exec backend npm run content:import -- --dry-run
@@ -219,6 +221,19 @@ docker stop nycuee-cms-tests
 
 `contact_test` 會清空收件測試資料；`content_test` 會清空活動、分類、媒體與紀錄測試資料；**`cms_test` 會重設整個 public schema**。僅能使用這些專用測試庫名稱。升級測試先建舊表與既有資料，再套用所有 migrations，驗證登入／收件保留及新模型約束；公開內容測試涵蓋匯入、重跑、衝突、缺圖、私有版本隔離與一致快照。
 
+H-1b 新增的 `backend/test/accounts.test.ts` 使用另一個隔離資料庫 `account_test`，由 `ACCOUNT_TEST_DATABASE_URL` 指定；未設定時明確跳過。取得驗證許可後，可在上述暫時 PostgreSQL 容器仍執行時，從 backend 目錄準備並單獨執行：
+
+```powershell
+docker exec nycuee-cms-tests createdb -U postgres account_test
+$env:DATABASE_URL='postgresql://postgres:cms-test-only@127.0.0.1:55434/account_test'
+npm run db:generate
+npm run db:migrate
+$env:ACCOUNT_TEST_DATABASE_URL=$env:DATABASE_URL
+node --import tsx --test test/accounts.test.ts
+```
+
+此測試會清空 `account_test` 的帳號、Session、Google 流程、密碼 Token、登入限速及操作紀錄，僅可指向專用測試庫。涵蓋真實帳號 HTTP、啟用／重設、Token 重放／過期、CSRF／角色限制、版本衝突、最後管理員、停用與跨裝置撤銷、紀錄去敏感資訊；Google 僅測試在外部交換前拒絕錯誤流程，不執行實際 Google 授權。**本輪僅撰寫測試，尚未執行。** 原有安全專項另由 `SECURITY_TEST_DATABASE_URL` 指向已套用 migration 的 `security_test`，未設定亦跳過；上述三個測試庫的指令不包含此安全專項與新增帳號測試。
+
 ## 正式 HTTPS 部署
 
 將網域指向 Linux 主機，開放 80、443 TCP 與 443 UDP，修改根目錄 `.env`：
@@ -232,7 +247,13 @@ COOKIE_SECURE=true
 ADMIN_INITIAL_PASSWORD=replace-with-a-long-initial-password
 ```
 
-執行 `docker compose up --build -d`，Caddy 會申請 HTTPS 憑證，同網域提供前台及 `/api`。後端在 production 模式要求 Secure Cookie。後端連接埠不對外發布，僅信任緊鄰的 Caddy 一層代理；本機直接啟動後端使用 `TRUST_PROXY=false`。資料庫連接埠僅綁定主機回環位址。
+正式部署使用覆寫檔：
+
+```bash
+docker compose -f compose.yaml -f compose.production.yaml --env-file .env up --build -d
+```
+
+覆寫檔固定 production、Secure Cookie 與明確的 `APP_ORIGIN`；Caddy 使用此 origin 申請 HTTPS 憑證，同網域提供前台及 `/api`。正式啟動前先輪替既有開發預設管理員密碼；`ADMIN_INITIAL_PASSWORD` 只用於首次建立，不會更新已存在的帳號。活動預設 api；系學會／系隊必須完成匯入及核對後，明確設定 `VITE_EESA_SOURCE=api`、`VITE_TEAM_SOURCE=api`。後端在 production 模式要求 Secure Cookie。後端連接埠不對外發布，僅信任緊鄰的 Caddy 一層代理；本機直接啟動後端使用 `TRUST_PROXY=false`。資料庫連接埠僅綁定主機回環位址。
 
 Dockerfile 內含部署所需的編譯步驟，後端啟動時自動套用已提交的 migrations。
 
@@ -379,11 +400,30 @@ npm test -- --maxWorkers=1
 
 ## 系學會與系隊 CMS
 
-2026/11/03 加入程式，依指示尚未執行測試、建置驗證、Prisma generate、migration 或資料匯入。後台入口為 `/#/admin/eesa`、`/#/admin/teams`，總覽僅 ADMIN，編輯者依部門／系隊授權。詳見 [契約](docs/organization-cms-contract.md)、[API](docs/organization-cms.openapi.json)與[遠端切換／回復](docs/organization-cms-rollout.md)。
+I-1 至 I-6 的模型、授權、版本、媒體、後台與公開 Provider 已接入。後台入口為 `/#/admin/eesa`、`/#/admin/teams`，總覽僅 ADMIN，編輯者依部門／系隊授權。詳見 [契約](docs/organization-cms-contract.md)、[API](docs/organization-cms.openapi.json)與[遠端切換／回復](docs/organization-cms-rollout.md)。
 
-新增的 migration 需隨更新後端套用。Docker 啟動時會在活動與系學會／系隊資料表皆為空的情況下，匯入內建內容一次；之後重啟會保留後台編輯。已有資料的環境可在 backend 目錄用 `npm run organization:import -- --inventory` 盤點、`--dry-run` 試跑、無參數匯入、`--compare` 核對資料庫、`--compare-public` 核對 APP_ORIGIN 的公開 API。相同內容重跑跳過，差異整批停止。
+2026/11/03 已依使用者要求更新本機 Docker，套用 organization migration、匯入 14 份內容並將本機兩個來源切為 api；當時資料庫與公開 API 比對一致。可開啟 `http://localhost/#/admin/eesa` 或 `http://localhost/#/admin/teams` 使用真實後台。既有缺圖、空合照及待填資料保留預留表示。未完成測試套件或真實瀏覽器驗收；遠端尚未部署，不視為 I-7 完成。詳見 [計畫第 16、17 節](docs/admin-cms-plan.md)。
 
-`VITE_EESA_SOURCE=json`、`VITE_TEAM_SOURCE=json` 為導入預設。完成備份、匯入及資料核對後設為 api 並重建 web，系學會／系隊、首頁入口、輪播、導覽和搜尋即共用公開快照。新增部署腳本 `bash deploy/organization-cutover.sh switch /absolute/new-backup-directory`；正式站資訊尚未提供，目前未執行。
+Docker 依上方空庫條件初始化；已有資料的環境可在 backend 目錄用 `npm run organization:import -- --inventory` 盤點、`--dry-run` 試跑、無參數匯入、`--compare` 核對資料庫、`--compare-public` 核對 APP_ORIGIN 的公開 API。相同內容重跑跳過，差異整批停止。
 
+`VITE_EESA_SOURCE=json`、`VITE_TEAM_SOURCE=json` 仍為程式／Compose 導入預設，本機 `.env` 的 api 設定不代表遠端已切換。完成備份、匯入及資料核對後設為 api 並重建 web，系學會／系隊、首頁入口、輪播、導覽和搜尋即共用公開快照。遠端切換使用 `bash deploy/organization-cutover.sh switch /absolute/new-backup-directory`；正式網址、主機與部署目錄尚未提供。
 
-2026/11/03 後續狀態：已依使用者要求更新本機 Docker 容器，套用 organization migration、匯入 14 份內容並將兩個來源切為 api。可開啟 `http://localhost/#/admin/eesa` 或 `http://localhost/#/admin/teams` 使用真實後台。未跑測試套件或瀏覽器驗收；遠端尚未部署。詳見計畫文件第 16 節。
+## 目前驗收與待辦狀態（2026/11/10）
+
+歷次有限檢查只代表當時版本與指定範圍。11/10 安全專項與隔離整合有通過紀錄，完整前後端回歸仍有失敗；詳見 [資安檢視](docs/security-review.md)及 [CMS 待辦](docs/admin-cms-plan.md#17-未完成任務盤點與後續交辦20261110)。H-1 優先同步舊測試及補齊真實服務覆蓋，再於允許驗證後執行；本輪依「不要驗證」指示，未執行測試、建置或服務探測。
+
+正式帳號／Google OAuth、Linux／HTTPS 部署、每日資料庫與媒體異機備份（保留 30 天）、整庫與媒體還原、服務／備份失敗／磁碟告警、正式活動與組織切換及站務交接仍未完成。首頁輪播／探索、學習資源及全站聯絡設定的 CMS 接入另列 K。
+
+## H 到 K 後續交付（2026/11/10，未驗證）
+
+- K 的首頁／資源／全站設定已有共用驗證、migration、版本工作流、ADMIN 表單、預覽、媒體引用及公開快照。入口為 `/#/admin/site-content/home`、`resources`、`settings`。公開導入預設為 `VITE_SITE_CONTENT_SOURCE=json`；完成匯入及驗收後才改為 api 重建 web，失敗不自動回退舊 JSON。詳見 [K 契約與切換](docs/site-content-cms-contract.md)。
+- backend 新增 `npm run site:import -- --inventory`／`--dry-run`／無參數匯入。Docker 啟動先套用 migration，再由 bootstrap 建立缺少的 K 資源；已存在的資源保留編輯。首次首頁 6 張圖片、4 個資源頁與共用聯絡設定來自既有內容。新增 migration 尚未套用，現有容器不會自動取得本輪程式。
+- 新增 `WORKFLOW_TEST_DATABASE_URL`，只接受已套用 migration 的 `workflow_test`；`node --import tsx --test test/workflows.test.ts` 涵蓋活動、14 份組織與 K 真實 HTTP。新增 `site-content.test.ts`、前台 Provider 測試及既有 AdminCms 非同步欄位等待修正，均未執行。其餘瀏覽器／OAuth／並行與正式環境驗收仍列 [驗收清單](docs/cms-acceptance.md)。
+- H 的 `deploy/backup.sh`、`restore.sh`、`monitor.py` 與 `deploy/systemd/` 為未啟用的操作工具；每日加密異機備份／30 天保留、成對還原、服務／備份／磁碟告警及全站內容切換的配置見 [維運與交接](docs/cms-operations.md)。未設定遠端 repository、金鑰、webhook 或負責人，不代表已有異機備份或告警。`content-cutover.sh` 僅供首次全站遷移，由操作者明確執行。
+- J 新增上傳頻率／process 併發／保留磁碟空間限制、媒體緊急撤回及較短公開快取。媒體庫管理員填原因後可撤回圖片，已下載或長期快取的副本仍可能存在。收件／稽核清理工具預設只列數量，須由負責人設定期限且明確 `--apply` 才刪除。
+
+本輪未執行套件安裝、測試、建置、Prisma generate、migration、匯入、HTTP／瀏覽器、備份、還原、排程、告警或部署，所有新增行為均待驗收。正式網域／主機／目錄、Google 憑證、異機備份及告警接收者仍待交接。
+
+後續使用者允許簡單驗證：兩端建置、Prisma Client 產生、後端選定三個測試檔、前端選定 43 項測試及腳本語法檢查已有通過紀錄；修正一處後端型別錯誤與後台測試的路由等待。未操作既有資料庫、套用 migration 或部署，詳細範圍見 [計畫第 21 節](docs/admin-cms-plan.md#21-20261110-使用者允許後的簡單驗證)。
+
+再依使用者重新啟動要求，本機 backend／web 已完成新版 Docker 建置、migration 與 K 三組內容初始化，本機 `VITE_SITE_CONTENT_SOURCE` 已切 api，Compose 服務就緒。可開啟 `http://localhost/#/admin/site-content/home` 使用真實後台。更新前已有本機資料庫／媒體／設定備份，完整流程與遠端正式驗收仍未完成；見 [計畫第 22 節](docs/admin-cms-plan.md#22-20261110-本機容器重新建置與啟動)。

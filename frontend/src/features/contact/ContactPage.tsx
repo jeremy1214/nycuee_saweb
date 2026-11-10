@@ -1,13 +1,14 @@
 import { useRef, useState, type FormEvent } from "react";
 import { Breadcrumb, PageContainer } from "../../shared/components/index";
-import { siteContact } from "../../shared/data/site";
+import { useSiteSettings } from "../../shared/data/SiteContentProvider";
 import "./contact.css";
 
-const contactEmail = siteContact.email;
+
 
 type SubmissionStatus = "idle" | "submitting" | "success" | "error" | "limited";
 
 export default function ContactPage() {
+  const contactEmail = useSiteSettings().siteContact.email;
   const [status, setStatus] = useState<SubmissionStatus>("idle");
   const submitting = useRef(false);
   const endpoint = import.meta.env.VITE_CONTACT_FORM_ENDPOINT?.trim() || "/api/v1/public/contact-messages";

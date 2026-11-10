@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Link } from "react-router-dom";
 import { useCarousel } from "../../../shared/hooks/useCarousel";
-import { slides } from "../data/home";
+import { useHomeContent } from "../../../shared/data/SiteContentProvider";
 
 export function HomeHero() {
+  const exploreContent = useHomeContent();
+  const slides = exploreContent?.slides ?? [];
   const heroRef = useRef<HTMLElement>(null);
   const [autoplayEnabled, setAutoplayEnabled] = useState(false);
   const { current, isPaused, handlers } = useCarousel(slides.length, 4800, { pauseOnHover: false, autoplayEnabled });
-  const title = slides[current].title;
+  const title = (slides[current % slides.length]?.title ?? "");
   const characters = Array.from(title);
 
   useEffect(() => {
@@ -26,6 +28,7 @@ export function HomeHero() {
     };
   }, []);
 
+  if (!slides.length) return <p className="page-container">首頁內容準備中。</p>;
   return (
     <section ref={heroRef} className="home-hero" data-motion-paused={!autoplayEnabled} aria-label="交大電機首頁主視覺" {...handlers}>
       <div className="page-container home-hero-inner">

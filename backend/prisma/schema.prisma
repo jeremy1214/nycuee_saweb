@@ -239,6 +239,10 @@ model Media {
   overviewId   String?
   departmentId String?
   teamId       String?
+  siteContentId String?
+  siteContent SiteContent? @relation(fields: [siteContentId], references: [id], onDelete: Restrict)
+  siteReferences SiteContentMediaReference[]
+  revokedAt DateTime?
   overview     EesaOverview? @relation(fields: [overviewId], references: [id], onDelete: Restrict)
   department   Department? @relation(fields: [departmentId], references: [id], onDelete: Restrict)
   team         Team? @relation(fields: [teamId], references: [id], onDelete: Restrict)
@@ -421,4 +425,42 @@ model TeamGrant {
   resource Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
   @@id([userId, teamId])
   @@index([teamId])
+}
+
+model SiteContent {
+  id String @id
+  version Int @default(1)
+  publishedRevisionId String?
+  workingRevisionId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  revisions SiteContentRevision[] @relation("SiteRevisions")
+  publishedRevision SiteContentRevision? @relation("SitePublished", fields: [id, publishedRevisionId], references: [resourceId, id], onDelete: NoAction, onUpdate: NoAction)
+  workingRevision SiteContentRevision? @relation("SiteWorking", fields: [id, workingRevisionId], references: [resourceId, id], onDelete: NoAction, onUpdate: NoAction)
+  media Media[]
+}
+model SiteContentRevision {
+  id String @id @default(cuid())
+  resourceId String
+  number Int
+  status ActivityRevisionStatus @default(DRAFT)
+  content Json @db.JsonB
+  rejectionNote String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  resource SiteContent @relation("SiteRevisions", fields: [resourceId], references: [id], onDelete: Cascade)
+  publishedFor SiteContent[] @relation("SitePublished")
+  workingFor SiteContent[] @relation("SiteWorking")
+  mediaReferences SiteContentMediaReference[]
+  @@unique([resourceId, number])
+  @@unique([resourceId, id])
+}
+model SiteContentMediaReference {
+  revisionId String
+  mediaId String
+  path String
+  revision SiteContentRevision @relation(fields: [revisionId], references: [id], onDelete: Cascade)
+  media Media @relation(fields: [mediaId], references: [id], onDelete: Restrict)
+  @@id([revisionId, path])
+  @@index([mediaId])
 }

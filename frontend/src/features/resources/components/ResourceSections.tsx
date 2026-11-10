@@ -1,10 +1,11 @@
 import { useEffect, useRef, type CSSProperties, type KeyboardEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { resourceCategories, resourceOrder } from "../data/resources";
+import { useResourceContent } from "../../../shared/data/SiteContentProvider";
 import type { ChecklistSection, ProcessSection, ResourceCategory, ResourceSlug } from "../resourceTypes";
 import { ExternalLink } from "../../../shared/components/index";
 
 export function ResourceTabs({ active }: { active: ResourceSlug }) {
+  const { resourceCategories, resourceOrder } = useResourceContent();
   const navigate = useNavigate();
   const tabsRef = useRef<HTMLElement>(null);
 

@@ -44,12 +44,19 @@ test('content errors carry a stable field path, including nested and date errors
   ];
   for (const [input, path] of cases) {
     assert.throws(() => parseActivityContent(input), error => error instanceof ActivityContentError && error.path === path);
+    assert.throws(() => validateActivityRevision(input, dataset.activityCategories.map(c => c.id)), error => {
+      assert.ok(error instanceof BadRequestException);
+      assert.equal(error.getStatus(), 400);
+      const response = error.getResponse() as { fieldErrors: { path: string }[] };
+      assert.equal(response.fieldErrors[0].path, path.replace(/^activity(?=\.|$)/, 'content'));
+      return true;
+    });
   }
   assert.throws(() => validateActivityRevision({ ...base, categoryId: 'missing' }, ['ee-camp']), error => {
     assert.ok(error instanceof BadRequestException);
     assert.equal(error.getStatus(), 400);
     const response = error.getResponse() as { fieldErrors: { path: string }[] };
-    assert.equal(response.fieldErrors[0].path, 'activity.categoryId');
+    assert.equal(response.fieldErrors[0].path, 'content.categoryId');
     return true;
   });
 });

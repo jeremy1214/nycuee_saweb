@@ -1,0 +1,13 @@
+[Unit]
+Description=Encrypted off-host NYCU EE CMS backup
+Wants=network-online.target
+After=network-online.target docker.service
+OnFailure=nycuee-monitor.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/srv/nycuee
+EnvironmentFile=/etc/nycuee/operations.env
+ExecStart=/bin/bash /srv/nycuee/deploy/backup.sh
+UMask=0077
+TimeoutStartSec=2h

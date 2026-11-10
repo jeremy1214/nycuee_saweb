@@ -1,10 +1,13 @@
 import { Link } from "react-router-dom";
 import { useCarousel } from "../../../shared/hooks/useCarousel";
-import { exploreContent, slides } from "../data/home";
+import { useHomeContent } from "../../../shared/data/SiteContentProvider";
 
 export function HeroCarousel() {
+  const exploreContent = useHomeContent();
+  const slides = exploreContent?.slides ?? [];
   const { current, isPaused, goTo: showSlide, handlers } = useCarousel(slides.length);
-  const slide = slides[current];
+  const slide = slides[current % slides.length];
+  if (!slide || !exploreContent) return null;
 
   return (
     <section className="home-photo-section home-section" id="explore" data-home-reveal aria-labelledby="home-photo-heading">
@@ -14,7 +17,7 @@ export function HeroCarousel() {
         <p>{exploreContent.description}</p>
       </div>
       <div className="hero" aria-label="首頁焦點輪播" aria-roledescription="carousel" {...handlers}>
-        <img className="hero-art" key={slide.image} src={slide.image} alt={slide.title} style={{ objectPosition: slide.imagePosition }} />
+        <img className="hero-art" key={slide.image} src={slide.image} alt={slide.alt} style={{ objectPosition: slide.imagePosition }} />
         <div className="hero-copy" key={current} aria-live={isPaused ? "polite" : "off"}>
           <span className="eyebrow">{slide.eyebrow}</span>
           <h3>{slide.title}</h3>

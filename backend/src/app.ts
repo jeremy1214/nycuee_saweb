@@ -13,6 +13,8 @@ import { PublicActivityController, PublicActivityService } from './public-activi
 import { AccountController, AccountService, AuditController, PasswordController } from './accounts';
 import { GoogleAuthController, GoogleAuthService } from './google-auth';
 import { AdminCategoryReadController, AdminContentReadController, AdminContentReadService, ContentAccess, ContentScopeGuard } from './content-access';
+import { SiteContentService, PublicSiteContentController, AdminSiteContentController } from './site-content';
+import { UploadProtection } from './upload-protection';
 import { appOrigin } from './account-utils';
 import { anonymousSessionLimits } from './security-config';
 import { MediaService, AdminMediaController, PublicMediaController } from './media';
@@ -20,10 +22,10 @@ import { OrganizationService, OverviewCmsController, DepartmentCmsController, Te
 import { ActivityWorkflow, ActivityWriteController, CategoryService, CategoryWriteController } from './activity-workflow';
 
 @Module({
-  controllers: [OverviewCmsController, DepartmentCmsController, TeamCmsController, PublicOrganizationController, HealthController, AuthController, PublicContactController, AdminContactController, PublicActivityController,
+  controllers: [PublicSiteContentController, AdminSiteContentController, OverviewCmsController, DepartmentCmsController, TeamCmsController, PublicOrganizationController, HealthController, AuthController, PublicContactController, AdminContactController, PublicActivityController,
     AccountController, PasswordController, AuditController, GoogleAuthController, AdminContentReadController, AdminCategoryReadController,
     AdminMediaController, PublicMediaController, ActivityWriteController, CategoryWriteController],
-  providers: [OrganizationService, Database, AuthService, AdminGuard, SessionGuard, ContactService, PublicActivityService,
+  providers: [SiteContentService, UploadProtection, OrganizationService, Database, AuthService, AdminGuard, SessionGuard, ContactService, PublicActivityService,
     AccountService, GoogleAuthService, ContentAccess, ContentScopeGuard, AdminContentReadService,
     MediaService, ActivityWorkflow, CategoryService],
 })

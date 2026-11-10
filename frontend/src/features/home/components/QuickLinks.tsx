@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useResourceContent } from "../../../shared/data/SiteContentProvider";
 import { sectionPages, buildSectionMenus } from "../../../shared/data/navigation";
 import { useActivityContent, ActivityContentStatus } from "../../activities/data/ActivityContentProvider";
 import { useCarousel } from "../../../shared/hooks/useCarousel";
@@ -10,7 +11,8 @@ export function QuickLinks() {
   const eesa = useEesaContent();
   const teams = useTeamContent();
   const { activityCategories } = useActivityContent();
-  const sectionMenus = buildSectionMenus(activityCategories, eesa.data.departments, teams.data.teams);
+  const resources = useResourceContent();
+  const sectionMenus = buildSectionMenus(activityCategories, eesa.data.departments, teams.data.teams, resources);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [showAllTeams, setShowAllTeams] = useState(false);
   const { current, goTo, handlers } = useCarousel(sectionPages.length, 6500);

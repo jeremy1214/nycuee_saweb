@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import { importSiteLegacy } from './site-legacy';
 import { PrismaClient } from '@prisma/client';
 import { importLegacyContent, readLegacyContent } from './legacy-import';
 import { importOrganizations } from './import-organization';
@@ -7,6 +8,7 @@ import { readOrganizationLegacy } from './organization-legacy';
 async function main() {
   const db = new PrismaClient();
   try {
+    console.log('Initializing missing site content:', await importSiteLegacy(db, false, true));
     const [activities, categories, overviews, departments, teams] = await Promise.all([
       db.activity.count(), db.activityCategory.count(), db.eesaOverview.count(),
       db.department.count(), db.team.count(),

@@ -34,7 +34,8 @@ function item(label: string, to: string, description: string, ...content: unknow
   return { label, to, description, content: [label, description, ...content.flatMap(visibleText)].join(" ") };
 }
 
-export function buildSearchItems({ activities, categories: activityCategories }: PublicActivityContent, eesa: PublicEesaContent = { overview: null, departments: [] }, teamContent: PublicTeamContent = { teams: [] }): SearchItem[] {
+export function buildSearchItems({ activities, categories: activityCategories }: PublicActivityContent, eesa: PublicEesaContent = { overview: null, departments: [] }, teamContent: PublicTeamContent = { teams: [] }, site = { exploreContent, siteContact, socialLinks, resourceCategories, resourceOrder }): SearchItem[] {
+  const { exploreContent, siteContact, socialLinks, resourceCategories, resourceOrder } = site;
   const eesaOverview = eesa.overview;
   const departments = Object.fromEntries(eesa.departments.map(d => [d.id, d]));
   const departmentCards = eesa.departments.map(d => ({ name: d.title, link: `/eesa/${d.id}`, description: d.cardDescription }));

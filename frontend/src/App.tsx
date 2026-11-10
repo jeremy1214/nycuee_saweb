@@ -1,10 +1,11 @@
 import { lazy, Suspense } from "react";
 import { Navigate, Route, Routes, useParams } from "react-router-dom";
+import { useResourceContent } from "./shared/data/SiteContentProvider";
 import AppShell from "./shared/components/layout/AppShell";
 import HomePage from "./features/home/index";
 import ContactPage from "./features/contact/index";
 import ActivitiesPage, { ActivityDetailPage, OtherActivitiesPage } from "./features/activities/index";
-import ResourcePage, { defaultResourceSlug } from "./features/resources/index";
+import ResourcePage from "./features/resources/index";
 import TeamPage, { TeamDetailPage } from "./features/teams/index";
 import EesaLayout, { EesaPage, DepartmentPage, DepartmentActivitiesPage, DepartmentActivityPage, DepartmentSkillsPage, DepartmentExperiencePage } from "./features/eesa/index";
 import NotFoundPage from "./shared/pages/NotFoundPage";
@@ -14,6 +15,11 @@ const AdminRoutes = lazy(() => import("./features/admin/AdminRoutes"));
 function LegacyEesaRedirect() {
   const { "*": path = "" } = useParams();
   return <Navigate to={path === "eesa-intro" || !path ? "/eesa" : `/eesa/${path}`} replace />;
+}
+
+function ResourceRedirect() {
+  const { defaultResourceSlug } = useResourceContent();
+  return defaultResourceSlug ? <Navigate to={`/resources/${defaultResourceSlug}`} replace /> : <p>學習資源準備中。</p>;
 }
 
 export default function App() {
@@ -38,7 +44,7 @@ export default function App() {
         <Route path="activities/other" element={<OtherActivitiesPage />} />
         <Route path="activities/:activityId" element={<ActivityDetailPage />} />
         <Route path="activities/:activityId/:tabId" element={<ActivityDetailPage />} />
-        <Route path="resources" element={<Navigate to={`/resources/${defaultResourceSlug}`} replace />} />
+        <Route path="resources" element={<ResourceRedirect />} />
         <Route path="resources/:category" element={<ResourcePage />} />
         <Route path="contact" element={<ContactPage />} />
         <Route path="*" element={<NotFoundPage />} />

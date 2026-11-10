@@ -75,6 +75,7 @@ export class ContentAccess {
     else if (media.overviewId) this.requireOrganization(scope, 'overview', media.overviewId);
     else if (media.departmentId) this.requireOrganization(scope, 'department', media.departmentId);
     else if (media.teamId) this.requireOrganization(scope, 'team', media.teamId);
+    else if (media.siteContentId) { if (scope.role !== 'ADMIN') throw new ForbiddenException('全站圖片僅限管理員。'); }
     else throw new ForbiddenException('圖片缺少有效授權範圍。');
     return media;
   }

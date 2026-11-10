@@ -23,12 +23,16 @@ RUN npm run db:generate
 COPY backend/tsconfig.json ./
 COPY backend/src ./src
 COPY shared /app/shared
+COPY frontend/src/content/home ./site-content/home
+COPY frontend/src/content/resources ./site-content/resources
+COPY frontend/src/content/site ./site-content/site
 COPY --from=legacy /legacy/content ./legacy-content
 COPY --from=organization /organization/content ./organization-content
 RUN npm run build
 ENV NODE_ENV=production
 ENV LEGACY_CONTENT_DIR=/app/backend/legacy-content
 ENV ORGANIZATION_CONTENT_DIR=/app/backend/organization-content
+ENV SITE_CONTENT_DIR=/app/backend/site-content
 ENV MEDIA_ROOT=/var/lib/nycuee/media
 RUN mkdir -p /var/lib/nycuee/media && chown node:node /var/lib/nycuee/media
 USER node

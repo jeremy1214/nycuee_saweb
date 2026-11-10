@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
-import { socialLinks, siteContact } from "../../data/site";
+import { useSiteSettings } from "../../data/SiteContentProvider";
 import { SocialIcon } from "../ui/SocialIcon";
 import { primaryNavigation } from "../../data/navigation";
 import { Brand } from "./Brand";
 import { PageContainer } from "./PageContainer";
 
 export function SiteFooter() {
+  const { siteContact, socialLinks } = useSiteSettings();
   return (
     <footer className="site-footer" id="contact">
       <PageContainer>
@@ -14,7 +15,7 @@ export function SiteFooter() {
           <div className="footer-column">
             <h2>聯絡資訊</h2>
             <p>{siteContact.institution}</p>
-            <a href={siteContact.website} target="_blank" rel="noreferrer">前往系所官方網站 ↗</a>
+            {siteContact.website && <a href={siteContact.website} target="_blank" rel="noreferrer">前往系所官方網站 ↗</a>}
             <div className="footer-social-links" aria-label="交大電機社群平台">
               {socialLinks.map((social) => <a key={social.id} href={social.href} target="_blank" rel="noreferrer">
                 <SocialIcon platform={social.id} />

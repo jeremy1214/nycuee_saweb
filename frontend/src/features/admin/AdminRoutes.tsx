@@ -24,6 +24,7 @@ import {
   InboxSummary,
 } from "./ContactInbox";
 import { OrganizationManager, OrganizationEditor, OrganizationWorkSummary } from "./OrganizationManager";
+import { SiteContentManager } from "./SiteContentManager";
 import ActivityManager, { WorkOverview } from "./ActivityManager";
 import ActivityEditor from "./ActivityEditor";
 import MediaManager from "./MediaManager";
@@ -199,6 +200,9 @@ export default function AdminRoutes() {
       routes: [
         ["/admin/eesa", "系學會管理", false],
         ["/admin/teams", "系隊管理", false],
+        ["/admin/site-content/home", "首頁內容", true],
+        ["/admin/site-content/resources", "學習資源", true],
+        ["/admin/site-content/settings", "全站聯絡設定", true],
         ["/admin/media", "媒體管理", false],
         ["/admin/users", "帳號與授權", true],
         ["/admin/audit", "操作紀錄", true],
@@ -431,6 +435,9 @@ export default function AdminRoutes() {
               <Route path="eesa/departments/:id" element={guard(<OrganizationEditor kind="department" />)} />
               <Route path="teams" element={guard(<OrganizationManager kind="team" />)} />
               <Route path="teams/:id" element={guard(<OrganizationEditor kind="team" />)} />
+              <Route path="site-content/home" element={guard(<SiteContentManager kind="home" />, true)} />
+              <Route path="site-content/resources" element={guard(<SiteContentManager kind="resources" />, true)} />
+              <Route path="site-content/settings" element={guard(<SiteContentManager kind="settings" />, true)} />
               <Route path="media" element={guard(<MediaManager />)} />
               <Route
                 path="categories"

@@ -6,6 +6,7 @@ import { Modal } from "../ui/Modal";
 import { SearchDialog } from "../SearchDialog";
 import { ActivityContentProvider } from "../../../features/activities/data/ActivityContentProvider";
 
+import { SiteContentProvider } from "../../data/SiteContentProvider";
 import { OrganizationContentProvider } from "../../../features/organization/OrganizationContentProvider";
 
 export interface AppOutletContext {
@@ -13,7 +14,7 @@ export interface AppOutletContext {
 }
 
 export default function AppShell() {
-  return <ActivityContentProvider><OrganizationContentProvider><PublicShell /></OrganizationContentProvider></ActivityContentProvider>;
+  return <ActivityContentProvider><OrganizationContentProvider><SiteContentProvider><PublicShell /></SiteContentProvider></OrganizationContentProvider></ActivityContentProvider>;
 }
 
 function PublicShell() {

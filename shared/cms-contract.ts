@@ -15,12 +15,12 @@ export interface GrantOptionsDto {
   teams?: { id: string; title: string }[];
 }
 export interface PasswordTokenLinkDto { url: string; expiresAt: string }
-type ScopeKey = 'activityId' | 'categoryId' | 'overviewId' | 'departmentId' | 'teamId';
+type ScopeKey = 'activityId' | 'categoryId' | 'overviewId' | 'departmentId' | 'teamId' | 'siteContentId';
 export type MediaScope = { [K in ScopeKey]: { [P in K]: string } & { [P in Exclude<ScopeKey, K>]?: never } }[ScopeKey];
 export type MediaDto = MediaScope & {
   id: string; originalName: string; mimeType: 'image/jpeg' | 'image/png' | 'image/webp';
   byteSize: number; width: number; height: number; visibility: 'PRIVATE' | 'PUBLIC';
-  createdAt: string;
+  createdAt: string; revokedAt?: string | null;
 }
 export interface AuditEntryDto {
   id: string; actorId: string | null; action: string; entityType: string; entityId: string;

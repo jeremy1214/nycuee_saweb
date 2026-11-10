@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { buildSearchItems } from "../data/search";
 import { useActivityContent, ActivityContentStatus } from "../../features/activities/data/ActivityContentProvider";
 import { useEesaContent, useTeamContent, OrganizationContentStatus } from "../../features/organization/OrganizationContentProvider";
+import { useHomeContent, useSiteSettings, useResourceContent } from "../data/SiteContentProvider";
 import { Modal } from "./ui/Modal";
 
 function resultSnippet(content: string, description: string, query: string) {
@@ -18,7 +19,10 @@ export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => 
   const content = useActivityContent();
   const eesa = useEesaContent();
   const teams = useTeamContent();
-  const searchItems = useMemo(() => buildSearchItems(content.data, eesa.data, teams.data), [content.data, eesa.data, teams.data]);
+  const home = useHomeContent();
+  const settings = useSiteSettings();
+  const resources = useResourceContent();
+  const searchItems = useMemo(() => buildSearchItems(content.data, eesa.data, teams.data, { exploreContent: home ?? { eyebrow: "", title: "", description: "", link: { label: "", to: "/" }, slides: [] }, ...settings, ...resources }), [content.data, eesa.data, teams.data, home, settings, resources]);
   const [query, setQuery] = useState("");
   const normalized = query.trim().toLocaleLowerCase("zh-Hant");
   const results = useMemo(() => {

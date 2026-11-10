@@ -1,5 +1,5 @@
 import { useOrganizationNavigate } from "../../organization/OrganizationContentProvider";
-import { siteContact, socialLinks } from "../../../shared/data/site";
+import { useSiteSettings } from "../../../shared/data/SiteContentProvider";
 import { useEesaContent } from "../../organization/OrganizationContentProvider";
 import EesaImage from "./EesaImage";
 import styles from "../EesaIntro.module.css";
@@ -62,14 +62,15 @@ export function PresidentMessage() {
 }
 
 export function AssociationContact() {
-  const facebook = socialLinks.find((social) => social.id === "facebook")!;
-  const instagram = socialLinks.find((social) => social.id === "instagram")!;
+  const { siteContact, socialLinks } = useSiteSettings();
+  const facebook = socialLinks.find((social) => social.id === "facebook");
+  const instagram = socialLinks.find((social) => social.id === "instagram");
   return <div className={styles.section}>
     <h2 className={styles.sectionTitle}>聯絡資訊</h2>
     <ul className={styles.contactList}>
       <li>電子信箱：{siteContact.email}</li>
-      <li>Facebook：{facebook.displayName}</li>
-      <li>Instagram：{instagram.displayName}</li>
+      {facebook && <li>Facebook：{facebook.displayName}</li>}
+      {instagram && <li>Instagram：{instagram.displayName}</li>}
       <li>辦公室：{siteContact.office}</li>
     </ul>
   </div>;

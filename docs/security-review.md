@@ -106,3 +106,17 @@ node --import tsx --test test/security.test.ts
 ```
 
 本批驗收使用專用 `nycuee-security-batch` Compose project、暫存資料庫、HTTP／HTTPS 測試埠及合成帳號。驗收後已關閉隔離 API 並移除測試容器、網路及暫存資料庫。正式密碼輪替、遠端部署、全面 CSP、SEC-004 至 SEC-009 的後續修補與 H／I 完整驗收繼續列待辦。
+
+## 第二批程式與維運交付（2026/11/10，未驗證）
+
+本節記錄後續「H 到 K」程式交付，不改寫前述歷史結果。依目前「不要驗證」指示，未執行任何測試、建置、migration、服務／瀏覽器／容量探測、備份還原或部署；以下均不能標為安全驗收通過。
+
+| 項目 | 新增程式與文件 | 限制與待驗收 |
+|---|---|---|
+| SEC-004 | `UploadProtection` 在 multipart interceptor 前執行帳號頻率（資料庫計數）、process 槽位與磁碟預留檢查；預設每分鐘 10 次、併發 2、預留 1 GiB 加輸出預算 | 多副本併發是每 process，未設定帳號累積容量配額。仍待解碼異常、取消／失敗清理、尖峰、實際磁碟容量、孤兒檔及代理限制驗收 |
+| SEC-005 | 新增真實服務活動、14 份組織與 K 的授權／版本／隔離／撤權測試準備；K 全站資源及其媒體限 ADMIN，交易內重讀權限 | 未執行，尚不能排除完整負向／並行矩陣的缺口，真實瀏覽器與快取亦待驗收 |
+| SEC-006 | `deploy/backup.sh` 取得成對資料庫／媒體快照，再用 restic 加密異機上傳、保留 30 天；交付 restore、monitor、systemd 與金鑰／權限手冊 | 遠端 repository、金鑰、負責人與 webhook 未配置，工具未啟用；未演練 RPO／RTO 或告警送達，主機故障仍須外部 dead-man 監測 |
+| SEC-007 | `operations:retention` 要求資料負責人指定期限，預設只列數量，明確 `--apply` 才刪除到期已讀收件及舊稽核，保存執行數量紀錄 | 沒有自動排程；正式目的、期限、個案保留及備份到期程序未確認。未執行或接觸真實收件資料 |
+| SEC-009 | `Media.revokedAt`、ADMIN 的撤回 API／媒體庫操作、稽核原因與公開源站拒絕；所有內容再次發布時拒絕已撤回圖。新公開回應改為 5 分鐘且 must-revalidate | 歷史一年快取、已下載及第三方副本無法遠端強制收回；仍需內容修正、受控快取清除及事件處理。未驗證源站、代理或歷史還原行為 |
+
+SEC-008 仍未查明既有依賴告警適用性，也未更動依賴或映像版本。完整 CSP 仍為 Report-Only，正式 HTTPS／Google／代理／密碼輪替仍待 H-2／H-3。詳見 [維運與事件手冊](cms-operations.md)、[待執行驗收](cms-acceptance.md)及 [K 契約](site-content-cms-contract.md)。

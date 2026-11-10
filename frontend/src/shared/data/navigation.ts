@@ -20,7 +20,7 @@ export const contactPage = {
 export const primaryNavigation = [...sectionPages, contactPage] as const;
 
 
-export function buildSectionMenus(activityCategories: ActivityCategoryOption[], departments: DepartmentContent[] = [], teams: TeamContent[] = []): Record<string, { label: string; to: string }[]> {
+export function buildSectionMenus(activityCategories: ActivityCategoryOption[], departments: DepartmentContent[] = [], teams: TeamContent[] = [], resources = { resourceCategories, resourceOrder }): Record<string, { label: string; to: string }[]> {
   return {
     "/eesa": [
       { label: "系學會介紹", to: "/eesa" },
@@ -41,8 +41,8 @@ export function buildSectionMenus(activityCategories: ActivityCategoryOption[], 
       })),
     ],
     "/team": teams.map((team) => ({ label: team.name, to: `/team/${team.id}` })),
-    "/resources": resourceOrder.map((slug) => ({
-      label: resourceCategories[slug].tabLabel,
+    "/resources": resources.resourceOrder.map((slug) => ({
+      label: resources.resourceCategories[slug].tabLabel,
       to: `/resources/${slug}`,
     })),
   };

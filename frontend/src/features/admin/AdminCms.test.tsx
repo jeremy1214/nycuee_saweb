@@ -47,6 +47,7 @@ function open(path = "/admin/activities/new", previous?: string) {
 it("creates, previews, submits and publishes an activity through normal routes", async () => {
   const router = open();
   await screen.findByLabelText("活動識別值");
+  await screen.findByLabelText("活動標題");
   for (const [label, value] of [
     ["活動識別值", "new-ui-event"],
     ["活動標題", "介面驗收活動"],
@@ -63,7 +64,7 @@ it("creates, previews, submits and publishes an activity through normal routes",
   fireEvent.click(screen.getByRole("button", { name: "儲存並送審" }));
   await screen.findByRole("button", { name: "發布送審版本" });
   expect(router.state.location.pathname).toBe("/admin/activities/new-ui-event");
-  expect(screen.getByLabelText("活動標題")).toBeDisabled();
+  expect(await screen.findByLabelText("活動標題")).toBeDisabled();
   fireEvent.click(screen.getByRole("button", { name: "發布送審版本" }));
   await waitFor(() =>
     expect(

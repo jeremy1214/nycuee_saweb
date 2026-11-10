@@ -17,7 +17,7 @@ import {
   Empty,
   useOperation,
 } from "./cmsUi";
-import { apiRequest } from "./api";
+import { apiRequest, apiMutation } from "./api";
 import { listOrganizations } from "./organizationApi";
 import { useCms } from "./cmsUi";
 import { mediaPreview } from "./mediaPreview";
@@ -58,6 +58,8 @@ export function MediaBrowser({
   scope: MediaScope;
   onSelect?: (src: string, alt: string) => void;
 }) {
+  const { user } = useCms();
+  const [revokeReason, setRevokeReason] = useState("");
   const scopeKey = JSON.stringify(scope);
   const resource = useResource(() => listMedia(scope), [scopeKey]);
   const [search, setSearch] = useState("");
@@ -101,6 +103,7 @@ export function MediaBrowser({
           />
         </Field>
       </div>
+      {user.role === "ADMIN" && <Field label="緊急撤回原因（撤回後停止新的公開讀取）"><input value={revokeReason} onChange={event => setRevokeReason(event.target.value)} maxLength={2000} /></Field>}
       <ErrorNotice error={op.error} />
       <p role="status">{op.pending ? "正在處理圖片…" : op.message}</p>
       <ResourceState {...resource} retry={resource.reload}>
@@ -121,10 +124,16 @@ export function MediaBrowser({
                 {m.width} × {m.height} · {(m.byteSize / 1024).toFixed(0)} KiB
               </small>
               <span className="cms-badge">
-                {m.visibility === "PRIVATE" ? "未公開" : "已公開"}
+                {m.revokedAt ? "已緊急撤回" : m.visibility === "PRIVATE" ? "未公開" : "已公開"}
               </span>
               <div className="cms-toolbar">
-                {onSelect && (
+                {user.role === "ADMIN" && !m.revokedAt && <button type="button" disabled={op.pending || !revokeReason.trim()} onClick={() => {
+                  if (window.confirm("確定緊急撤回圖片？已下載或快取的副本仍可能存在。")) void op.run(async () => {
+                    await apiMutation(`admin/media/${encodeURIComponent(m.id)}/revoke`, "POST", { reason: revokeReason });
+                    resource.reload(); setSelected(undefined); op.setMessage("已停止新的公開圖片讀取，請一併處理內容引用與可控快取。");
+                  });
+                }}>緊急撤回</button>}
+                {onSelect && !m.revokedAt && (
                   <button
                     type="button"
                     onClick={() => onSelect(mediaPath(m), m.originalName)}
@@ -204,6 +213,7 @@ export default function MediaManager() {
       ? { categoryId: scope.slice(9) }
       : scope.startsWith('department:') ? { departmentId: scope.slice(11) }
       : scope.startsWith('team:') ? { teamId: scope.slice(5) }
+      : scope === 'site:home' ? { siteContentId: 'home' }
       : scope === 'overview:overview' ? { overviewId: 'overview' }
       : null;
   return (
@@ -216,7 +226,7 @@ export default function MediaManager() {
         <Field label="活動或分類範圍">
           <select value={scope} onChange={(e) => setScope(e.target.value)}>
             <option value="">請選擇範圍</option>
-            {user.role === 'ADMIN' && <option value="overview:overview">系學會總覽</option>}
+            {user.role === 'ADMIN' && <><option value="overview:overview">系學會總覽</option><option value="site:home">首頁輪播</option></>}
             <optgroup label="系學會部門">{choices.data?.departments.map(d => <option key={d.id} value={`department:${d.id}`}>{d.id}</option>)}</optgroup>
             <optgroup label="系隊">{choices.data?.teams.map(t => <option key={t.id} value={`team:${t.id}`}>{t.id}</option>)}</optgroup>
             <optgroup label="活動">

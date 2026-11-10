@@ -12,7 +12,9 @@
     "db:seed": "tsx prisma/seed.ts",
     "content:import": "tsx src/import-content.ts",
     "content:bootstrap": "tsx src/bootstrap-content.ts",
-    "organization:import": "tsx src/import-organization.ts"
+    "organization:import": "tsx src/import-organization.ts",
+    "site:import": "tsx src/import-site.ts",
+    "operations:retention": "tsx src/retention.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.0",

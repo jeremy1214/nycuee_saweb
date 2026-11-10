@@ -10,6 +10,8 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { basename, resolve } from 'node:path';
 import { createHash } from 'node:crypto';
 import { Response } from 'express';
+import type { SiteContentKind, SiteContentMap, HomeContent } from '../../shared/site-content';
+import { UploadProtection } from './upload-protection';
 import { visitOrganizationImages, type OrganizationContent, type OrganizationKind } from '../../shared/organization-content';
 import { organizationStore } from './organization-store';
 import { readOrganizationLegacy } from './organization-legacy';
@@ -20,12 +22,13 @@ import { Database } from './database';
 import { inputObject, invalid, secret, serializable } from './account-utils';
 
 interface Upload { buffer: Buffer; originalname: string }
-interface Scope { activityId?: string; categoryId?: string; overviewId?: string; departmentId?: string; teamId?: string }
+interface Scope { activityId?: string; categoryId?: string; overviewId?: string; departmentId?: string; teamId?: string; siteContentId?: string }
 const mediaRoot = () => resolve(process.env.MEDIA_ROOT || resolve(process.cwd(), 'media'));
 const dto = (m: Media) => ({
+  revokedAt: m.revokedAt?.toISOString() ?? null,
   id: m.id, originalName: m.originalName, mimeType: m.mimeType, byteSize: m.byteSize,
   width: m.width, height: m.height, visibility: m.visibility, createdAt: m.createdAt.toISOString(),
-  ...Object.fromEntries(['activityId', 'categoryId', 'overviewId', 'departmentId', 'teamId'].flatMap(key => { const value = m[key as keyof Media]; return value ? [[key, value]] : []; })),
+  ...Object.fromEntries(['activityId', 'categoryId', 'overviewId', 'departmentId', 'teamId', 'siteContentId'].flatMap(key => { const value = m[key as keyof Media]; return value ? [[key, value]] : []; })),
 });
 const managedId = (src: string) => {
   const match = /^\/api\/v1\/(?:admin\/media\/([a-zA-Z0-9_-]+)\/file|public\/media\/([a-zA-Z0-9_-]+))$/.exec(src);
@@ -56,7 +59,7 @@ export class MediaService {
   }
 
   scope(body: unknown): Scope {
-    const keys = ['activityId', 'categoryId', 'overviewId', 'departmentId', 'teamId'];
+    const keys = ['activityId', 'categoryId', 'overviewId', 'departmentId', 'teamId', 'siteContentId'];
     const input = inputObject(body, keys);
     const selected = keys.filter(key => input[key] !== undefined);
     if (selected.length !== 1) invalid('', '須指定且只能指定一個內容範圍。');
@@ -67,7 +70,10 @@ export class MediaService {
   }
 
   private async authorize(tx: Prisma.TransactionClient, user: ContentScope, scope: Scope) {
-    if (scope.activityId) await this.access.requireActivity(tx, user, scope.activityId);
+    if (scope.siteContentId) {
+      if (user.role !== 'ADMIN') throw new ForbiddenException('全站圖片僅限管理員。');
+      if (!await tx.siteContent.findUnique({ where: { id: scope.siteContentId } })) throw new NotFoundException('找不到此全站內容。');
+    } else if (scope.activityId) await this.access.requireActivity(tx, user, scope.activityId);
     else if (scope.overviewId || scope.departmentId || scope.teamId) {
       const kind = scope.overviewId ? 'overview' : scope.departmentId ? 'department' : 'team';
       const id = scope.overviewId ?? scope.departmentId ?? scope.teamId!;
@@ -154,6 +160,9 @@ export class MediaService {
         const href = group.kind === 'overview' ? '/admin/eesa/overview' : group.kind === 'department' ? `/admin/eesa/departments/${ref.revision.resourceId}` : `/admin/teams/${ref.revision.resourceId}`;
         items.push({ entityType: group.kind, entityId: ref.revision.resourceId, title: content.title ?? content.name ?? ref.revision.resourceId, number: ref.revision.number, path: ref.path, href });
       }
+      if (user.role === 'ADMIN') for (const ref of await tx.siteContentMediaReference.findMany({ where: { mediaId: id }, include: { revision: true } })) {
+        items.push({ entityType: 'SiteContent', entityId: ref.revision.resourceId, title: ref.revision.resourceId, number: ref.revision.number, path: ref.path, href: `/admin/site-content/${ref.revision.resourceId}` });
+      }
       return { items };
     }, { isolationLevel: 'RepeatableRead' });
   }
@@ -163,7 +172,7 @@ export class MediaService {
       const user = await this.access.scope(tx, userId);
       const media = await this.access.requireMedia(tx, user, id);
       if (user.role !== 'ADMIN' && media.uploadedById !== userId) throw new ForbiddenException('只能刪除自己上傳的圖片。');
-      if (media.visibility === 'PUBLIC' || await tx.mediaReference.count({ where: { mediaId: id } })
+      if (media.visibility === 'PUBLIC' || await tx.siteContentMediaReference.count({ where: { mediaId: id } }) || await tx.mediaReference.count({ where: { mediaId: id } })
         || await tx.eesaOverviewMediaReference.count({ where: { mediaId: id } })
         || await tx.departmentMediaReference.count({ where: { mediaId: id } })
         || await tx.teamMediaReference.count({ where: { mediaId: id } })) {
@@ -188,7 +197,7 @@ export class MediaService {
     const media = await this.db.$transaction(async tx => {
       if (userId) return this.access.requireMedia(tx, await this.access.scope(tx, userId), id);
       const row = await tx.media.findUnique({ where: { id } });
-      if (!row || row.visibility !== 'PUBLIC') throw new NotFoundException('找不到公開圖片。');
+      if (!row || row.visibility !== 'PUBLIC' || row.revokedAt) throw new NotFoundException('找不到公開圖片。');
       return row;
     }, { isolationLevel: 'RepeatableRead' });
     let bytes: Buffer;
@@ -196,7 +205,7 @@ export class MediaService {
     catch { throw new NotFoundException('找不到圖片檔案。'); }
     res.setHeader('Content-Type', media.mimeType);
     res.setHeader('X-Content-Type-Options', 'nosniff');
-    res.setHeader('Cache-Control', userId ? 'no-store' : 'public, max-age=31536000, immutable');
+    res.setHeader('Cache-Control', userId ? 'no-store' : 'public, max-age=300, must-revalidate');
     res.send(bytes);
   }
 
@@ -223,10 +232,50 @@ export class MediaService {
     for (const ref of refs) {
       const item = items.find(m => m.id === ref.mediaId);
       const scopeId = kind === 'overview' ? item?.overviewId : kind === 'department' ? item?.departmentId : item?.teamId;
-      if (!item || scopeId !== resourceId) invalid(ref.path, '圖片不存在或不屬於此資源。');
+      if (!item || item.revokedAt || scopeId !== resourceId) invalid(ref.path, '圖片不存在或不屬於此資源。');
       if (publish && !existsSync(this.path(item))) invalid(ref.path, '圖片檔案不存在，無法發布。');
     }
     if (publish && ids.length) await tx.media.updateMany({ where: { id: { in: ids } }, data: { visibility: 'PUBLIC' } });
+    return { content: normalized, refs };
+  }
+
+  async revoke(actorId: string, id: string, body: unknown) {
+    const input = inputObject(body, ['reason']);
+    if (typeof input.reason !== 'string' || !input.reason.trim() || input.reason.length > 2000) invalid('reason', '請填寫撤回原因（最多 2000 字元）。');
+    const reason = input.reason;
+    return serializable(this.db, async tx => {
+      const actor = await tx.user.findUnique({ where: { id: actorId } });
+      if (!actor?.enabled || actor.role !== 'ADMIN') throw new ForbiddenException('緊急撤回僅限管理員。');
+      const media = await tx.media.findUnique({ where: { id } });
+      if (!media) throw new NotFoundException('找不到圖片。');
+      if (!media.revokedAt) {
+        await tx.media.update({ where: { id }, data: { revokedAt: new Date() } });
+        await tx.auditEntry.create({ data: { actorId, action: 'media.revoked', entityType: 'Media', entityId: id, details: { reason } } });
+      }
+      return { ok: true };
+    });
+  }
+
+  async siteReferences(tx: Prisma.TransactionClient, content: SiteContentMap[SiteContentKind], kind: SiteContentKind, publish = false) {
+    const normalized = structuredClone(content);
+    const refs: { mediaId: string; path: string }[] = [];
+    if (kind === 'home') for (const [index, slide] of (normalized as HomeContent).slides.entries()) {
+      const id = managedId(slide.image);
+      const path = `content.slides[${index}].image`;
+      if (id) {
+        const item = await tx.media.findUnique({ where: { id } });
+        if (!item || item.siteContentId !== kind || item.revokedAt) invalid(path, '圖片不存在、已撤回或不屬於首頁。');
+        if (publish && !existsSync(this.path(item))) invalid(path, '圖片檔案不存在。');
+        refs.push({ mediaId: id, path });
+        if (publish) {
+          await tx.media.update({ where: { id }, data: { visibility: 'PUBLIC' } });
+          slide.image = `/api/v1/public/media/${id}`;
+        }
+      } else {
+        const legacy = JSON.parse(readFileSync(resolve(process.env.SITE_CONTENT_DIR || '../frontend/src/content', 'home/explore.json'), 'utf8')) as HomeContent;
+        if (!legacy.slides.some(original => original.image === slide.image)) invalid(path, '請選擇既有首頁圖片或媒體庫。');
+      }
+    }
     return { content: normalized, refs };
   }
 
@@ -245,7 +294,7 @@ export class MediaService {
     const media = await tx.media.findMany({ where: { id: { in: unique } } });
     for (const ref of refs) {
       const item = media.find(m => m.id === ref.mediaId);
-      if (!item || (item.activityId !== activityId && item.categoryId !== content.categoryId)) invalid(ref.path, '圖片不存在或不屬於此活動／分類。');
+      if (!item || item.revokedAt || (item.activityId !== activityId && item.categoryId !== content.categoryId)) invalid(ref.path, '圖片不存在或不屬於此活動／分類。');
       // Validate that the persisted file is present before exposing a published reference.
       if (publish && !existsSync(this.path(item))) invalid(ref.path, '圖片檔案不存在，無法發布。');
     }
@@ -260,8 +309,9 @@ export class AdminMediaController {
   constructor(@Inject(MediaService) private readonly media: MediaService) {}
   @Get() list(@Req() req: AuthRequest, @Query() query: unknown) { return this.media.list(req.authUser!.id, query); }
   @Post()
-  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 10 * 1024 * 1024, files: 1, fields: 2, fieldSize: 1024, parts: 3 } }))
+  @UseInterceptors(UploadProtection, FileInterceptor('file', { limits: { fileSize: 10 * 1024 * 1024, files: 1, fields: 2, fieldSize: 1024, parts: 3 } }))
   upload(@Req() req: AuthRequest, @Body() body: unknown, @UploadedFile() file?: Upload) { return this.media.upload(req.authUser!.id, body, file); }
+  @Post(':id/revoke') revoke(@Req() req: AuthRequest, @Param('id') id: string, @Body() body: unknown) { return this.media.revoke(req.authUser!.id, id, body); }
   @Delete(':id') remove(@Req() req: AuthRequest, @Param('id') id: string) { return this.media.remove(req.authUser!.id, id); }
   @Get(':id/references') usages(@Req() req: AuthRequest, @Param('id') id: string) { return this.media.usages(req.authUser!.id, id); }
   @Get(':id/file') file(@Req() req: AuthRequest, @Param('id') id: string, @Res() res: Response) { return this.media.file(id, res, req.authUser!.id); }

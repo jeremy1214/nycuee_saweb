@@ -6,9 +6,11 @@
 
 在既有遠端部署目錄操作，沿用該站 `.env`、Compose project 名稱、PostgreSQL 和媒體 volume。需要 Docker Compose（支援 `up --wait`）、足夠的備份空間及可寫入的站外備份目錄。`APP_ORIGIN`、`SITE_ADDRESS` 必須指向正式站。若原部署使用 `COMPOSE_PROJECT_NAME`，執行時沿用相同設定，避免建立另一套空 volume。
 
-先將本次程式送達遠端，保留正式 `.env` 及站點現有 Caddy 設定。凍結這 14 份來源 JSON 更新。切換期間腳本會暫停 backend，讓 API 寫入暫停；完成或失敗回復後才重新啟動。
+先將對應版本送達遠端，保留正式 `.env` 及站點現有 Caddy 設定，並凍結這 14 份來源 JSON 的更新。切換期間腳本會暫停 backend，完成或回復後再啟動。
 
-本輪依使用者指示不跑測試套件、建置驗證或瀏覽器驗收。Docker 映像仍須執行部署所需的編譯；沒有額外啟動 npm 測試 hook。只執行備份檔存在／checksum、匯入圖片與資料核對、部署服務就緒和公開 API 資料比對。
+正式環境先確認[正式 Compose 與安全前置條件](security-review.md#部署與回復操作)。腳本會從現有 backend 容器的 Compose 標籤辨識 `compose.production.yaml`，並在備份、切換及回復時沿用該覆寫。11/10 已有腳本語法檢查紀錄，使用正式覆寫的實際切換／回復演練仍待辦。
+
+Docker 啟動時的 `content:bootstrap` 僅在組織三張資料表皆空時匯入初始內容。既有站點切換仍依下列備份、試跑、比對與來源設定流程處理。[初始化程式](../backend/src/bootstrap-content.ts)
 
 ## 一次切換
 

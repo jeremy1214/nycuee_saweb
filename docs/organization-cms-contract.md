@@ -1,6 +1,6 @@
 # 系學會與系隊 CMS 契約及匯入對照
 
-2026/11/03 加入程式實作，未執行測試、型別／建置驗證、Prisma generate、migration、HTTP 或瀏覽器驗收。完整介面見 [OpenAPI](organization-cms.openapi.json)，切換流程見[遠端切換手冊](organization-cms-rollout.md)。
+2026/11/03 已加入程式，並在本機套用 migration、匯入 14 份內容、切至 API 且完成資料核對。完整權限、瀏覽器及正式切換待 I-7。完整介面見 [OpenAPI](organization-cms.openapi.json)，切換流程見[遠端切換手冊](organization-cms-rollout.md)。
 
 ## 資料與既有網址
 
@@ -54,6 +54,6 @@
 
 ## 來源與預覽
 
-`VITE_EESA_SOURCE`、`VITE_TEAM_SOURCE` 各接受 json／api，導入預設 json。同一公開 Provider 供入口、詳情、首頁、輪播、上下項目、導覽及搜尋使用；換頁、視窗重獲焦點或手動重試時重新讀取。API 模式不從靜態 repository 取得內容。
+Docker 在總覽、部門、系隊三張表皆空時，會以舊 JSON 初始化組織內容。公開來源由前端建置參數 `VITE_EESA_SOURCE`、`VITE_TEAM_SOURCE` 分別決定，導入預設為 `json`。本機已有切至 `api` 的紀錄。入口、詳情、首頁、輪播、上下項目、導覽及搜尋共用公開 Provider。換頁、視窗重獲焦點或手動重試時重新讀取，API 模式直接使用公開快照。[初始化程式](../backend/src/bootstrap-content.ts)
 
 後台新增 `/admin/eesa`、`/admin/eesa/overview`、`/admin/eesa/departments/{id}`、`/admin/teams`、`/admin/teams/{id}`。預覽重用公開呈現元件，連結與活動／能力／體驗談切換保留在後台。`VITE_ADMIN_SOURCE=mock` 使用獨立記憶體資料；EDITOR 範例授權 technical 部門與 basketball-men 系隊，重設示範會重建所有範例狀態。

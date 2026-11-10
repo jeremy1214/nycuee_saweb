@@ -1,18 +1,18 @@
 # 活動 CMS 基礎契約（v0.1）
 
-> 2026/11/03：C／D／E 的帳號、授權、活動寫入與審核發布、媒體服務程式碼已加入，接入既有 F 介面；本次未執行驗證、migration 或部署。歷史驗收結果不涵蓋本次變更。
+> 現況（2026/11/10）：帳號、授權、活動寫入、審核發布與媒體已接入真實 API。11/03 有隔離環境 47 項主要 HTTP 流程檢查紀錄，完整回歸及正式部署見[總計畫第 17 節](admin-cms-plan.md#17-未完成任務盤點與後續交辦20261110)。
 
-機器可讀介面見 [OpenAPI 3.1](activity-cms.openapi.json)。內容驗證的單一實作為 [`shared/activity-content.ts`](../shared/activity-content.ts)，後端透過 `validateActivityRevision` 轉成 400 欄位錯誤。JSON Schema 描述結構，日期先後、重複識別值與跨記錄引用由共用驗證及後續交易服務檢查。
+機器可讀介面見 [OpenAPI 3.1](activity-cms.openapi.json)。內容驗證的單一實作為 [`shared/activity-content.ts`](../shared/activity-content.ts)，後端透過 `validateActivityRevision` 轉成 400 欄位錯誤。JSON Schema 描述結構，日期先後、重複識別值與跨記錄引用由共用驗證及交易服務檢查。
 
 ## 資料與相容性
 
 - `Activity.id` 沿用現有 slug，建立後不改名；新增時保留 `overview`、`other` 給既有路由，不接受這兩個 ID；`version` 是整個活動資源的樂觀鎖。`ActivityCategory` 保存分類標籤、排序與精選入口。
 - `ActivityRevision` 以活動與遞增 `number` 唯一識別版本；標題、分類、日期、摘要、介紹及地點均隨版本保存。`links`、`detail`、`album` 為 JSONB，不另建其他活動資料表。
 - `publishedRevisionId` 指向公開快照，`workingRevisionId` 指向草稿或送審快照。複合外鍵限制兩個指標只能引用同一活動的版本，且不能同時指向相同版本。
-- 公開 API 只能依公開指標讀取；不能用「最新版本」或工作版本的分類／日期決定公開結果。工作流程服務尚待實作，模型本身不等於完整的公開過濾或發布授權。
+- 公開 API 依公開指標讀取，分類及日期均取自公開版本。後台工作版本由 [`ActivityWorkflow`](../backend/src/activity-workflow.ts) 處理。
 - 日期為 PostgreSQL `DATE`，API 為 `YYYY-MM-DD`；Prisma 轉換時使用 UTC 午夜，輸出取 UTC 日期，不套用主機時區。`endDate` 包含當天，省略為單日；無日期介紹合法。
 - 保留獨立介紹／共用簡介、雙主圖、選填章節圖片、分頁排序、圖片 `fit`／`objectPosition`、活動外部連結與相簿排序。舊 JSON 的 `$schema`／`status` 僅由舊資料解析器接受，CMS 可編輯內容不接受身分或流程欄位。
-- migration 只更新資料表、索引、關聯與檢查；獨立匯入指令經試跑後載入舊內容，不隨啟動自動匯入。資料庫檢查日期區間、JSONB 容器及版本編號；巢狀格式與引用有效性仍須在寫入與發布時驗證。
+- migration 更新資料表、索引、關聯與檢查。資料庫約束涵蓋日期區間、JSONB 容器及版本編號，巢狀格式與引用則由寫入及發布服務檢查。舊內容另由匯入工具或 Docker 空庫初始化處理。
 
 ## 工作流程與衝突規則
 
@@ -29,13 +29,13 @@
 
 已發布版本不可原地修改。送審版本不可編輯；先撤回或退回。所有既有活動寫入都帶正整數 `version`，在交易中以 `id + version` 比對並遞增；過時版本回 409。非法狀態轉換回 400。重複發送已成功的命令因版本過時回 409，不重複發布。版本還原不直接公開。
 
-發布、變更分類或下架若導致分類精選入口指向未公開、無詳細頁或不同分類的活動，第一版阻擋並回 409，由管理員先調整入口。媒體引用驗證與操作紀錄須與發布服務一起實作，不能只依賴目前 JSONB 欄位。
+發布、變更分類或下架若導致分類精選入口指向未公開、無詳細頁或不同分類的活動，回 409，由管理員先調整入口。發布服務在同一交易驗證媒體引用、切換公開版本及寫入操作紀錄。
 
 ## API 與權限
 
 已實作的公開端點為 `GET /api/v1/public/activities`、`/activities/{id}`、`/activity-categories`；列表統一回 `{ items }`，只含公開內容。活動依 ID 排序，分類依 `order`、ID 排序。草稿／下架活動詳細查詢為 404。另有 `GET /api/v1/public/activity-content` 回 `{ activities, categories }`，於 RepeatableRead 交易中取得同一快照，前台以此統一更新。空資料庫合法回空陣列，所有回應禁止快取。公開分類會省略已失效的精選引用，發布服務仍須按上列規則阻擋不合法變更。
 
-D 的後台介面使用 `/api/v1/admin/activities`，規劃支援建立、列表及詳情；子路徑為 `draft`、`preview`、`submit`、`withdraw`、`reject`、`publish`、`unpublish`、`restore`、`revisions`。可編輯內容統一包在 `content`，資源身分、版本鎖及狀態留在外層；詳見 OpenAPI。預覽重用前台元件。
+後台介面使用 `/api/v1/admin/activities` 建立、列表及讀取詳情。子路徑為 `draft`、`preview`、`submit`、`withdraw`、`reject`、`publish`、`unpublish`、`restore`、`revisions`。可編輯內容包在 `content`，資源身分、版本鎖及狀態留在外層。預覽重用前台元件。完整 HTTP 方法與資料格式見 [OpenAPI](activity-cms.openapi.json)。
 
 | 能力 | 訪客 | 編輯者 | 管理員 |
 |---|---|---|---|
@@ -56,9 +56,11 @@ D 的後台介面使用 `/api/v1/admin/activities`，規劃支援建立、列表
 - 共用驗證以現有 11 筆 JSON 為相容性資料，另測無日期、跨日、非法日期、分類引用、重複 ID 與欄位錯誤；沿用前端分頁、相簿、行事曆與 ICS 測試。
 - `npm test`（backend）執行純驗證與契約檢查。設定 `CMS_TEST_DATABASE_URL` 才執行 migration／版本隔離驗收；資料庫必須命名為 `cms_test`，測試會重設其 `public` schema。既有收件測試使用另一個 `contact_test`。
 - migration 驗收先套用前三個舊 migration，寫入帳號、Session、聯絡訊息及限速資料，加入既有活動與公開指標後再升級並核對保存；同時測公開／工作版本獨立保存、跨活動指標拒絕及非法日期拒絕。
-- 下一個任務為「帳號與授權基礎」：管理員建立／停用帳號、短效單次啟用／密碼重設、分類及指定活動授權、編輯者 Guard、權限變更立即生效與操作紀錄。之後才接內容交易服務、媒體及編輯介面；Google 登入另接身分綁定流程。
+- 目前後續工作為完整回歸、角色／範圍與並行寫入驗收，以及正式資料切換。活動列表與編輯頁已分開顯示公開狀態及工作版本標籤，相關瀏覽器驗收併入 H-1。
 
 ## G：匯入與前台來源
+
+Docker 在 migration 與 seed 後執行 `content:bootstrap`。僅當活動與分類資料表皆為空時，才自動使用舊 JSON 初始化。既有或部分匯入的環境走下列人工試跑與比對流程。[初始化程式](../backend/src/bootstrap-content.ts)
 
 使用 `npm run content:import -- --dry-run` 試跑，正式匯入執行 `npm run content:import`。工具先驗證 JSON、分類精選及所有圖片，再以 Serializable 單一交易與匯入鎖比對／寫入。相同資料不新增版本；現有內容不同或已有工作版本整批拒絕，不提供覆寫旗標。分類順序使用原陣列順序。
 

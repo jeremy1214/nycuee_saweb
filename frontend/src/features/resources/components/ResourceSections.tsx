@@ -103,6 +103,7 @@ export function OfficialLinks({ category }: { category: ResourceCategory }) {
       <header className="official-heading">
         <span className="eyebrow">OFFICIAL SOURCES</span>
         <h1 id="official-links-title">官方資訊入口</h1>
+        <p>詳細規定與申請方式請以官方最新公告為準。</p>
       </header>
       <div className="official-links">
         {category.links.map((link, index) => (

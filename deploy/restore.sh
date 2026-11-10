@@ -10,6 +10,10 @@ snapshot=${1:-}
 [[ -f "$snapshot/database.dump" && -f "$snapshot/media.tgz" && -f "$snapshot/SHA256SUMS" ]]
 (cd "$snapshot" && sha256sum -c SHA256SUMS >/dev/null)
 compose=(docker compose --project-name "$CMS_RESTORE_PROJECT" --env-file "${CMS_ENV_FILE:-.env}" -f compose.yaml -f compose.production.yaml)
+if [[ -n "${CMS_COMPOSE_OVERRIDE:-}" ]]; then
+  [[ "$CMS_COMPOSE_OVERRIDE" == /* && -f "$CMS_COMPOSE_OVERRIDE" ]] || { echo 'CMS_COMPOSE_OVERRIDE must be an existing absolute file.' >&2; exit 2; }
+  compose+=(-f "$CMS_COMPOSE_OVERRIDE")
+fi
 "${compose[@]}" stop backend web
 # The target database must already exist. Do not start backend: startup would migrate/import.
 "${compose[@]}" exec -T db pg_restore -U nycuee -d nycuee --clean --if-exists --no-owner --no-privileges --single-transaction < "$snapshot/database.dump"

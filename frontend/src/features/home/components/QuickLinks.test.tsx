@@ -3,9 +3,14 @@ import { act, fireEvent, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { QuickLinks } from "./QuickLinks";
+import { TeamContentContext } from "../../organization/OrganizationContentProvider";
+import teamContent from "virtual:legacy-team-content";
+import { parsePublicTeams } from "../../../../../shared/organization-content";
 
 function renderQuickLinks() {
-  render(<MemoryRouter><QuickLinks /></MemoryRouter>);
+  render(<MemoryRouter><TeamContentContext.Provider value={{ status: "ready", data: parsePublicTeams(teamContent), refresh() {} }}>
+    <QuickLinks />
+  </TeamContentContext.Provider></MemoryRouter>);
 }
 
 describe("home team menu", () => {

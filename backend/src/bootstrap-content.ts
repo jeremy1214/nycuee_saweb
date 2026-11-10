@@ -15,7 +15,10 @@ async function main() {
     ]);
 
     if (activities === 0 && categories === 0) {
-      const dataset = readLegacyContent(process.env.LEGACY_CONTENT_DIR ?? '../frontend/src/content/activities');
+      const dataset = readLegacyContent(
+        process.env.LEGACY_CONTENT_DIR ?? '../frontend/src/content/activities',
+        process.env.LEGACY_PUBLIC_DIR ?? '../frontend/public',
+      );
       console.log('Importing initial activity content:', await importLegacyContent(db, dataset));
     }
     if (overviews === 0 && departments === 0 && teams === 0) {

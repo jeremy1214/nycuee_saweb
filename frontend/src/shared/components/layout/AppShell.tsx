@@ -28,9 +28,14 @@ function PublicShell() {
 
   return (
     <div className="app-shell">
-      <a className="skip-link" href="#main-content">跳至主要內容</a>
+      <a className="skip-link" href="#main-content" onClick={event => {
+        event.preventDefault();
+        const main = document.getElementById('main-content');
+        main?.focus({ preventScroll: true });
+        main?.scrollIntoView({ block: 'start' });
+      }}>跳至主要內容</a>
       <SiteHeader onSearch={() => setSearchOpen(true)} onPlaceholder={setPlaceholderTitle} />
-      <div id="main-content"><Outlet context={{ openPlaceholder: setPlaceholderTitle } satisfies AppOutletContext} /></div>
+      <div id="main-content" tabIndex={-1}><Outlet context={{ openPlaceholder: setPlaceholderTitle } satisfies AppOutletContext} /></div>
       <SiteFooter />
       <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} />
       <Modal open={placeholderTitle !== null} title={placeholderTitle ?? "建置中"} onClose={() => setPlaceholderTitle(null)}>
@@ -39,4 +44,3 @@ function PublicShell() {
     </div>
   );
 }
-

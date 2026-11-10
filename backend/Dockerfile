@@ -16,6 +16,8 @@ RUN node build-organization-manifest.cjs content public
 FROM node:22-bookworm-slim
 WORKDIR /app/backend
 RUN apt-get update && apt-get install -y --no-install-recommends openssl && rm -rf /var/lib/apt/lists/*
+# Keep npm's bundled dependencies patched as well as the application's lockfile.
+RUN npm install --global npm@12.2.2 && npm cache clean --force
 COPY backend/package.json backend/package-lock.json ./
 COPY backend/prisma ./prisma
 RUN npm ci

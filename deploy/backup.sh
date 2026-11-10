@@ -12,6 +12,11 @@ mkdir -p "$CMS_BACKUP_STATE_DIR"
 exec 9>"$CMS_BACKUP_STATE_DIR/backup.lock"
 flock -n 9 || exit 0
 compose=(docker compose --env-file "${CMS_ENV_FILE:-.env}" -f compose.yaml -f compose.production.yaml)
+if [[ -n "${CMS_BACKUP_PROJECT:-}" ]]; then compose+=(--project-name "$CMS_BACKUP_PROJECT"); fi
+if [[ -n "${CMS_COMPOSE_OVERRIDE:-}" ]]; then
+  [[ "$CMS_COMPOSE_OVERRIDE" == /* && -f "$CMS_COMPOSE_OVERRIDE" ]] || { echo 'CMS_COMPOSE_OVERRIDE must be an existing absolute file.' >&2; exit 2; }
+  compose+=(-f "$CMS_COMPOSE_OVERRIDE")
+fi
 stage=$(mktemp -d "${CMS_BACKUP_STAGING_DIR:-/tmp}/nycuee-backup.XXXXXXXX")
 stopped=false
 finish() {

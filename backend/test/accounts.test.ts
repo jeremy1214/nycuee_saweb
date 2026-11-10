@@ -134,7 +134,10 @@ test('account HTTP lifecycle with isolated PostgreSQL', {
     const current = tokenOf((await issued.json()).url);
     const anonymous = await csrf();
     assert.equal((await write('auth/password/consume', { token: old, password }, anonymous)).status, 400);
-    await db.passwordToken.update({ where: { tokenHash: digest(current) }, data: { expiresAt: new Date(0) } });
+    // Preserve the database invariant expiresAt > createdAt while simulating an expired ticket.
+    await db.passwordToken.update({ where: { tokenHash: digest(current) }, data: {
+      createdAt: new Date(Date.now() - 120000), expiresAt: new Date(Date.now() - 60000),
+    } });
     assert.equal((await write('auth/password/consume', { token: current, password }, anonymous)).status, 400);
     assert.equal((await db.user.findUniqueOrThrow({ where: { id: created.user.id } })).passwordHash, null);
   });
@@ -195,6 +198,49 @@ test('account HTTP lifecycle with isolated PostgreSQL', {
     assert.equal((await write('auth/password/consume', { token, password: nextPassword }, anonymous)).status, 400);
     assert.equal((await write('auth/login', { username: user.username, password }, anonymous)).status, 401);
     assert.equal((await read('auth/me', await login(user.username, nextPassword))).status, 200);
+  });
+
+  await t.test('invalid credentials, disabled users, login throttling and expired sessions are rejected', async context => {
+    const { admin, session } = await setup();
+    const fixedNow = Math.floor(Date.now() / 60000) * 60000 + 1000;
+    const clock = context.mock.method(Date, 'now', () => fixedNow);
+    try {
+      await db.loginAttempt.deleteMany();
+      const anonymous = await csrf();
+      await db.user.update({ where: { id: admin.id }, data: { enabled: false } });
+      const inputs = [
+        { username: admin.username, password }, { username: 'missing-user', password },
+        { username: admin.username, password: 'incorrect-password' }, {}, { username: '', password: '' },
+      ];
+      let message: string | undefined;
+      assert.equal((await write('auth/login', null, anonymous)).status, 400);
+      for (const input of inputs) {
+        const result = await write('auth/login', input, anonymous);
+        assert.equal(result.status, 401);
+        const body = await result.json();
+        message ??= body.message;
+        assert.equal(body.message, message);
+      }
+      assert.equal((await write('auth/login', { username: admin.username, password }, anonymous)).status, 429);
+      await db.user.update({ where: { id: admin.id }, data: { enabled: true } });
+      await db.session.updateMany({ where: { userId: admin.id }, data: { expiresAt: new Date(0) } });
+      assert.equal((await read('auth/me', session)).status, 401);
+      assert.equal((await read('admin/users', session)).status, 401);
+    } finally { clock.mock.restore(); }
+  });
+
+  await t.test('self password change rejects incorrect or weak passwords and revokes every device', async () => {
+    const { admin, session } = await setup();
+    const second = await login(admin.username);
+    for (const body of [
+      { currentPassword: 'wrong', password: 'new-account-password' },
+      { currentPassword: password, password: 'short' },
+      { currentPassword: password, password },
+    ]) assert.equal((await write('auth/password/change', body, session)).status, 400);
+    assert.equal((await read('auth/me', second)).status, 200);
+    assert.equal((await write('auth/password/change', { currentPassword: password, password: 'new-account-password' }, session)).status, 200);
+    for (const device of [session, second]) assert.equal((await read('auth/me', device)).status, 401);
+    assert.equal((await read('auth/me', await login(admin.username, 'new-account-password'))).status, 200);
   });
 
   await t.test('Google callbacks reject cross-session, expired and replayed states before provider exchange', async () => {

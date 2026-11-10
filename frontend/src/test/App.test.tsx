@@ -16,6 +16,15 @@ function renderApp(route = "/") {
 }
 
 describe("NYCU EE website", () => {
+  it("moves keyboard focus to the main content without replacing the hash route", async () => {
+    const user = userEvent.setup();
+    renderApp('/resources/courses');
+    const hash = window.location.hash;
+    await user.click(screen.getByRole('link', { name: '跳至主要內容' }));
+    expect(document.getElementById('main-content')).toHaveFocus();
+    expect(window.location.hash).toBe(hash);
+    expect(screen.getByRole('heading', { name: '官方資訊入口', level: 1 })).toBeInTheDocument();
+  });
   it.each(otherActivities)("opens $title from its album link and supports direct access", async (activity) => {
     const user = userEvent.setup();
     const view = renderApp("/activities/other");

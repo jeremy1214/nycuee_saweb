@@ -6,8 +6,8 @@
 }
 
 .activity-links .activity-links-button {
-  --link-accent: #096869;
-  --link-tint: #edf8f5;
+  --link-accent: #1d4ed8;
+  --link-tint: #edf4ff;
   position: relative;
   isolation: isolate;
   display: flex;
@@ -16,7 +16,7 @@
   min-width: 0;
   padding: 17px 18px;
   overflow: hidden;
-  border: 1px solid #d6e7e3;
+  border: 1px solid #d6e4f7;
   border-radius: 14px;
   background: linear-gradient(120deg, #fff 45%, var(--link-tint));
   color: var(--navy);

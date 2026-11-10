@@ -10,7 +10,7 @@
 .activity-detail-titlebar .activity-detail-dates,
 .other-activity-title .activity-date {
   margin-top: 14px;
-  color: var(--teal-dark);
+  color: var(--blue-dark);
   font-size: .8rem;
   font-weight: 700;
   line-height: 1.8;
@@ -19,7 +19,7 @@
 .activity-card-content .activity-card-range {
   display: block;
   margin-top: 6px;
-  color: var(--teal-dark);
+  color: var(--blue-dark);
   font-size: .72rem;
   line-height: 1.8;
 }

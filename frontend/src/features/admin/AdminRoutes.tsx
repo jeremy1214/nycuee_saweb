@@ -149,6 +149,7 @@ export default function AdminRoutes() {
     return () => observer.disconnect();
   }, []);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [activityMenuOpen, setActivityMenuOpen] = useState(true);
   const [pending, setPending] = useState(false);
   const [operationError, setOperationError] = useState("");
   const navigate = useNavigate();
@@ -183,19 +184,30 @@ export default function AdminRoutes() {
   }, [retry]);
 
   const user = auth.status === "ready" ? auth.user : null;
-  const routes = [
-    ["/admin", "工作總覽", false],
-    ["/admin/activities", "活動管理", false],
-    ["/admin/other", "其他活動介紹", false],
-    ["/admin/eesa", "系學會管理", false],
-    ["/admin/teams", "系隊管理", false],
-    ["/admin/media", "媒體管理", false],
-    ["/admin/categories", "分類設定", true],
-    ["/admin/users", "帳號與授權", true],
-    ["/admin/audit", "操作紀錄", true],
-    ["/admin/contact-messages", "聯絡收件匣", true],
-    ["/admin/profile", "我的帳號", false],
+  const routeGroups = [
+    { label: null, routes: [["/admin", "工作總覽", false]] },
+    {
+      label: "活動管理",
+      routes: [
+        ["/admin/activities", "活動管理", false],
+        ["/admin/other", "其他活動介紹", false],
+        ["/admin/categories", "分類設定", true],
+      ],
+    },
+    {
+      label: null,
+      routes: [
+        ["/admin/eesa", "系學會管理", false],
+        ["/admin/teams", "系隊管理", false],
+        ["/admin/media", "媒體管理", false],
+        ["/admin/users", "帳號與授權", true],
+        ["/admin/audit", "操作紀錄", true],
+        ["/admin/contact-messages", "聯絡收件匣", true],
+        ["/admin/profile", "我的帳號", false],
+      ],
+    },
   ] as const;
+  const routes = routeGroups.flatMap((group) => [...group.routes]);
   const title =
     routes
       .slice()
@@ -277,20 +289,47 @@ export default function AdminRoutes() {
               功能選單
             </button>
             <nav aria-label="後台功能" className={menuOpen ? "is-open" : ""}>
-              {routes
-                .filter(
-                  ([, , adminOnly]) => !adminOnly || user.role === "ADMIN",
-                )
-                .map(([path, label]) => (
-                  <NavLink
-                    key={path}
-                    to={path}
-                    end={path === "/admin"}
-                    onClick={() => setMenuOpen(false)}
+              {routeGroups.map((group, index) => (
+                <div
+                  key={group.label ?? index}
+                  className={`cms-nav-group${group.label ? " cms-nav-group-labeled" : ""}`}
+                  role={group.label ? "group" : undefined}
+                  aria-label={group.label ?? undefined}
+                >
+                  {group.label && (
+                    <button
+                      type="button"
+                      className="cms-nav-group-toggle"
+                      aria-expanded={activityMenuOpen}
+                      aria-controls="cms-activity-menu"
+                      onClick={() => setActivityMenuOpen((open) => !open)}
+                    >
+                      <span>{group.label}</span>
+                      <span className="cms-nav-group-arrow" aria-hidden="true">{activityMenuOpen ? "▾" : "▸"}</span>
+                    </button>
+                  )}
+                  <div
+                    id={group.label ? "cms-activity-menu" : undefined}
+                    className="cms-nav-group-items"
+                    hidden={Boolean(group.label) && !activityMenuOpen}
                   >
-                    {label}
-                  </NavLink>
-                ))}
+                    {group.routes
+                    .filter(
+                      ([, , adminOnly]) => !adminOnly || user.role === "ADMIN",
+                    )
+                    .map(([path, label]) => (
+                      <NavLink
+                        key={path}
+                        to={path}
+                        end={path === "/admin"}
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        {label}
+                      </NavLink>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </nav>
             <small>
               陽明交大電機系

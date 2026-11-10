@@ -1,6 +1,6 @@
 # A：帳號、授權、媒體與紀錄契約
 
-> 2026/11/03：A 的模型／契約與 C 的帳號、Google、密碼、操作紀錄及範圍授權程式碼已加入；C 本次未執行驗證或 migration。D／E 的寫入／發布與媒體服務程式碼亦已加入，本次未驗證，機器契約見 OpenAPI。
+> 現況（2026/11/10）：帳號、授權、內容工作流與媒體服務均已有實作。11/03 已進行主要流程的隔離檢查，11/10 另有匿名 Session 限額與正式模式的隔離安全驗收。實際 Google OAuth 與完整回歸仍待 H。見[總計畫](admin-cms-plan.md)與[資安檢視](security-review.md)。
 
 ## 資料模型與邊界
 
@@ -15,9 +15,9 @@
 | MediaReference | 版本 ID＋內容欄位路徑唯一，連到媒體 ID；被引用的媒體不可刪除 |
 | AuditEntry | 操作者、動作、目標類型／ID、時間及去除敏感值的 JSON 摘要；使用者移除時保留紀錄並清空操作者關聯 |
 
-這些新增結構不變更既有登入者的角色或啟用狀態。migration 保留帳號、Session、聯絡訊息及限速資料，不自動設定授權或綁定。現有 65 張公開圖片沿用靜態路徑，不建立虛假的媒體記錄；E 之後才處理上傳、磁碟持久化及舊媒體搬移。
+這些 migration 保留既有帳號、角色、啟用狀態、Session、聯絡訊息與限速資料。授權及 Google 綁定透過管理流程建立。既有 65 張活動圖片沿用靜態路徑，後台新增的受管媒體則使用 `MEDIA_ROOT`。
 
-## 帳號與 Google 流程（C 已加入程式碼，未驗證）
+## 帳號與 Google 流程
 
 - 不開放公開註冊。管理員透過 `POST /admin/users` 建立使用者名稱及角色，回傳帳號與一次顯示的啟用連結。未設定密碼時，既有帳密登入驗證使用 dummy hash，不能登入。
 - 啟用／重設 Token 使用 32 bytes 安全亂數，明文為 64 個十六進位字元；只保存 SHA-256 雜湊，預設 30 分鐘有效。發行新 Token 時作廢同帳號同用途的舊 Token。連結使用同來源 `/#/admin/set-password?token=...`，經既有聯絡方式交付。
@@ -25,7 +25,7 @@
 - `PATCH /admin/users/{userId}` 與 `PUT /admin/users/{userId}/grants` 必須攜帶目前帳號 `version`；成功遞增，過時為 409。管理員停用或降級最後一位啟用中的 ADMIN 回 409，透過 Serializable 交易防止兩位管理員同時繞過檢查。
 - `GET /auth/google/start` 發起 OIDC；callback 必須驗證一次性 state、nonce、issuer、audience、授權碼及 PKCE，暫存流程 10 分鐘到期並綁定發起 Session。登入只接受已對應的 `sub`，未知身分不自動建立帳號。
 - 綁定從已登入的 `POST /auth/google/link` 主動發起，攜帶 CSRF 後回 `200 { url }`，瀏覽器導向該網址；callback 綁到同一個內部 User；`sub` 已被其他帳號使用回 409。不能因 email 一樣自動合併。回跳網址使用設定的同來源，不接收任意外部 return URL。
-- `GET /auth/me` 及帳密登入已支援 ADMIN／EDITOR。SessionGuard、AdminGuard 與 ContentScopeGuard 已分離；活動列表、工作版本與歷史皆依最新範圍過濾。本次依使用者指示未執行測試。
+- `GET /auth/me` 及帳密登入支援 ADMIN／EDITOR。SessionGuard、AdminGuard 與 ContentScopeGuard 分別處理 Session、角色與範圍。活動列表、工作版本與歷史依當前授權過濾。
 
 ## 授權矩陣與狀態檢查
 
@@ -42,7 +42,7 @@
 
 每次受保護請求重新讀取 User 與範圍授權，停用、改角色或撤銷範圍於下一次請求生效。列表、歷史、預覽與檔案串流也要檢查，不能只限制寫入。新建活動沒有指定活動授權，必須有分類授權。
 
-## 媒體與操作紀錄（E／D 已加入程式碼，未驗證）
+## 媒體與操作紀錄
 
 - `POST /admin/media` 使用 multipart，`file` 與 `activityId`／`categoryId` 二擇一；伺服器檢查實際 JPEG、PNG、WebP 格式，原檔最多 10 MiB，拒絕超過 40MP 的解碼尺寸，重新編碼並將長邊縮到最多 4096px。儲存鍵由伺服器產生，不能使用訪客檔名作磁碟路徑。
 - 上傳先為 PRIVATE。私有列表需指定一個活動或分類範圍，讀取檔案走 `/admin/media/{mediaId}/file`；公開檔案走 `/public/media/{mediaId}`，私有或不存在回 404。檔案回應設定正確 MIME 與 `nosniff`；私有回應禁止快取。
@@ -54,7 +54,9 @@
 
 共用 DTO 在 `shared/cms-contract.ts`；公開活動型別與實際驗證在 `shared/activity-content.ts`。OpenAPI 是線上介面的來源，DTO 不包含 Prisma 物件、內部儲存鍵或憑證。錯誤為 `{ message, fieldErrors?: [{ path, message }], statusCode?, error? }`；內容驗證 400、未登入／停用 401、角色／範圍／CSRF 不符 403、不存在 404、版本／唯一身分／引用／最後管理員衝突 409、限速 429。
 
-所有第一方寫入使用 Session 與 CSRF，包括匿名啟用／重設表單先取得匿名 CSRF；公開聯絡收件沿用既有限速流程。Token 設密碼另須有效 Token，Google callback 使用 OIDC state 保護。所有 JSON 管理回應禁止快取。
+管理端寫入使用 Session 與 CSRF，匿名啟用／重設表單先取得匿名 CSRF。公開聯絡收件沿用獨立限速流程。設密碼另須有效 Token，Google callback 使用 OIDC state 保護。管理 JSON 回應禁止快取。
+
+匿名 CSRF 與 Google start 若需新建匿名 Session，共用每分鐘單 IP 與全站限額，預設為 30／300，可由 `ANONYMOUS_SESSION_IP_LIMIT`／`ANONYMOUS_SESSION_GLOBAL_LIMIT` 調整。有效 Session 會重用，超額回 429 並附 `Retry-After`。[資安驗收](security-review.md)
 
 A 驗收模型、migration、唯一性／引用約束與契約完整性；C 驗收 Token 競爭、Google 綁定及即時授權；D 驗收審核交易與紀錄；E 驗收實際影像解碼、檔案存取及引用清理。未完成服務不能僅因模型／契約存在就標為可用。
 
@@ -71,7 +73,7 @@ A 驗收模型、migration、唯一性／引用約束與契約完整性；C 驗�
 本次未執行測試、建置或 migration，不能據此宣稱已完成驗收或上線。OIDC 實作參考 [Google 官方 OpenID Connect 文件](https://developers.google.com/identity/openid-connect/openid-connect)。
 
 
-## D／E 接入（2026/11/03，未驗證）
+## D／E 接入紀錄（2026/11/03）
 
 ActivityWorkflow、CategoryService 與 MediaService 已接入真實活動及媒體路由；Multipart 檔案超過 10 MiB 可回 413。實際解碼格式白名單為 JPEG／PNG／WebP，額外拒絕動畫，統一輸出 WebP。磁碟儲存使用 MEDIA_ROOT，Docker 為 media_data volume；公開檔案與私有檔案均走 API。
 
@@ -85,7 +87,7 @@ ActivityWorkflow、CategoryService 與 MediaService 已接入真實活動及媒�
 使用者後續同意簡單驗證。前後端編譯、隔離 PostgreSQL 全新 migration 與 47 項主要 HTTP 流程檢查通過；取代本次實作初期的未驗證狀態。未跑完整測試、瀏覽器及實際 Google OAuth，未變更目前網站資料庫或更新容器。細項見 admin-cms-plan.md 第 14 節。
 
 
-## 系學會／系隊擴充（2026/11/03，程式已加入、未驗證）
+## 系學會／系隊擴充
 
 共同 DTO 及表單規格見 `shared/organization-content.ts`，完整規格見 [Organization CMS 契約](organization-cms-contract.md)及 [OpenAPI](organization-cms.openapi.json)。EesaOverview、Department、Team 各自保存資源、版本與媒體引用；共用原 Session、CSRF、工作流狀態及 AuditEntry。
 

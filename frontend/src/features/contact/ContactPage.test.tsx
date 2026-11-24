@@ -53,3 +53,15 @@ it("preserves an explicitly configured external endpoint and sends the honeypot"
   await screen.findByRole("status");
   expect(fetchMock).toHaveBeenCalledWith("https://forms.example.com/contact", expect.objectContaining({ body: expect.stringContaining('"website":"spam"') }));
 });
+
+it("sends a selected image even when the picker supplies no MIME type", async () => {
+  const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response("{}", { status: 201 }));
+  const button = prepare();
+  const image = new File(["image data"], "screenshot.PNG");
+  fireEvent.change(screen.getByLabelText("選擇圖片"), { target: { files: [image] } });
+  expect(screen.getByRole("status")).toHaveTextContent("已選擇 screenshot.PNG");
+  fireEvent.click(button);
+  const body = fetchMock.mock.calls[0]?.[1]?.body;
+  expect(body).toBeInstanceOf(FormData);
+  expect((body as FormData).get("image")).toMatchObject({ name: "screenshot.PNG" });
+});

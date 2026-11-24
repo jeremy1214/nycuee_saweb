@@ -73,7 +73,7 @@ export class MediaService {
     if (scope.siteContentId) {
       if (user.role !== 'ADMIN') throw new ForbiddenException('全站圖片僅限管理員。');
       if (!await tx.siteContent.findUnique({ where: { id: scope.siteContentId } })) throw new NotFoundException('找不到此全站內容。');
-    } else if (scope.activityId) await this.access.requireActivity(tx, user, scope.activityId);
+    } else if (scope.activityId) await this.access.requireCurrentActivity(tx, user, scope.activityId);
     else if (scope.overviewId || scope.departmentId || scope.teamId) {
       const kind = scope.overviewId ? 'overview' : scope.departmentId ? 'department' : 'team';
       const id = scope.overviewId ?? scope.departmentId ?? scope.teamId!;
@@ -280,7 +280,7 @@ export class MediaService {
   }
 
   /** D calls this in the same transaction as every revision write/publication. */
-  async references(tx: Prisma.TransactionClient, content: ActivityContent, activityId: string, publish = false) {
+  async references(tx: Prisma.TransactionClient, scope: ContentScope, content: ActivityContent, activityId: string, publish = false) {
     const normalized = structuredClone(content);
     const refs: { mediaId: string; path: string }[] = [];
     images(normalized, (src, path, image) => {
@@ -295,6 +295,7 @@ export class MediaService {
     for (const ref of refs) {
       const item = media.find(m => m.id === ref.mediaId);
       if (!item || item.revokedAt || (item.activityId !== activityId && item.categoryId !== content.categoryId)) invalid(ref.path, '圖片不存在或不屬於此活動／分類。');
+      if (item.visibility === 'PRIVATE' && item.categoryId) this.access.requireCategory(scope, item.categoryId);
       // Validate that the persisted file is present before exposing a published reference.
       if (publish && !existsSync(this.path(item))) invalid(ref.path, '圖片檔案不存在，無法發布。');
     }

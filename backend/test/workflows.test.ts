@@ -73,12 +73,15 @@ test('real CMS workflows, organization scopes and site content', {
   async function command(path: string, session: Session, action: string, version: number, extra = {}) {
     return json(`${path}/${action}`, session, 'POST', { version, ...extra });
   }
-  async function upload(scope: Record<string, string>, session: Session) {
+  async function uploadResponse(scope: Record<string, string>, session: Session) {
     const form = new FormData();
     for (const [key, value] of Object.entries(scope)) form.set(key, value);
     const png = await sharp({ create: { width: 2, height: 2, channels: 3, background: 'red' } }).png().toBuffer();
     form.set('file', new Blob([new Uint8Array(png)], { type: 'image/png' }), 'fixture.png');
-    const response = await fetch(`${base}admin/media`, { method: 'POST', headers: session, body: form });
+    return fetch(`${base}admin/media`, { method: 'POST', headers: session, body: form });
+  }
+  async function upload(scope: Record<string, string>, session: Session) {
+    const response = await uploadResponse(scope, session);
     assert.equal(response.status, 201);
     const media = await response.json(); assert.equal(media.mimeType, 'image/webp');
     return media;
@@ -229,12 +232,20 @@ test('real CMS workflows, organization scopes and site content', {
     assert.equal(await db!.auditEntry.count({ where: { action: 'activity.publish', entityId: 'course-selection' } }), 1);
   });
 
-  await t.test('category grants filter working content, preview and historical revisions across category moves', async () => {
+  await t.test('two category editors have separate version and media access across category moves and unpublish', async () => {
     const { admin, editor, editorId } = await setup();
     const path = 'admin/activities/course-selection';
     const initial = await json(path, admin);
     const original = (await json(`${path}/revisions`, admin)).items[0];
     await db!.categoryGrant.create({ data: { userId: editorId, categoryId: original.content.categoryId } });
+    const destinationUser = await db!.user.create({ data: { username: 'destination-editor', role: 'EDITOR', passwordHash } });
+    await db!.categoryGrant.create({ data: { userId: destinationUser.id, categoryId: 'ee-camp' } });
+    const destination = await login(destinationUser.username);
+    const mediaScope = { activityId: 'course-selection' };
+    const media = await upload(mediaScope, editor);
+    const mediaPath = `admin/media/${media.id}`;
+    const mediaList = 'admin/media?activityId=course-selection';
+    assert.equal((await call(`${mediaPath}/file`, destination)).status, 403);
     let moved = await json(`${path}/draft`, admin, 'PUT', {
       version: initial.version, content: { ...original.content, categoryId: 'ee-camp', title: 'restricted-category-marker' },
     });
@@ -242,15 +253,69 @@ test('real CMS workflows, organization scopes and site content', {
     assert.ok(!JSON.stringify(await json(`${path}/revisions`, editor)).includes('restricted-category-marker'));
     assert.equal((await call(`${path}/preview`, editor)).status, 403);
     assert.equal((await call(`${path}/draft`, editor, 'PUT', { version: moved.version, content: original.content })).status, 403);
+    for (const target of [mediaList, `${mediaPath}/file`, `${mediaPath}/references`]) {
+      assert.equal((await call(target, editor)).status, 403);
+      assert.equal((await call(target, destination)).status, 200);
+    }
+    assert.equal((await call(mediaPath, editor, 'DELETE')).status, 403);
+    assert.equal((await uploadResponse(mediaScope, editor)).status, 403);
+    await upload(mediaScope, destination);
     moved = await command(path, admin, 'submit', moved.version);
-    await command(path, admin, 'publish', moved.version);
+    moved = await command(path, admin, 'publish', moved.version);
     assert.equal((await call(path, editor)).status, 403);
-    await db!.categoryGrant.deleteMany({ where: { userId: editorId } });
-    await db!.categoryGrant.create({ data: { userId: editorId, categoryId: 'ee-camp' } });
-    const history = await json(`${path}/revisions`, editor);
+    const history = await json(`${path}/revisions`, destination);
     assert.equal(history.items.length, 1);
     assert.equal(history.items[0].content.title, 'restricted-category-marker');
     assert.ok(!history.items.some((item: { id: string }) => item.id === original.id));
+
+    const unpublished = await command(path, admin, 'unpublish', moved.version);
+    assert.equal((await call('public/activities/course-selection')).status, 404);
+    assert.ok((await json('admin/activities', destination)).items.some((item: { id: string }) => item.id === mediaScope.activityId));
+    assert.equal((await json(path, destination)).publishedRevisionId, null);
+    assert.equal((await json(`${path}/revisions`, destination)).items[0].id, history.items[0].id);
+    assert.equal((await call(`${path}/restore`, editor, 'POST', { version: unpublished.version, revisionId: original.id })).status, 403);
+    assert.equal((await call(`${path}/restore`, destination, 'POST', { version: unpublished.version, revisionId: original.id })).status, 403);
+    const restored = await command(path, destination, 'restore', unpublished.version, { revisionId: history.items[0].id });
+    assert.equal(restored.workingRevision.status, 'DRAFT');
+    assert.equal(restored.workingRevision.content.categoryId, 'ee-camp');
+    assert.equal((await call('public/activities/course-selection')).status, 404);
+  });
+
+  await t.test('activity-only editors cannot save or submit drafts using unreadable private category media', async () => {
+    const { admin, editor, editorId } = await setup();
+    const activityId = 'course-selection';
+    const path = `admin/activities/${activityId}`;
+    await db!.activityGrant.create({ data: { userId: editorId, activityId } });
+    const initial = await json(path, editor);
+    const { content } = (await json(`${path}/revisions`, editor)).items[0];
+    const media = await upload({ categoryId: content.categoryId }, admin);
+    const privatePath = `admin/media/${media.id}/file`;
+    const draft = { ...content, detail: { ...content.detail, heroImages: [
+      { src: `/api/v1/${privatePath}`, alt: '測試圖片' }, content.detail.heroImages[1],
+    ] } };
+    assert.equal((await call(privatePath, editor)).status, 403);
+    assert.equal((await call(`${path}/draft`, editor, 'PUT', { version: initial.version, content: draft })).status, 403);
+    assert.equal((await json(path, editor)).version, initial.version);
+    assert.equal(await db!.mediaReference.count({ where: { mediaId: media.id } }), 0);
+
+    let state = await json(`${path}/draft`, admin, 'PUT', { version: initial.version, content: draft });
+    assert.equal((await call(`${path}/submit`, editor, 'POST', { version: state.version })).status, 403);
+    assert.equal((await json(path, editor)).workingRevision.status, 'DRAFT');
+    const grant = { userId: editorId, categoryId: content.categoryId };
+    await db!.categoryGrant.create({ data: grant });
+    assert.equal((await call(privatePath, editor)).status, 200);
+    state = await json(`${path}/draft`, editor, 'PUT', { version: state.version, content: draft });
+    state = await command(path, editor, 'submit', state.version);
+    state = await command(path, admin, 'publish', state.version);
+    await db!.categoryGrant.delete({ where: { userId_categoryId: grant } });
+
+    const publicPath = `public/media/${media.id}`;
+    assert.equal((await call(publicPath)).status, 200);
+    const published = (await json(`${path}/revisions`, editor)).items[0];
+    assert.equal(published.content.detail.heroImages[0].src, `/api/v1/${publicPath}`);
+    state = await command(path, editor, 'restore', state.version, { revisionId: published.id });
+    assert.equal(state.workingRevision.status, 'DRAFT');
+    await command(path, editor, 'submit', state.version);
   });
 
   await t.test('activity draft, freeze, publication, restore, private media and immediate grant revocation', async () => {

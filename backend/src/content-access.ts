@@ -10,7 +10,11 @@ import { revisionContent } from './public-activities';
 
 const userScope = { categoryGrants: true, activityGrants: true, departmentGrants: true, teamGrants: true } as const;
 export type ContentScope = Prisma.UserGetPayload<{ include: typeof userScope }>;
-const activityIncludes = { workingRevision: true, publishedRevision: true } as const;
+const activityIncludes = {
+  workingRevision: true,
+  publishedRevision: true,
+  revisions: { where: { status: 'PUBLISHED' }, orderBy: { number: 'desc' }, take: 1, select: { categoryId: true } },
+} as const;
 type ScopedActivity = Prisma.ActivityGetPayload<{ include: typeof activityIncludes }>;
 
 @Injectable()
@@ -40,9 +44,18 @@ export class ContentAccess {
       || this.category(scope, revision.categoryId);
   }
 
-  activity(scope: ContentScope, activity: ScopedActivity) {
+  private activityCategory(activity: ScopedActivity) {
+    return (activity.workingRevision ?? activity.publishedRevision ?? activity.revisions[0])?.categoryId;
+  }
+
+  private currentActivity(scope: ContentScope, activity: ScopedActivity) {
+    const categoryId = this.activityCategory(activity);
     return scope.role === 'ADMIN' || scope.activityGrants.some(grant => grant.activityId === activity.id)
-      || !!(activity.workingRevision && this.category(scope, activity.workingRevision.categoryId))
+      || !!(categoryId && this.category(scope, categoryId));
+  }
+
+  activity(scope: ContentScope, activity: ScopedActivity) {
+    return this.currentActivity(scope, activity)
       || !!(activity.publishedRevision && this.category(scope, activity.publishedRevision.categoryId));
   }
 
@@ -50,19 +63,27 @@ export class ContentAccess {
     if (!this.category(scope, categoryId)) throw new ForbiddenException('沒有目標分類的編輯授權。');
   }
 
-  async requireActivity(tx: Prisma.TransactionClient, scope: ContentScope, id: string) {
+  private async getActivity(tx: Prisma.TransactionClient, id: string) {
     const activity = await tx.activity.findUnique({ where: { id }, include: activityIncludes });
     if (!activity) throw new NotFoundException('找不到此活動。');
+    return activity;
+  }
+
+  async requireActivity(tx: Prisma.TransactionClient, scope: ContentScope, id: string) {
+    const activity = await this.getActivity(tx, id);
     if (!this.activity(scope, activity)) throw new ForbiddenException('沒有此活動的編輯授權。');
     return activity;
   }
 
-  /** D must call this inside the same transaction as its update or restore. */
+  async requireCurrentActivity(tx: Prisma.TransactionClient, scope: ContentScope, id: string) {
+    const activity = await this.getActivity(tx, id);
+    if (!this.currentActivity(scope, activity)) throw new ForbiddenException('沒有此活動目前分類的編輯授權。');
+    return activity;
+  }
+
   async requireMove(tx: Prisma.TransactionClient, scope: ContentScope, id: string, targetCategoryId: string) {
-    const activity = await this.requireActivity(tx, scope, id);
-    const original = activity.workingRevision ?? activity.publishedRevision;
-    if (original && !this.revision(scope, original)) throw new ForbiddenException('沒有目前工作版本的編輯授權。');
-    if (!original || original.categoryId !== targetCategoryId) this.requireCategory(scope, targetCategoryId);
+    const activity = await this.requireCurrentActivity(tx, scope, id);
+    if (this.activityCategory(activity) !== targetCategoryId) this.requireCategory(scope, targetCategoryId);
     return activity;
   }
 
@@ -70,7 +91,7 @@ export class ContentAccess {
   async requireMedia(tx: Prisma.TransactionClient, scope: ContentScope, mediaId: string) {
     const media = await tx.media.findUnique({ where: { id: mediaId } });
     if (!media) throw new NotFoundException('找不到此圖片。');
-    if (media.activityId) await this.requireActivity(tx, scope, media.activityId);
+    if (media.activityId) await this.requireCurrentActivity(tx, scope, media.activityId);
     else if (media.categoryId) this.requireCategory(scope, media.categoryId);
     else if (media.overviewId) this.requireOrganization(scope, 'overview', media.overviewId);
     else if (media.departmentId) this.requireOrganization(scope, 'department', media.departmentId);
@@ -156,7 +177,7 @@ export class AdminContentReadService {
       const assigned = await tx.activity.findMany({
         where: { id: { in: scope.activityGrants.map(g => g.activityId) } }, include: activityIncludes,
       });
-      const assignedCategories = new Set(assigned.flatMap(a => [a.workingRevision?.categoryId, a.publishedRevision?.categoryId]));
+      const assignedCategories = new Set(assigned.flatMap(a => [a.workingRevision?.categoryId, a.publishedRevision?.categoryId, a.revisions[0]?.categoryId]));
       return { items: categories.filter(c => this.access.category(scope, c.id) || assignedCategories.has(c.id)).map(c => ({
         id: c.id, label: c.label, shortLabel: c.shortLabel, order: c.order, version: c.version,
         ...(c.featuredActivityId ? { featuredActivityId: c.featuredActivityId } : {}),

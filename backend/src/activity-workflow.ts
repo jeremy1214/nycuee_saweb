@@ -68,7 +68,7 @@ export class ActivityWorkflow {
       const scope = await this.access.scope(tx, userId);
       const content = await this.content(tx, input.content);
       this.access.requireCategory(scope, content.categoryId);
-      const checked = await this.media.references(tx, content, id);
+      const checked = await this.media.references(tx, scope, content, id);
       await tx.activity.create({ data: { id } });
       const revision = await tx.activityRevision.create({ data: { ...revisionData(content), activityId: id, number: 1 } });
       await this.refs(tx, revision.id, checked.refs);
@@ -87,7 +87,7 @@ export class ActivityWorkflow {
       const activity = await this.access.requireMove(tx, scope, id, content.categoryId);
       if (activity.version !== version) throw new ConflictException('活動已更新，請重新載入。');
       if (activity.workingRevision && activity.workingRevision.status !== 'DRAFT') throw new BadRequestException('送審版本已凍結，請先撤回或退回。');
-      const checked = await this.media.references(tx, content, id);
+      const checked = await this.media.references(tx, scope, content, id);
       const revision = activity.workingRevision
         ? await tx.activityRevision.update({ where: { id: activity.workingRevision.id }, data: revisionData(content) })
         : await tx.activityRevision.create({ data: { ...revisionData(content), activityId: id, number: await this.nextNumber(tx, id) } });
@@ -104,11 +104,10 @@ export class ActivityWorkflow {
     const version = versionOf(input.version);
     return serializable(this.db, async tx => {
       const scope = await this.access.scope(tx, userId);
-      const activity = await this.access.requireActivity(tx, scope, id);
+      const activity = await this.access.requireCurrentActivity(tx, scope, id);
       if (scope.role !== 'ADMIN' && ['reject', 'publish', 'unpublish'].includes(command)) throw new ForbiddenException('此操作僅限管理員。');
       if (activity.version !== version) throw new ConflictException('活動已更新，請重新載入。');
       const working = activity.workingRevision;
-      if (working && !this.access.revision(scope, working)) throw new ForbiddenException('沒有目前工作版本的授權。');
       let pointer: { workingRevisionId?: string | null; publishedRevisionId?: string | null } = {};
       if (command === 'restore') {
         if (working) throw new ConflictException('已有工作版本，不能覆寫。');
@@ -117,7 +116,7 @@ export class ActivityWorkflow {
         if (!source) throw new NotFoundException('找不到此歷史版本。');
         const content = await this.content(tx, revisionContent(source));
         await this.access.requireMove(tx, scope, id, content.categoryId);
-        const checked = await this.media.references(tx, content, id);
+        const checked = await this.media.references(tx, scope, content, id);
         const revision = await tx.activityRevision.create({ data: { ...revisionData(content), activityId: id, number: await this.nextNumber(tx, id) } });
         await this.refs(tx, revision.id, checked.refs);
         pointer = { workingRevisionId: revision.id };
@@ -131,7 +130,7 @@ export class ActivityWorkflow {
         if (working.status !== expected) throw new BadRequestException('目前版本狀態無法執行此操作。');
         if (command === 'submit' || command === 'publish') {
           const content = await this.content(tx, revisionContent(working));
-          const checked = await this.media.references(tx, content, id, command === 'publish');
+          const checked = await this.media.references(tx, scope, content, id, command === 'publish');
           if (command === 'publish') {
             const featured = await tx.activityCategory.findMany({ where: { featuredActivityId: id } });
             if (featured.some(c => c.id !== content.categoryId || !content.detail)) throw new ConflictException('發布後會使精選入口失效，請先調整入口。');
@@ -161,10 +160,9 @@ export class ActivityWorkflow {
   async preview(userId: string, id: string) {
     return this.db.$transaction(async tx => {
       const scope = await this.access.scope(tx, userId);
-      const activity = await this.access.requireActivity(tx, scope, id);
+      const activity = await this.access.requireCurrentActivity(tx, scope, id);
       const revision = activity.workingRevision ?? activity.publishedRevision;
       if (!revision) throw new NotFoundException('沒有可預覽的版本。');
-      if (!this.access.revision(scope, revision)) throw new ForbiddenException('沒有此版本的預覽授權。');
       return { id: revision.id, number: revision.number, status: revision.status, content: revisionContent(revision),
         rejectionNote: revision.rejectionNote, submittedAt: revision.submittedAt?.toISOString() ?? null,
         publishedAt: revision.publishedAt?.toISOString() ?? null };

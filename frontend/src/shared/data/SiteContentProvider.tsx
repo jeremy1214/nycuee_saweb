@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
+import { sitePath } from '../sitePath';
 import { parseSiteContent, resourceSnapshot, type SiteContentMap, type SiteContentKind } from '../../../../shared/site-content';
 import { exploreContent } from '../../features/home/data/home';
 import { siteContact, socialLinks } from './site';
@@ -23,7 +24,7 @@ export function SiteContentProvider({ children }: { children: ReactNode }) {
     if (!api) return;
     const controller = new AbortController();
     const timer = window.setTimeout(() => controller.abort(), 15000);
-    void fetch('/api/v1/public/site-content', { signal: controller.signal, credentials: 'same-origin', cache: 'no-store' }).then(async response => {
+    void fetch(sitePath('/api/v1/public/site-content'), { signal: controller.signal, credentials: 'same-origin', cache: 'no-store' }).then(async response => {
       if (!response.ok) throw new Error('無法載入網站內容。');
       const raw = await response.json();
       const data: PublicSiteContent = {

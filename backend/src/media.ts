@@ -4,7 +4,6 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Media, Prisma } from '@prisma/client';
-import sharp from 'sharp';
 import { mkdir, open, readFile, unlink } from 'node:fs/promises';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { basename, resolve } from 'node:path';
@@ -20,6 +19,7 @@ import { AuthRequest, SessionGuard } from './auth';
 import { ContentAccess, ContentScope } from './content-access';
 import { Database } from './database';
 import { inputObject, invalid, secret, serializable } from './account-utils';
+import { normalizeImage } from './normalize-image';
 
 interface Upload { buffer: Buffer; originalname: string }
 interface Scope { activityId?: string; categoryId?: string; overviewId?: string; departmentId?: string; teamId?: string; siteContentId?: string }
@@ -100,21 +100,7 @@ export class MediaService {
     if (!file?.buffer?.length || file.buffer.length > 10 * 1024 * 1024) throw new BadRequestException('請上傳 10 MiB 以內的圖片。');
     // Recheck the scope after decoding, immediately before recording the upload.
     await this.db.$transaction(async tx => this.authorize(tx, await this.access.scope(tx, userId), scope));
-    let buffer: Buffer;
-    let width: number;
-    let height: number;
-    try {
-      const image = sharp(file.buffer, { limitInputPixels: 40000000, failOn: 'warning' });
-      const metadata = await image.metadata();
-      if (!metadata.format || !['jpeg', 'png', 'webp'].includes(metadata.format)
-        || !metadata.width || !metadata.height || metadata.width * metadata.height > 40000000
-        || (metadata.pages ?? 1) > 1) throw new Error('unsupported image');
-      const output = await image.rotate().resize({ width: 4096, height: 4096, fit: 'inside', withoutEnlargement: true })
-        .webp({ quality: 82 }).toBuffer({ resolveWithObject: true });
-      buffer = output.data; width = output.info.width; height = output.info.height;
-    } catch {
-      throw new BadRequestException('圖片必須為可解碼的 JPEG、PNG 或 WebP，且不超過 40MP；不接受動畫。');
-    }
+    const { data: buffer, width, height } = await normalizeImage(file.buffer);
     const storageKey = `${secret()}.webp`;
     const path = resolve(mediaRoot(), storageKey);
     await mkdir(mediaRoot(), { recursive: true });

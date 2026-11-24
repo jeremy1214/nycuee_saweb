@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useLocation, useParams, useSearchParams } from "react-router-dom";
 import { AuthError } from "./api";
-import { contactCategories, getContactMessage, getContactMessages, markContactRead } from "./contactApi";
+import { contactCategories, contactImageUrl, getContactMessage, getContactMessages, markContactRead } from "./contactApi";
 
 type AuthProps = { onSessionExpired: () => void };
 const dateFormat = new Intl.DateTimeFormat("zh-TW", {
@@ -61,7 +61,7 @@ export function ContactInbox({ onSessionExpired }: AuthProps) {
   return <section className="admin-card admin-inbox" aria-labelledby="admin-inbox-title">
     <Link className="admin-text-link admin-action-link" to="/admin">← 管理總覽</Link>
     <h1 id="admin-inbox-title">聯絡訊息</h1>
-    <p className="admin-description">查看訪客透過聯絡表單送來的問題。回覆請使用既有信箱。</p>
+    <p className="admin-description">查看訪客透過聯絡表單送來的問題及圖片附件。</p>
     <div className="admin-inbox-toolbar">
       <label>顯示訊息 <select value={read} onChange={(event) => setParams({ page: "1", read: event.target.value })}>
         <option value="all">全部訊息</option><option value="unread">未讀訊息</option>
@@ -76,7 +76,12 @@ export function ContactInbox({ onSessionExpired }: AuthProps) {
         : <ul className="admin-message-list">{data.items.map((message) => <li key={message.id}>
           <Link to={`/admin/contact-messages/${encodeURIComponent(message.id)}${query}`}>
             <div className="admin-message-heading"><span className={`admin-read-badge${message.readAt ? " is-read" : ""}`}>{message.readAt ? "已讀" : "未讀"}</span><strong>{message.subject}</strong></div>
-            <div className="admin-message-meta"><span>{message.name} · {message.email}</span><span>{contactCategories[message.category]}</span><time dateTime={message.createdAt}>{date(message.createdAt)}（台灣時間）</time></div>
+            <div className="admin-message-meta">
+              {message.name && <span>{message.name}</span>}
+              {message.email && <span>{message.email}</span>}
+              <span>{contactCategories[message.category]}</span>
+              <time dateTime={message.createdAt}>{date(message.createdAt)}（台灣時間）</time>
+            </div>
           </Link>
         </li>)}</ul>}
       <nav className="admin-pagination" aria-label="訊息分頁">
@@ -93,6 +98,7 @@ export function ContactMessageDetail({ onSessionExpired }: AuthProps) {
   const { search } = useLocation();
   const load = useCallback(() => getContactMessage(id), [id]);
   const { data, setData, loading, error, reload } = useLoad(load, onSessionExpired);
+  const attachmentUrl = data?.image ? contactImageUrl(data.id) : null;
   const [pending, setPending] = useState(false);
   const [readError, setReadError] = useState("");
   async function markRead() {
@@ -113,13 +119,19 @@ export function ContactMessageDetail({ onSessionExpired }: AuthProps) {
     {data && <>
       <h2 className="admin-message-subject">{data.subject}</h2>
       <dl className="admin-message-details">
-        <div><dt>姓名</dt><dd>{data.name}</dd></div>
-        <div><dt>Email</dt><dd><a href={`mailto:${encodeURIComponent(data.email)}`}>{data.email}</a></dd></div>
+        {data.name && <div><dt>姓名</dt><dd>{data.name}</dd></div>}
+        {data.email && <div><dt>Email</dt><dd><a href={`mailto:${encodeURIComponent(data.email)}`}>{data.email}</a></dd></div>}
         <div><dt>問題類別</dt><dd>{contactCategories[data.category]}</dd></div>
         <div><dt>收件時間</dt><dd><time dateTime={data.createdAt}>{date(data.createdAt)}（台灣時間）</time></dd></div>
         <div><dt>已讀狀態</dt><dd>{data.readAt ? `已讀 · ${date(data.readAt)}（台灣時間）` : "未讀"}</dd></div>
       </dl>
       <h3>問題內容</h3><p className="admin-message-body">{data.message}</p>
+      {data.image && attachmentUrl && <section className="admin-message-attachment">
+        <h3>圖片附件</h3>
+        <a href={attachmentUrl} target="_blank" rel="noreferrer">
+          <img src={attachmentUrl} width={data.image.width} height={data.image.height} alt="開啟聯絡訊息的圖片附件" />
+        </a>
+      </section>}
       {readError && <p className="admin-error" role="alert">{readError}</p>}
       {data.readAt ? <p role="status">這則訊息已標記為已讀。</p> : <button className="admin-button" disabled={pending} onClick={markRead}>{pending ? "更新中…" : "標記已讀"}</button>}
     </>}

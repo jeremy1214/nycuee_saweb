@@ -6,7 +6,7 @@ import type { ContactMessage } from "./contactApi";
 const messages: ContactMessage[] = Array.from({ length: 21 }, (_, index) => ({
   id: String(index), name: "王小明", email: "student@example.com", category: "website",
   subject: `網站問題 ${index}`, message: "第一行\n<script>alert('test')</script>",
-  createdAt: "2026-10-25T01:30:00.000Z", readAt: null,
+  createdAt: "2026-10-25T01:30:00.000Z", readAt: null, image: null,
 }));
 let stored: ContactMessage[];
 let unauthorized: boolean;

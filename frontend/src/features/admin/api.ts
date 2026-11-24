@@ -1,4 +1,5 @@
 import type { CmsRole } from "../../../../shared/cms-contract";
+import { sitePath } from "../../shared/sitePath";
 
 export interface AdminUser {
   id: string;
@@ -26,15 +27,15 @@ export async function apiRequest<T>(
 ): Promise<T> {
   let response: Response;
   try {
-    const request =
-      import.meta.env.VITE_ADMIN_SOURCE === "mock"
-        ? (await loadAdminMock()).mockRequest
-        : fetch;
-    response = await request(`/api/v1/${path}`, {
+    const url = `/api/v1/${path}`;
+    const requestOptions: RequestInit = {
       ...options,
       credentials: "same-origin",
       cache: "no-store",
-    });
+    };
+    response = isAdminMock
+      ? await (await loadAdminMock()).mockRequest(url, requestOptions)
+      : await fetch(sitePath(url), requestOptions);
   } catch {
     throw new AuthError(0, "無法連線至伺服器，請稍後重試。");
   }

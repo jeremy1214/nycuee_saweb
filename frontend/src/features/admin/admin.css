@@ -71,6 +71,9 @@
 .admin-message-details dt { color: var(--muted); }
 .admin-message-details dd { margin: 0; overflow-wrap: anywhere; }
 .admin-message-body { white-space: pre-wrap; overflow-wrap: anywhere; padding: 20px; background: var(--paper); line-height: 1.9; }
+.admin-message-attachment { margin-block: 24px; }
+.admin-message-attachment a { display: inline-block; max-width: 100%; }
+.admin-message-attachment img { display: block; width: auto; height: auto; max-width: 100%; max-height: 32rem; object-fit: contain; }
 @media (max-width: 480px) {
   .admin-message-details > div { grid-template-columns: 1fr; gap: 6px; }
   .admin-inbox-toolbar { align-items: stretch; }

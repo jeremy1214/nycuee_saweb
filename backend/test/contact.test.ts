@@ -2,12 +2,13 @@ import 'reflect-metadata';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { hash } from 'argon2';
+import sharp from 'sharp';
 import { createApp } from '../src/app';
 import { Database } from '../src/database';
 import { ContactService } from '../src/contact';
 
 const testUrl = process.env.TEST_DATABASE_URL;
-const valid = { name: '王小明', email: 'student@example.com', category: 'website', subject: '網站內容問題', message: '我想詢問網站上的學習資料如何更新。' };
+const valid = { category: 'website', subject: '網站內容問題', message: '我想詢問網站上的學習資料如何更新。' };
 
 test('contact HTTP API with PostgreSQL', { skip: !testUrl && 'Set TEST_DATABASE_URL to a dedicated database named contact_test.' }, async (t) => {
   assert.equal(new URL(testUrl!).pathname, '/contact_test', 'Tests must use an isolated contact_test database.');
@@ -52,14 +53,17 @@ test('contact HTTP API with PostgreSQL', { skip: !testUrl && 'Set TEST_DATABASE_
   await t.test('stores full Chinese text, ignores client timestamps, and persists across API restart', async () => {
     await resetMessages();
     // Escaped Unicode deliberately exceeds the former 8 KB request limit.
-    const body = JSON.stringify({ ...valid, message: '中'.repeat(2000), subject: '主'.repeat(120), submittedAt: '2000-01-01T00:00:00Z', readAt: '2000-01-01T00:00:00Z' })
+    const body = JSON.stringify({ ...valid, message: '中'.repeat(2001), subject: '主'.repeat(121), submittedAt: '2000-01-01T00:00:00Z', readAt: '2000-01-01T00:00:00Z' })
       .replace(/[\u0080-\uFFFF]/g, (character) => `\\u${character.charCodeAt(0).toString(16).padStart(4, '0')}`);
     assert.ok(Buffer.byteLength(body) > 8192);
     const response = await call('public/contact-messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body });
     assert.equal(response.status, 201);
     assert.deepEqual(await response.json(), { ok: true });
     const saved = await db.contactMessage.findFirstOrThrow();
-    assert.equal(saved.message.length, 2000);
+    assert.equal(saved.message.length, 2001);
+    assert.equal(saved.subject.length, 121);
+    assert.equal(saved.name, null);
+    assert.equal(saved.email, null);
     assert.equal(saved.readAt, null);
     assert.ok(saved.createdAt.getTime() > Date.now() - 60000);
     await app.close();
@@ -69,15 +73,36 @@ test('contact HTTP API with PostgreSQL', { skip: !testUrl && 'Set TEST_DATABASE_
     db = app.get(Database);
     const detail = await call(`admin/contact-messages/${saved.id}`, { headers: adminHeaders });
     assert.equal(detail.status, 200);
-    assert.equal((await detail.json()).message, '中'.repeat(2000));
+    assert.equal((await detail.json()).message, '中'.repeat(2001));
   });
 
   await t.test('rejects invalid fields without saving', async () => {
-    for (const input of [null, [], {}, { ...valid, name: ' ' }, { ...valid, name: '名'.repeat(61) }, { ...valid, email: 'bad' }, { ...valid, email: `${'a'.repeat(110)}@example.com` }, { ...valid, category: 'invalid' }, { ...valid, subject: '主'.repeat(121) }, { ...valid, message: '太短' }, { ...valid, message: '中'.repeat(2001) }]) {
+    for (const input of [null, [], {}, { ...valid, category: 'invalid' }, { ...valid, subject: ' ' }, { ...valid, message: ' ' }, { ...valid, message: 5 }]) {
       await resetMessages();
       assert.equal((await post(input)).status, 400);
       assert.equal(await db.contactMessage.count(), 0);
     }
+  });
+
+  await t.test('accepts a short anonymous multipart message and restricts image access to the inbox', async () => {
+    await resetMessages();
+    const png = await sharp({ create: { width: 2, height: 2, channels: 3, background: '#1455aa' } }).png().toBuffer();
+    const form = new FormData();
+    form.set('category', 'website');
+    form.set('subject', '圖');
+    form.set('message', '請看截圖');
+    form.set('image', new Blob([new Uint8Array(png)], { type: 'image/png' }), 'screenshot.png');
+    const response = await call('public/contact-messages', { method: 'POST', body: form });
+    assert.equal(response.status, 201);
+    const { id } = await db.contactMessage.findFirstOrThrow();
+    const path = `admin/contact-messages/${id}`;
+    const detail = await call(path, { headers: adminHeaders });
+    assert.deepEqual((await detail.json()).image, { width: 2, height: 2 });
+    assert.equal((await call(`${path}/image`)).status, 401);
+    const image = await call(`${path}/image`, { headers: adminHeaders });
+    assert.equal(image.status, 200);
+    assert.equal(image.headers.get('content-type'), 'image/webp');
+    assert.equal((await sharp(Buffer.from(await image.arrayBuffer())).metadata()).format, 'webp');
   });
 
   await t.test('silently drops honeypot submissions', async () => {
@@ -111,7 +136,7 @@ test('contact HTTP API with PostgreSQL', { skip: !testUrl && 'Set TEST_DATABASE_
     let now = end - 1;
     const clock = context.mock.method(Date, 'now', () => now);
     try {
-      for (let index = 0; index < 5; index++) assert.equal((await post({ ...valid, message: '短' })).status, 400);
+      for (let index = 0; index < 5; index++) assert.equal((await post({ ...valid, message: ' ' })).status, 400);
       const spoof = await call('public/contact-messages', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': '192.0.2.123' }, body: JSON.stringify(valid) });
       assert.equal(spoof.status, 429);
       now = end + 1;

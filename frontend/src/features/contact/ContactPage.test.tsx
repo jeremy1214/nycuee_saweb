@@ -6,8 +6,6 @@ afterEach(() => { vi.restoreAllMocks(); vi.unstubAllEnvs(); });
 
 function prepare() {
   render(<MemoryRouter><ContactPage /></MemoryRouter>);
-  fireEvent.change(screen.getByRole("textbox", { name: /姓名/ }), { target: { value: "王小明" } });
-  fireEvent.change(screen.getByRole("textbox", { name: /Email/ }), { target: { value: "student@example.com" } });
   fireEvent.change(screen.getByRole("combobox"), { target: { value: "website" } });
   fireEvent.change(screen.getByRole("textbox", { name: /主旨/ }), { target: { value: "網站問題" } });
   fireEvent.change(screen.getByRole("textbox", { name: /問題內容/ }), { target: { value: "我想詢問網站上的學習資料如何更新。" } });
@@ -19,7 +17,7 @@ it("keeps inputs on server or network failure", async () => {
   const button = prepare();
   fireEvent.click(button);
   expect(await screen.findByRole("alert")).toHaveTextContent("目前無法送出");
-  expect(screen.getByRole("textbox", { name: /姓名/ })).toHaveValue("王小明");
+  expect(screen.getByRole("textbox", { name: /主旨/ })).toHaveValue("網站問題");
   fireEvent.click(button);
   expect(await screen.findByRole("alert")).toHaveTextContent("目前無法送出");
   expect(screen.getByRole("textbox", { name: /主旨/ })).toHaveValue("網站問題");
@@ -39,11 +37,11 @@ it("prevents duplicate submissions and disables fields while awaiting storage", 
   fireEvent.click(button);
   fireEvent.submit(button.closest("form")!);
   expect(fetchMock).toHaveBeenCalledTimes(1);
-  expect(screen.getByRole("textbox", { name: /姓名/ })).toBeDisabled();
+  expect(screen.getByRole("textbox", { name: /主旨/ })).toBeDisabled();
   expect(screen.queryByRole("status")).not.toBeInTheDocument();
   await act(async () => resolve(new Response('{"ok":true}', { status: 201 })));
   expect(await screen.findByRole("status")).toHaveTextContent("成功送出");
-  expect(screen.getByRole("textbox", { name: /姓名/ })).toHaveValue("");
+  expect(screen.getByRole("textbox", { name: /主旨/ })).toHaveValue("");
 });
 
 it("preserves an explicitly configured external endpoint and sends the honeypot", async () => {

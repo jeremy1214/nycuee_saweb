@@ -670,7 +670,7 @@ async function dispatch(
       };
     }
     if (method === "PATCH") inboxReadAt = inboxReadAt ?? now();
-    return { ...message, readAt: inboxReadAt };
+    return { ...message, readAt: inboxReadAt, image: null };
   }
   fail(404, "此服務尚未提供。");
 }

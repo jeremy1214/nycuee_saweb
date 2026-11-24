@@ -7,7 +7,7 @@ import { Session, User } from '@prisma/client';
 import { hash, verify, argon2id } from 'argon2';
 import { Request, Response } from 'express';
 import { Database } from './database';
-import { digest, secret, serializable } from './account-utils';
+import { appBasePath, digest, secret, serializable } from './account-utils';
 import { anonymousSessionLimits } from './security-config';
 
 const cookieName = 'nycuee_session';
@@ -17,7 +17,7 @@ const cookieOptions = () => ({
   httpOnly: true,
   secure: process.env.COOKIE_SECURE === 'true',
   sameSite: 'lax' as const,
-  path: '/api',
+  path: `${appBasePath()}/api`,
 });
 
 export type AuthRequest = Request & { authUser?: User };

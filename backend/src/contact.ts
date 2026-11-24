@@ -1,23 +1,26 @@
 import {
-  BadRequestException, Body, Controller, Get, HttpException, Inject, Injectable,
-  NotFoundException, Param, Patch, Post, Query, Req, Res, UseGuards,
+  BadRequestException, Body, CallHandler, Controller, ExecutionContext, Get, HttpException, Inject, Injectable,
+  NestInterceptor, NotFoundException, Param, Patch, Post, Query, Res, UploadedFile, UseGuards, UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ContactCategory } from '@prisma/client';
 import { createHash } from 'node:crypto';
 import { Request, Response } from 'express';
+import { finalize } from 'rxjs';
 import { AdminGuard } from './auth';
 import { Database } from './database';
+import { normalizeImage } from './normalize-image';
 
 const windowMs = 10 * 60 * 1000;
 const pageSize = 20;
+const maxImageBytes = 10 * 1024 * 1024;
 const summary = {
   id: true, name: true, email: true, category: true, subject: true, createdAt: true, readAt: true,
 } as const;
 
-function text(input: Record<string, unknown>, key: string, min: number, max: number) {
-  const value = input[key];
-  if (typeof value !== 'string' || value.trim().length < min || value.trim().length > max) {
-    throw new BadRequestException(`欄位 ${key} 須為 ${min}–${max} 字。`);
+function requiredText(value: unknown, label: string) {
+  if (typeof value !== 'string' || !value.trim()) {
+    throw new BadRequestException(`請填寫${label}。`);
   }
   return value.trim();
 }
@@ -26,7 +29,7 @@ function text(input: Record<string, unknown>, key: string, min: number, max: num
 export class ContactService {
   constructor(@Inject(Database) private readonly db: Database) {}
 
-  async submit(body: unknown, ip: string, res: Response) {
+  async limitSubmissions(ip: string, res: Response) {
     const now = Date.now();
     const end = (Math.floor(now / windowMs) + 1) * windowMs;
     const key = createHash('sha256').update(`contact:${ip}:${end}`).digest('hex');
@@ -37,25 +40,28 @@ export class ContactService {
       res.setHeader('Retry-After', String(Math.ceil((end - now) / 1000)));
       throw new HttpException('傳送次數過多，請稍後再試。', 429);
     }
+  }
+
+  async submit(body: unknown, file?: { buffer: Buffer }) {
     if (!body || typeof body !== 'object' || Array.isArray(body)) {
       throw new BadRequestException('請提供有效的表單資料。');
     }
     const input = body as Record<string, unknown>;
     // Silently discard honeypot submissions without saving them.
     if (input.website) return { ok: true };
-    const name = text(input, 'name', 1, 60);
-    const email = text(input, 'email', 3, 120);
-    if (!/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(email)) {
-      throw new BadRequestException('請提供有效的 Email。');
-    }
     if (typeof input.category !== 'string'
       || !Object.values(ContactCategory).includes(input.category as ContactCategory)) {
       throw new BadRequestException('請選擇有效的問題類別。');
     }
-    const subject = text(input, 'subject', 1, 120);
-    const message = text(input, 'message', 10, 2000);
+    const subject = requiredText(input.subject, '主旨');
+    const message = requiredText(input.message, '問題內容');
+    if (file && (!file.buffer.length || file.buffer.length > maxImageBytes)) {
+      throw new BadRequestException('請上傳 10 MiB 以內的圖片。');
+    }
+    const image = file ? await normalizeImage(file.buffer) : undefined;
     await this.db.contactMessage.create({ data: {
-      name, email, category: input.category as ContactCategory, subject, message,
+      category: input.category as ContactCategory, subject, message,
+      image: image ? { create: image } : undefined,
     } });
     return { ok: true };
   }
@@ -82,9 +88,20 @@ export class ContactService {
   }
 
   async detail(id: string) {
-    const message = await this.db.contactMessage.findUnique({ where: { id } });
+    const message = await this.db.contactMessage.findUnique({
+      where: { id },
+      select: { ...summary, message: true, image: { select: { width: true, height: true } } },
+    });
     if (!message) throw new NotFoundException('找不到這則聯絡訊息。');
     return message;
+  }
+
+  async image(id: string) {
+    const attachment = await this.db.contactMessageImage.findUnique({
+      where: { messageId: id }, select: { data: true },
+    });
+    if (!attachment) throw new NotFoundException('找不到這則訊息的圖片附件。');
+    return Buffer.from(attachment.data);
   }
 
   async markRead(id: string) {
@@ -98,13 +115,36 @@ export class ContactService {
   }
 }
 
+@Injectable()
+export class ContactSubmissionProtection implements NestInterceptor {
+  private activeUploads = 0;
+  constructor(@Inject(ContactService) private readonly contact: ContactService) {}
+
+  async intercept(context: ExecutionContext, next: CallHandler) {
+    const http = context.switchToHttp();
+    const req = http.getRequest<Request>();
+    const res = http.getResponse<Response>();
+    await this.contact.limitSubmissions(req.ip ?? req.socket.remoteAddress ?? 'unknown', res);
+    if (!req.is('multipart/form-data')) return next.handle();
+    if (this.activeUploads >= 2) {
+      res.setHeader('Retry-After', '5');
+      throw new HttpException('圖片處理忙碌，請稍後再試。', 429);
+    }
+    this.activeUploads++;
+    return next.handle().pipe(finalize(() => { this.activeUploads--; }));
+  }
+}
+
 @Controller('public/contact-messages')
 export class PublicContactController {
   constructor(@Inject(ContactService) private readonly contact: ContactService) {}
 
   @Post()
-  submit(@Body() body: unknown, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    return this.contact.submit(body, req.ip ?? req.socket.remoteAddress ?? 'unknown', res);
+  @UseInterceptors(ContactSubmissionProtection, FileInterceptor('image', {
+    limits: { fileSize: maxImageBytes + 1, files: 1, fields: 6, parts: 8 },
+  }))
+  submit(@Body() body: unknown, @UploadedFile() file?: { buffer: Buffer }) {
+    return this.contact.submit(body, file);
   }
 }
 
@@ -120,6 +160,11 @@ export class AdminContactController {
 
   @Get(':id')
   detail(@Param('id') id: string) { return this.contact.detail(id); }
+
+  @Get(':id/image')
+  async image(@Param('id') id: string, @Res() res: Response) {
+    res.type('image/webp').send(await this.contact.image(id));
+  }
 
   @Patch(':id/read')
   markRead(@Param('id') id: string) { return this.contact.markRead(id); }

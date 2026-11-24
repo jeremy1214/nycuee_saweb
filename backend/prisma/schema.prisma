@@ -77,16 +77,25 @@ enum ContactCategory {
 
 model ContactMessage {
   id        String          @id @default(cuid())
-  name      String          @db.VarChar(60)
-  email     String          @db.VarChar(120)
+  name      String?         @db.VarChar(60)
+  email     String?         @db.VarChar(120)
   category  ContactCategory
-  subject   String          @db.VarChar(120)
-  message   String          @db.VarChar(2000)
+  subject   String
+  message   String
   createdAt DateTime        @default(now())
   readAt    DateTime?
+  image     ContactMessageImage?
 
   @@index([createdAt, id])
   @@index([readAt, createdAt, id])
+}
+
+model ContactMessageImage {
+  messageId String         @id
+  message   ContactMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  data      Bytes
+  width     Int
+  height    Int
 }
 
 model ContactSubmissionAttempt {

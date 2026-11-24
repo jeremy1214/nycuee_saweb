@@ -1,3 +1,4 @@
+import { sitePath } from "../../shared/sitePath";
 import type { ActivityItem } from './activityTypes';
 import { Link, Navigate, NavLink, useParams } from "react-router-dom";
 import { Breadcrumb, PageContainer } from "../../shared/components/index";
@@ -95,7 +96,7 @@ export function ActivityDetailView({ activity, tabId, onTabChange }: { activity:
             <div className="activity-detail-collage" aria-label={`${activityTitle}活動照片`}>
               {detail.heroImages.map((image, index) => (
                 <figure className={`activity-detail-photo activity-detail-photo-${index + 1}`} key={image.src}>
-                  <img src={image.src} alt={image.alt} style={{ objectPosition: image.objectPosition, objectFit: image.fit }} />
+                  <img src={sitePath(image.src)} alt={image.alt} style={{ objectPosition: image.objectPosition, objectFit: image.fit }} />
                 </figure>
               ))}
             </div>
@@ -131,7 +132,7 @@ export function ActivityDetailView({ activity, tabId, onTabChange }: { activity:
                 {section.image && (
                   <figure className="activity-detail-section-image">
                     <img
-                      src={section.image.src}
+                      src={sitePath(section.image.src)}
                       alt={section.image.alt}
                       loading={detail.tabs ? "lazy" : undefined}
                       style={{ objectPosition: section.image.objectPosition, objectFit: section.image.fit }}
@@ -159,7 +160,7 @@ export function ActivityDetailView({ activity, tabId, onTabChange }: { activity:
             <div className="activity-detail-gallery-grid">
               {activity.album.photos.map((photo) => (
                 <figure key={photo.src}>
-                  <img src={photo.src} alt={photo.alt} loading="lazy" style={{ objectFit: photo.fit ?? "cover", objectPosition: photo.objectPosition }} />
+                  <img src={sitePath(photo.src)} alt={photo.alt} loading="lazy" style={{ objectFit: photo.fit ?? "cover", objectPosition: photo.objectPosition }} />
                   <figcaption>{photo.alt}</figcaption>
                 </figure>
               ))}

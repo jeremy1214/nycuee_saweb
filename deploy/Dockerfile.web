@@ -12,8 +12,9 @@ ENV VITE_EESA_SOURCE=${VITE_EESA_SOURCE}
 ENV VITE_TEAM_SOURCE=${VITE_TEAM_SOURCE}
 ARG VITE_ACTIVITY_SOURCE=api
 ENV VITE_ACTIVITY_SOURCE=${VITE_ACTIVITY_SOURCE}
+ARG VITE_BASE_PATH=/
 # Build directly so the existing npm prebuild test hook is not invoked.
-RUN ./node_modules/.bin/tsc -b && ./node_modules/.bin/vite build
+RUN ./node_modules/.bin/tsc -b && ./node_modules/.bin/vite build --base "$VITE_BASE_PATH"
 
 FROM caddy:2-alpine
 COPY deploy/Caddyfile /etc/caddy/Caddyfile

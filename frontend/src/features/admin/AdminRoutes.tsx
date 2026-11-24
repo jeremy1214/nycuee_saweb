@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState, useRef } from "react";
 import type { CSSProperties, FormEvent } from "react";
+import { sitePath } from "../../shared/sitePath";
 import {
   Link,
   NavLink,
@@ -111,7 +112,7 @@ function LoginPage({ onLogin }: { onLogin: (user: AdminUser) => void }) {
       </p>
       <a
         className="admin-text-link admin-action-link"
-        href={isAdminMock ? "/#/admin" : "/api/v1/auth/google/start"}
+        href={sitePath(isAdminMock ? "/#/admin" : "/api/v1/auth/google/start")}
         onClick={
           isAdminMock
             ? (e) => {

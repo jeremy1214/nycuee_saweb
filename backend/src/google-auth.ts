@@ -7,7 +7,7 @@ import { OAuth2Client } from 'google-auth-library';
 import { Request, Response } from 'express';
 import { AuthService, SessionGuard } from './auth';
 import { Database } from './database';
-import { appOrigin, digest, secret, serializable, writeAudit } from './account-utils';
+import { appUrl, digest, secret, serializable, writeAudit } from './account-utils';
 
 @Injectable()
 export class GoogleAuthService {
@@ -18,7 +18,7 @@ export class GoogleAuthService {
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
     if (!clientId || !clientSecret) throw new BadRequestException('尚未設定 Google 登入，請先使用帳號密碼。');
-    return { clientId, clientSecret, redirectUri: `${appOrigin()}/api/v1/auth/google/callback` };
+    return { clientId, clientSecret, redirectUri: `${appUrl()}/api/v1/auth/google/callback` };
   }
 
   async start(req: Request, res: Response, link = false) {
@@ -110,7 +110,7 @@ export class GoogleAuthService {
       return linked.user;
     });
     await this.auth.establish(session.id, user, res);
-    res.redirect(302, `${appOrigin()}/#/admin${flow.linkUserId ? '/profile?linked=1' : ''}`);
+    res.redirect(302, `${appUrl()}/#/admin${flow.linkUserId ? '/profile?linked=1' : ''}`);
   }
 }
 

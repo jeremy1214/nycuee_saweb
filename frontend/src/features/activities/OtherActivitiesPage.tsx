@@ -1,3 +1,4 @@
+import { sitePath } from "../../shared/sitePath";
 import type { OtherActivity } from "./activityTypes";
 import type { CSSProperties } from "react";
 import { Link, useSearchParams } from "react-router-dom";
@@ -69,7 +70,7 @@ export function OtherActivitiesView({ otherActivities, onDetail }: { otherActivi
                   tabIndex={selected ? 0 : -1}
                   onClick={() => album.select(index)}
                 >
-                  <img src={item.cover.src} alt={item.cover.alt} style={{ objectFit: item.cover.fit ?? "cover", objectPosition: item.cover.objectPosition }} draggable={false} />
+                  <img src={sitePath(item.cover.src)} alt={item.cover.alt} style={{ objectFit: item.cover.fit ?? "cover", objectPosition: item.cover.objectPosition }} draggable={false} />
                   <span className="activity-album-card-caption">
                     <span><strong>{item.title}</strong><small>{item.summary}</small></span>
                   </span>
@@ -120,7 +121,7 @@ export function OtherActivitiesView({ otherActivities, onDetail }: { otherActivi
               <div className="other-activity-photo-grid">
                 {activity.photos.map((photo, index) => (
                   <figure key={photo.src}>
-                    <img src={photo.src} alt={photo.alt} loading="lazy" style={{ objectFit: photo.fit ?? "cover", objectPosition: photo.objectPosition }} />
+                    <img src={sitePath(photo.src)} alt={photo.alt} loading="lazy" style={{ objectFit: photo.fit ?? "cover", objectPosition: photo.objectPosition }} />
                   </figure>
                 ))}
               </div>
@@ -131,7 +132,7 @@ export function OtherActivitiesView({ otherActivities, onDetail }: { otherActivi
                 <div className="other-activity-group-grid">
                   {activity.groups.map((group) => (
                     <section className="other-activity-group" key={group.id} aria-labelledby={`other-group-${group.id}`}>
-                      <img src={group.image.src} alt={group.image.alt} loading="lazy" style={{ objectPosition: group.image.objectPosition, objectFit: group.image.fit }} />
+                      <img src={sitePath(group.image.src)} alt={group.image.alt} loading="lazy" style={{ objectPosition: group.image.objectPosition, objectFit: group.image.fit }} />
                       <div><h4 id={`other-group-${group.id}`}>{group.title}</h4>{group.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div>
                     </section>
                   ))}

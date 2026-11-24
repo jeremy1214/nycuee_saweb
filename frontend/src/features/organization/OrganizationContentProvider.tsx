@@ -1,3 +1,4 @@
+import { sitePath } from "../../shared/sitePath";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { parsePublicEesa, parsePublicTeams, imageSrc, imageAlt, type PublicEesaContent, type PublicTeamContent } from '../../../../shared/organization-content';
@@ -16,7 +17,7 @@ export function useOrganizationParams() {
 }
 export function useOrganizationNavigate() { const navigate = useNavigate(); const preview = useContext(PreviewNavigationContext); return preview?.navigate ?? navigate; }
 async function load<T>(path: string, parse: (value: unknown) => T, signal: AbortSignal): Promise<T> {
-  const response = await fetch(`/api/v1/public/${path}`, { signal, cache: 'no-store', credentials: 'same-origin' });
+  const response = await fetch(sitePath(`/api/v1/public/${path}`), { signal, cache: 'no-store', credentials: 'same-origin' });
   if (!response.ok) throw new Error('內容服務暫時無法使用，請重試。');
   return parse(await response.json());
 }

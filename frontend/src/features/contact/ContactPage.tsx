@@ -1,17 +1,18 @@
+import { sitePath } from "../../shared/sitePath";
 import { useRef, useState, type FormEvent } from "react";
 import { Breadcrumb, PageContainer } from "../../shared/components/index";
 import { useSiteSettings } from "../../shared/data/SiteContentProvider";
 import "./contact.css";
 
-
-
+const maxImageBytes = 10 * 1024 * 1024;
 type SubmissionStatus = "idle" | "submitting" | "success" | "error" | "limited";
 
 export default function ContactPage() {
   const contactEmail = useSiteSettings().siteContact.email;
   const [status, setStatus] = useState<SubmissionStatus>("idle");
+  const [inputError, setInputError] = useState("");
   const submitting = useRef(false);
-  const endpoint = import.meta.env.VITE_CONTACT_FORM_ENDPOINT?.trim() || "/api/v1/public/contact-messages";
+  const endpoint = import.meta.env.VITE_CONTACT_FORM_ENDPOINT?.trim() || sitePath("/api/v1/public/contact-messages");
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -20,6 +21,17 @@ export default function ContactPage() {
 
     const form = event.currentTarget;
     const formData = new FormData(form);
+    const file = formData.get("image");
+    const hasImage = file instanceof File && file.name !== "";
+    setInputError("");
+    if (hasImage && (!file.size || file.size > maxImageBytes)) {
+      setInputError("請選擇 10 MiB 以內的 JPEG、PNG 或 WebP 圖片。");
+      setStatus("error");
+      return;
+    }
+    if (!hasImage) formData.delete("image");
+    formData.set("source", "nycu-ee-website");
+    formData.set("submittedAt", new Date().toISOString());
 
     submitting.current = true;
     setStatus("submitting");
@@ -27,24 +39,21 @@ export default function ContactPage() {
     try {
       const response = await fetch(endpoint, {
         method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
+        headers: hasImage ? { Accept: "application/json" } : {
+          Accept: "application/json", "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          name: formData.get("name"),
-          email: formData.get("email"),
-          category: formData.get("category"),
-          subject: formData.get("subject"),
-          message: formData.get("message"),
-          website: formData.get("website"),
-          source: "nycu-ee-website",
-          submittedAt: new Date().toISOString(),
-        }),
+        body: hasImage ? formData : JSON.stringify(Object.fromEntries(formData)),
       });
 
       if (response.status === 429) {
         setStatus("limited");
+        return;
+      }
+      if (response.status === 400 || response.status === 413) {
+        const body = await response.json().catch(() => null);
+        setInputError(response.status === 413 ? "送出的資料超出單次傳送容量。"
+          : typeof body?.message === "string" ? body.message : "請檢查欄位內容和圖片格式。");
+        setStatus("error");
         return;
       }
       if (!response.ok) throw new Error(`Contact form returned ${response.status}`);
@@ -78,7 +87,7 @@ export default function ContactPage() {
             <ol>
               <li><span>01</span><p><strong>選擇問題類別</strong>幫助我們更快找到負責窗口。</p></li>
               <li><span>02</span><p><strong>提供完整資訊</strong>請說明遇到的情況與希望獲得的協助。</p></li>
-              <li><span>03</span><p><strong>留意電子信箱</strong>後續回覆將寄到你填寫的 Email。</p></li>
+              <li><span>03</span><p><strong>視需要附上圖片</strong>截圖或照片能協助我們了解問題。</p></li>
             </ol>
             <div className="contact-email-card">
               <span>也可以直接寄信</span>
@@ -97,17 +106,6 @@ export default function ContactPage() {
 
             <form className="contact-form" onSubmit={handleSubmit} onChange={() => !submitting.current && status !== "idle" && setStatus("idle")}>
               <fieldset disabled={status === "submitting"} className="contact-form-fields">
-              <div className="contact-form-row">
-                <label>
-                  姓名 <span aria-hidden="true">*</span>
-                  <input name="name" type="text" autoComplete="name" required maxLength={60} placeholder="請輸入姓名" />
-                </label>
-                <label>
-                  Email <span aria-hidden="true">*</span>
-                  <input name="email" type="email" autoComplete="email" required maxLength={120} placeholder="name@example.com" />
-                </label>
-              </div>
-
               <label>
                 問題類別 <span aria-hidden="true">*</span>
                 <select name="category" required defaultValue="">
@@ -123,12 +121,18 @@ export default function ContactPage() {
 
               <label>
                 主旨 <span aria-hidden="true">*</span>
-                <input name="subject" type="text" required maxLength={120} placeholder="請簡短描述你的問題" />
+                <input name="subject" type="text" required placeholder="請簡短描述你的問題" />
               </label>
 
               <label>
                 問題內容 <span aria-hidden="true">*</span>
-                <textarea name="message" required minLength={10} maxLength={2000} rows={7} placeholder="請提供相關背景與具體問題（至少 10 個字）" />
+                <textarea name="message" required rows={7} placeholder="請提供相關背景與具體問題" />
+              </label>
+
+              <label>
+                圖片附件（選填）
+                <input name="image" type="file" accept="image/jpeg,image/png,image/webp" aria-describedby="contact-image-help" />
+                <small id="contact-image-help">可上傳一張 JPEG、PNG 或 WebP 圖片，大小上限 10 MiB。</small>
               </label>
 
               <label className="contact-honeypot" aria-hidden="true">
@@ -145,7 +149,7 @@ export default function ContactPage() {
               </div>
 
               {status === "success" && <p className="contact-form-status is-success" role="status">問題已成功送出，感謝你的來信。</p>}
-              {status === "error" && <p className="contact-form-status is-error" role="alert">目前無法送出，請稍後再試，或直接寄信至 <a href={`mailto:${contactEmail}`}>{contactEmail}</a>。</p>}
+              {status === "error" && <p className="contact-form-status is-error" role="alert">{inputError || <>目前無法送出，請稍後再試，或直接寄信至 <a href={`mailto:${contactEmail}`}>{contactEmail}</a>。</>}</p>}
               {status === "limited" && <p className="contact-form-status is-error" role="alert">傳送次數過多，請稍後再試。你填寫的內容已保留。</p>}
               </fieldset>
             </form>

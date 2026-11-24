@@ -1,3 +1,4 @@
+import { sitePath } from "../../../shared/sitePath";
 import { Link } from "react-router-dom";
 import { useActivityContent, ActivityContentStatus } from "../../activities/data/ActivityContentProvider";
 import { activityEndDate, compareActivityDates, hasActivityDate, todayInTaiwan } from "../../activities/data/activityDates";
@@ -27,7 +28,7 @@ export function RecentActivitiesSection() {
             return (
               <Link className="news-card" to={`/activities/${activity.id}`} key={activity.id} aria-label={`${activity.title}，查看活動詳細頁`}>
                 <span className="news-art">
-                  <img src={image?.src ?? "/intro/activities.jpg"} alt={image?.alt ?? "系上活動紀錄"} style={{ objectPosition: image?.objectPosition, objectFit: image?.fit }} />
+                  <img src={sitePath(image?.src ?? "/intro/activities.jpg")} alt={image?.alt ?? "系上活動紀錄"} style={{ objectPosition: image?.objectPosition, objectFit: image?.fit }} />
                 </span>
                 <span className="news-body">
                   <ActivityDate className="news-date" activity={activity} />

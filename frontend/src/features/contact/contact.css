@@ -68,8 +68,8 @@
 .contact-required-note i,
 .contact-form label > span { color: #a34f3e; font-style: normal; }
 .contact-form { display: grid; gap: 20px; }
-.contact-form-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
 .contact-form label { display: grid; gap: 8px; color: var(--ink); font-size: .73rem; font-weight: 700; }
+.contact-form label small { color: var(--muted); font-size: .7rem; font-weight: 400; }
 .contact-form input,
 .contact-form select,
 .contact-form textarea {
@@ -84,6 +84,8 @@
 }
 .contact-form input,
 .contact-form select { height: 46px; padding: 0 13px; }
+.contact-form input[type="file"] { height: auto; padding: 9px 13px; }
+.contact-form input::file-selector-button { padding: 5px 10px; margin-inline-end: 10px; border: 1px solid var(--line); border-radius: 3px; background: var(--paper); color: var(--navy); font: inherit; cursor: pointer; }
 .contact-form textarea { min-height: 154px; padding: 13px; resize: vertical; line-height: 1.7; }
 .contact-form :is(input, select, textarea):focus { border-color: var(--blue); outline: none; box-shadow: 0 0 0 3px rgb(37 99 235 / 12%); }
 .contact-form :is(input, textarea)::placeholder { color: #9aa8ae; }
@@ -114,7 +116,6 @@
   .contact-form-card { padding: 28px 22px; }
   .contact-details ol { grid-template-columns: 1fr; gap: 0; }
   .contact-details li { grid-template-columns: 36px 1fr; }
-  .contact-form-row { grid-template-columns: 1fr; }
   .contact-form-heading,
   .contact-form-footer { align-items: flex-start; flex-direction: column; }
   .contact-form-footer button { width: 100%; }

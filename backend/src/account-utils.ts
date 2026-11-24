@@ -51,6 +51,18 @@ export function appOrigin(): string {
   return url.origin;
 }
 
+export function appBasePath(): string {
+  const path = process.env.APP_BASE_PATH || '';
+  if (path && !/^(?:\/[A-Za-z0-9_-]+)+$/.test(path)) {
+    throw new Error('APP_BASE_PATH must be a leading-slash path without a trailing slash.');
+  }
+  return path;
+}
+
+export function appUrl(): string {
+  return appOrigin() + appBasePath();
+}
+
 /** Retry serialization conflicts; unique/version failures become explicit conflicts. */
 export async function serializable<T>(db: Database, work: (tx: Prisma.TransactionClient) => Promise<T>): Promise<T> {
   for (let attempt = 0; attempt < 3; attempt++) {

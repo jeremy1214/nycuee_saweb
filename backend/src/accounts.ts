@@ -10,7 +10,7 @@ import { AdminGuard, AuthRequest, AuthService, SessionGuard } from './auth';
 import { organizationStore } from './organization-store';
 import { Database } from './database';
 import {
-  appOrigin, digest, inputObject, invalid, passwordOf, roleOf, secret,
+  appUrl, digest, inputObject, invalid, passwordOf, roleOf, secret,
   serializable, versionOf, writeAudit,
 } from './account-utils';
 
@@ -69,7 +69,7 @@ export class AccountService {
   private async token(tx: Prisma.TransactionClient, userId: string, purpose: 'ACTIVATE' | 'RESET', actorId: string) {
     const token = secret();
     const expiresAt = new Date(Date.now() + 30 * 60 * 1000);
-    const url = `${appOrigin()}/#/admin/set-password?token=${token}`;
+    const url = `${appUrl()}/#/admin/set-password?token=${token}`;
     await tx.passwordToken.updateMany({ where: { userId, purpose, usedAt: null }, data: { usedAt: new Date() } });
     await tx.passwordToken.create({ data: { userId, purpose, tokenHash: digest(token), expiresAt } });
     await writeAudit(tx, actorId, 'account.password-token-issued', userId, { purpose });

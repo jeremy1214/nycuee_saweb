@@ -348,14 +348,15 @@ npm run dev
 
 | API | 用途 |
 | --- | --- |
-| `POST /api/v1/public/contact-messages` | 匿名 JSON 提交 `{ name, email, category, subject, message, website? }`；成功儲存回傳 201 `{ "ok": true }` |
+| `POST /api/v1/public/contact-messages` | 匿名提交 `{ category, subject, message, website? }`；附圖時以 multipart 上傳欄位 `image`；成功回傳 201 `{ "ok": true }` |
 | `GET /api/v1/admin/contact-messages?page=1&read=all` | 回傳 `{ items, total, unreadCount, page, pageSize }`；`read` 可為 `all` 或 `unread`，最新優先，摘要不含問題內容 |
-| `GET /api/v1/admin/contact-messages/:id` | 回傳完整訊息，含伺服器收件時間 `createdAt` 與 `readAt`；不存在為 404 |
+| `GET /api/v1/admin/contact-messages/:id` | 回傳訊息、收件與已讀時間，以及附件尺寸 `image`（無附件時為 `null`）；不存在為 404 |
+| `GET /api/v1/admin/contact-messages/:id/image` | 提供管理員查看 WebP 附件；無附件時為 404 |
 | `PATCH /api/v1/admin/contact-messages/:id/read` | 標記已讀並回傳訊息；重複操作保留首次已讀時間 |
 
 所有管理 API 需要有效 ADMIN Session；PATCH 亦需從 `/api/v1/auth/csrf` 取得 `X-CSRF-Token`。未登入或停用帳號為 401、無管理權限或 CSRF 不符為 403。列表 `total` 為目前篩選筆數，`unreadCount` 為全部未讀數，非法分頁／篩選回傳 400。
 
-姓名 1–60 字、Email 最高 120 字、主旨 1–120 字、內容 10–2000 字；所有字串去除首尾空白。類別限 `association`、`activities`、`teams`、`resources`、`website`、`other`。收件與已讀時間均由伺服器產生，不採用訪客提供的時間；必填、格式或長度錯誤為 400，JSON 請求上限 32 KB。
+主旨與內容去除首尾空白後須有文字。新訊息以匿名方式收件，歷史訊息保留原有姓名及 Email。類別限 `association`、`activities`、`teams`、`resources`、`website`、`other`。收件與已讀時間由伺服器產生。每封可附一張 10 MiB 以內的靜態 JPEG、PNG 或 WebP，後端轉成 WebP 後與訊息一併存入 PostgreSQL。
 
 公開收件以 IP 的 SHA-256 雜湊加固定時間區間進行資料庫限速，每 10 分鐘最多 5 次請求（含無效資料及隱藏欄位命中），第 6 次回傳 429 及 `Retry-After` 秒數。非空的 `website` 隱藏欄位回傳成功但不儲存，降低簡單機器人垃圾訊息。限速紀錄每 15 分鐘清理，後端重啟仍保留當期次數。代理信任設定沿用登入系統。
 

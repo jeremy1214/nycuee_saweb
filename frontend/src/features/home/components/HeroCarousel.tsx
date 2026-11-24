@@ -1,3 +1,4 @@
+import { sitePath } from "../../../shared/sitePath";
 import { Link } from "react-router-dom";
 import { useCarousel } from "../../../shared/hooks/useCarousel";
 import { useHomeContent } from "../../../shared/data/SiteContentProvider";
@@ -17,7 +18,7 @@ export function HeroCarousel() {
         <p>{exploreContent.description}</p>
       </div>
       <div className="hero" aria-label="首頁焦點輪播" aria-roledescription="carousel" {...handlers}>
-        <img className="hero-art" key={slide.image} src={slide.image} alt={slide.alt} style={{ objectPosition: slide.imagePosition }} />
+        <img className="hero-art" key={slide.image} src={sitePath(slide.image)} alt={slide.alt} style={{ objectPosition: slide.imagePosition }} />
         <div className="hero-copy" key={current} aria-live={isPaused ? "polite" : "off"}>
           <span className="eyebrow">{slide.eyebrow}</span>
           <h3>{slide.title}</h3>

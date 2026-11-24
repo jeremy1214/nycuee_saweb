@@ -1,6 +1,8 @@
+import { sitePath } from "../../shared/sitePath";
+
 const previews = new Map<string, string>();
 export function mediaPreview(src: string) {
-  return previews.get(src) ?? src;
+  return previews.get(src) ?? sitePath(src);
 }
 export function registerPreview(id: string, file: File) {
   const url = URL.createObjectURL(file);

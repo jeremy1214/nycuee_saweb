@@ -8,14 +8,14 @@ import express from 'express';
 import { AuthController, AuthService, AdminGuard, SessionGuard } from './auth';
 import { Database } from './database';
 import { HealthController } from './health';
-import { AdminContactController, ContactService, PublicContactController } from './contact';
+import { AdminContactController, ContactService, ContactSubmissionProtection, PublicContactController } from './contact';
 import { PublicActivityController, PublicActivityService } from './public-activities';
 import { AccountController, AccountService, AuditController, PasswordController } from './accounts';
 import { GoogleAuthController, GoogleAuthService } from './google-auth';
 import { AdminCategoryReadController, AdminContentReadController, AdminContentReadService, ContentAccess, ContentScopeGuard } from './content-access';
 import { SiteContentService, PublicSiteContentController, AdminSiteContentController } from './site-content';
 import { UploadProtection } from './upload-protection';
-import { appOrigin } from './account-utils';
+import { appUrl } from './account-utils';
 import { anonymousSessionLimits } from './security-config';
 import { MediaService, AdminMediaController, PublicMediaController } from './media';
 import { OrganizationService, OverviewCmsController, DepartmentCmsController, TeamCmsController, PublicOrganizationController } from './organization';
@@ -26,13 +26,13 @@ import { ActivityWorkflow, ActivityWriteController, CategoryService, CategoryWri
     AccountController, PasswordController, AuditController, GoogleAuthController, AdminContentReadController, AdminCategoryReadController,
     AdminMediaController, PublicMediaController, ActivityWriteController, CategoryWriteController],
   providers: [SiteContentService, UploadProtection, OrganizationService, Database, AuthService, AdminGuard, SessionGuard, ContactService, PublicActivityService,
-    AccountService, GoogleAuthService, ContentAccess, ContentScopeGuard, AdminContentReadService,
+    AccountService, GoogleAuthService, ContentAccess, ContentScopeGuard, AdminContentReadService, ContactSubmissionProtection,
     MediaService, ActivityWorkflow, CategoryService],
 })
 class AppModule {}
 
 export async function createApp() {
-  appOrigin();
+  appUrl();
   anonymousSessionLimits();
   if (process.env.NODE_ENV === 'production' && process.env.COOKIE_SECURE !== 'true') {
     throw new Error('Production requires COOKIE_SECURE=true and HTTPS.');

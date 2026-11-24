@@ -1,3 +1,4 @@
+import { sitePath } from "../../../shared/sitePath";
 import { Link } from "react-router-dom";
 import { SectionHeading } from "../../../shared/components/index";
 import { useCarousel } from "../../../shared/hooks/useCarousel";
@@ -14,7 +15,7 @@ export function TeamCarousel() {
   if (!slide) return null;
   return (
     <section className="teams-carousel" aria-label="系隊照片輪播" aria-roledescription="carousel" {...handlers}>
-      <img className="teams-carousel-image" src={slide.image} alt={slide.alt} key={slide.image} />
+      <img className="teams-carousel-image" src={sitePath(slide.image)} alt={slide.alt} key={slide.image} />
       <div className="teams-carousel-shade" aria-hidden="true" />
       <button className="teams-carousel-arrow teams-carousel-prev" type="button" onClick={() => showSlide(-1)} aria-label="上一張系隊照片">‹</button>
       <button className="teams-carousel-arrow teams-carousel-next" type="button" onClick={() => showSlide(1)} aria-label="下一張系隊照片">›</button>

@@ -9,6 +9,7 @@ import { Prisma, PrismaClient } from '@prisma/client';
 import { visitOrganizationImages, type OrganizationContent, type DepartmentContent, type TeamContent } from '../../shared/organization-content';
 import { organizationLegacyRoot, readOrganizationLegacy, readOrganizationManifest, type LegacyOrganization } from './organization-legacy';
 import { organizationEntity, organizationIncludes, organizationStore } from './organization-store';
+import { appUrl } from './account-utils';
 export function organizationInventory(records: LegacyOrganization[]) {
   const root = organizationLegacyRoot();
   const manifest = readOrganizationManifest(root);
@@ -61,7 +62,10 @@ async function main() {
   if (args.includes('--compare-public')) {
     if (!process.env.APP_ORIGIN) throw new Error('APP_ORIGIN is required for public comparison.');
     const read = async (path: string) => {
-      const target = new URL(`/api/v1/public/${path}`, process.env.ORGANIZATION_PUBLIC_ORIGIN || process.env.APP_ORIGIN);
+      const base = process.env.ORGANIZATION_PUBLIC_ORIGIN
+        ? new URL(process.env.ORGANIZATION_PUBLIC_ORIGIN).origin
+        : appUrl();
+      const target = new URL(`${base}/api/v1/public/${path}`);
       if (process.env.ORGANIZATION_PUBLIC_ORIGIN) {
         // Node fetch derives Host from the URL; use HTTP directly when addressing the
         // Compose service by name while preserving Caddy's configured virtual host.

@@ -1,3 +1,4 @@
+import { sitePath } from "../../../shared/sitePath";
 import { parsePublicActivityContent } from '../../../../../shared/activity-content';
 
 export async function loadActivityContent(signal: AbortSignal) {
@@ -8,7 +9,7 @@ export async function loadActivityContent(signal: AbortSignal) {
   }
   if (source !== 'api') throw new Error('VITE_ACTIVITY_SOURCE 必須是 api 或 json。');
   let response: Response;
-  try { response = await fetch('/api/v1/public/activity-content', { signal, cache: 'no-store', credentials: 'same-origin' }); }
+  try { response = await fetch(sitePath('/api/v1/public/activity-content'), { signal, cache: 'no-store', credentials: 'same-origin' }); }
   catch (error) {
     if (signal.aborted) throw error;
     throw new Error('目前無法連線至活動服務，請稍後重試。');

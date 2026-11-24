@@ -23,9 +23,10 @@ import {
   ContactMessageDetail,
   InboxSummary,
 } from "./ContactInbox";
-import { OrganizationManager, OrganizationEditor, OrganizationWorkSummary } from "./OrganizationManager";
+import { OrganizationManager, OrganizationEditor } from "./OrganizationManager";
 import { SiteContentManager } from "./SiteContentManager";
-import ActivityManager, { WorkOverview } from "./ActivityManager";
+import ActivityManager from "./ActivityManager";
+import { WorkOverview } from "./WorkOverview";
 import ActivityEditor from "./ActivityEditor";
 import MediaManager from "./MediaManager";
 import AccountManager, { SetPassword, Profile } from "./AccountManager";
@@ -109,7 +110,7 @@ function LoginPage({ onLogin }: { onLogin: (user: AdminUser) => void }) {
           : "帳號由管理員建立，請使用獲授權的登入方式。"}
       </p>
       <a
-        className="admin-text-link"
+        className="admin-text-link admin-action-link"
         href={isAdminMock ? "/#/admin" : "/api/v1/auth/google/start"}
         onClick={
           isAdminMock
@@ -127,7 +128,7 @@ function LoginPage({ onLogin }: { onLogin: (user: AdminUser) => void }) {
         {isAdminMock ? "示範 Google 登入" : "使用 Google 登入"}
       </a>
       <br />
-      <Link className="admin-text-link" to="/">
+      <Link className="admin-text-link admin-action-link" to="/">
         ← 返回公開網站
       </Link>
     </section>
@@ -225,7 +226,7 @@ export default function AdminRoutes() {
       <section>
         <h1>無法存取此功能</h1>
         <p role="alert">此功能僅限管理員。</p>
-        <Link to="/admin">返回工作總覽</Link>
+        <Link className="admin-action-link" to="/admin">返回工作總覽</Link>
       </section>
     ) : (
       node
@@ -351,7 +352,7 @@ export default function AdminRoutes() {
             <span>
               {user.username} · {user.role === "ADMIN" ? "管理員" : "編輯者"}
             </span>
-            <Link to="/">公開網站 ↗</Link>
+            <Link className="admin-action-link" to="/">公開網站 ↗</Link>
             <button
               type="button"
               disabled={pending}
@@ -385,7 +386,7 @@ export default function AdminRoutes() {
             >
               {auth.forbidden ? "使用其他帳號登入" : "重試"}
             </button>
-            <Link className="admin-text-link" to="/">
+            <Link className="admin-text-link admin-action-link" to="/">
               返回公開網站
             </Link>
           </section>
@@ -417,7 +418,6 @@ export default function AdminRoutes() {
                 element={guard(
                   <>
                     <WorkOverview />
-                    <OrganizationWorkSummary />
                     {user?.role === "ADMIN" && (
                       <InboxSummary onSessionExpired={sessionExpired} />
                     )}

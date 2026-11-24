@@ -46,7 +46,7 @@ export function OrganizationManager({ kind }: { kind: 'department' | 'team' }) {
                     {working?.rejectionNote && <p className="cms-muted">退回原因：{working.rejectionNote}</p>}
                   </div>
                   <RevisionBadges resource={resource} />
-                  <Link to={to}>{working?.status === 'SUBMITTED' ? '檢視送審版本' : '開啟編輯'} →</Link>
+                  <Link className="admin-action-link" to={to}>{working?.status === 'SUBMITTED' ? '檢視送審版本' : '開啟編輯'} →</Link>
                 </article>
               );
             })}
@@ -57,16 +57,6 @@ export function OrganizationManager({ kind }: { kind: 'department' | 'team' }) {
       </ResourceState>
     </section>
   );
-}
-export function OrganizationWorkSummary() {
-  const { user } = useCms();
-  const list = useResource(async () => {
-    const kinds = (['department', 'team'] as const);
-    const resources = await Promise.all(kinds.map(async kind => (await listOrganizations(kind)).items.map(resource => ({ kind, resource }))));
-    const overview = user.role === 'ADMIN' ? [{ kind: 'overview' as const, resource: (await loadOrganization('overview', 'overview')).resource }] : [];
-    return [...overview, ...resources.flat()].filter(r => r.resource.workingRevision);
-  });
-  return <section className="admin-card"><h2>系學會與系隊待辦</h2><ResourceState {...list} retry={list.reload}>{!list.data?.length && <p>目前沒有工作版本。</p>}<ul>{list.data?.map(({ kind, resource }) => <li key={kind + resource.id}><Link to={organizationAdminLink(kind, resource.id)}>{labels[kind]} · {resource.id}</Link> · {resource.workingRevision?.status}{resource.workingRevision?.rejectionNote && <p>{resource.workingRevision.rejectionNote}</p>}</li>)}</ul></ResourceState></section>;
 }
 function StructuredField({ field, value, change, path, kind, id, admin, locked }: { field: ContentField; value: unknown; change: (value: unknown) => void; path: string; kind: OrganizationKind; id: string; admin: boolean; locked: Set<string> }) {
   const [choosing, setChoosing] = useState(false);
@@ -105,10 +95,10 @@ export function OrganizationEditor({ kind }: { kind: OrganizationKind }) {
   async function save() { if (!content || !row) return; const parsed = parseOrganization(kind, content, id); await saveOrganization(kind, id, row.version, parsed); setDirty(false); resource.reload(); op.setMessage('草稿已儲存。'); }
   async function command(name: string, extra = {}) { if (!row) return; await organizationCommand(kind, id, name, row.version, extra); setDirty(false); resource.reload(); }
   const fields = op.error instanceof OrganizationValidationError ? op.error.fieldErrors : op.error instanceof AuthError ? op.error.fieldErrors : undefined;
-  return <section><div className="cms-toolbar"><h1>{labels[kind]}：{id}</h1><Link to={kind === 'team' ? '/admin/teams' : '/admin/eesa'}>返回列表</Link></div><ResourceState {...resource} retry={resource.reload}>{content && row && <>
+  return <section><div className="cms-toolbar cms-editor-heading"><h1>{labels[kind]}：{id}</h1><Link className="admin-action-link" to={kind === 'team' ? '/admin/teams' : '/admin/eesa'}>返回列表</Link></div><ResourceState {...resource} retry={resource.reload}>{content && row && <>
     <p>公開版本：{row.publishedRevisionId ? '已公開' : '未公開'} · 工作版本：{row.workingRevision?.status ?? '尚無草稿'}</p>{row.workingRevision?.rejectionNote && <p className="cms-notice">退回原因：{row.workingRevision.rejectionNote}</p>}
     <ErrorNotice error={op.error} retry={() => { if (!dirty || window.confirm('重新載入會放棄未儲存內容，確定繼續？')) resource.reload(); }} />{fields?.length ? <ul className="admin-error">{fields.map(f => <li key={f.path}>{f.path}：{f.message}</li>)}</ul> : null}<p role="status">{op.message}</p>
-    <nav className="cms-toolbar" aria-label="編輯器分區">{Object.entries(organizationFields[kind].fields!).filter(([, field]) => ['array','object','image'].includes(field.type)).map(([key, field]) => <a key={key} href={`#organization-field-${key}`} onClick={event => { event.preventDefault(); document.querySelector(`[data-field-section="content.${key}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}>{field.label}</a>)}</nav>
+    <nav className="cms-toolbar" aria-label="編輯器分區">{Object.entries(organizationFields[kind].fields!).filter(([, field]) => ['array','object','image'].includes(field.type)).map(([key, field]) => <a key={key} className="admin-action-link" href={`#organization-field-${key}`} onClick={event => { event.preventDefault(); document.querySelector(`[data-field-section="content.${key}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}>{field.label}</a>)}</nav>
     <div className="cms-toolbar"><button disabled={op.pending || readonly} onClick={() => void op.run(save)}>儲存草稿</button><button onClick={() => { try { setPreview(preview ? undefined : parseOrganization(kind, content, id)); } catch (e) { op.setError(e); } }}>{preview ? '返回編輯' : '預覽目前內容'}</button>{row.workingRevision?.status === 'DRAFT' && <button disabled={op.pending || dirty} onClick={() => void op.run(() => command('submit'))}>送審</button>}{readonly && <button disabled={op.pending} onClick={() => void op.run(() => command('withdraw'))}>撤回</button>}{readonly && user.role === 'ADMIN' && <><button disabled={op.pending} onClick={() => { if (window.confirm('確定發布目前送審版本？')) void op.run(() => command('publish')); }}>發布</button><button disabled={op.pending} onClick={() => { const reason = window.prompt('退回原因'); if (reason) void op.run(() => command('reject', { reason })); }}>退回</button></>}{row.publishedRevisionId && user.role === 'ADMIN' && <button disabled={op.pending || dirty} onClick={() => { if (window.confirm('確定下架此資源？')) void op.run(() => command('unpublish')); }}>下架</button>}</div>
     {preview ? <OrganizationPreview key={JSON.stringify(preview)} kind={kind} id={id} content={preview} /> : <fieldset disabled={readonly || op.pending}><legend>{readonly ? '送審內容唯讀' : '內容編輯'}</legend><StructuredField field={organizationFields[kind]} value={content} change={next => { setContent(next as OrganizationContent); setDirty(true); }} path="content" kind={kind} id={id} admin={user.role === 'ADMIN'} locked={locked} /></fieldset>}
     <section className="cms-panel"><h2>歷史版本</h2>{resource.data?.revisions.map((revision: OrganizationRevision) => <div className="cms-toolbar" key={revision.id}><span>版本 {revision.number} · {revision.status}</span><button onClick={() => setPreview(revision.content)}>預覽此版本</button><button disabled={op.pending || dirty || !!row.workingRevisionId} onClick={() => { if (window.confirm('將此版本還原為新草稿？')) void op.run(() => command('restore', { revisionId: revision.id })); }}>還原為新草稿</button></div>)}</section>

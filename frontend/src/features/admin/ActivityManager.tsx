@@ -6,67 +6,8 @@ import {
   ResourceState,
   Field,
   Empty,
-  useCms,
   RevisionBadges,
 } from "./cmsUi";
-export function WorkOverview() {
-  const { user } = useCms();
-  const resource = useResource(loadActivities);
-  const records = resource.data ?? [];
-  const groups = [
-    {
-      title: "可編輯草稿",
-      records: records.filter(
-        (a) => a.activity.workingRevision?.status === "DRAFT",
-      ),
-    },
-    {
-      title: "待審項目",
-      records: records.filter(
-        (a) => a.activity.workingRevision?.status === "SUBMITTED",
-      ),
-    },
-    {
-      title: "退回提醒",
-      records: records.filter((a) => a.activity.workingRevision?.rejectionNote),
-    },
-  ];
-  return (
-    <section className="cms-overview">
-      <span className="eyebrow">CONTENT WORKSPACE</span>
-      <h1>今天要更新哪些內容？</h1>
-      <p className="admin-description">
-        歡迎，{user.username}。從草稿、審核或退回事項繼續工作。
-      </p>
-      <ResourceState {...resource} retry={resource.reload}>
-        <div className="cms-summary-grid">
-          {groups.map((group) => (
-            <section className="cms-panel" key={group.title}>
-              <span className="cms-count">{group.records.length}</span>
-              <h2>{group.title}</h2>
-              {group.records.length ? (
-                <ul className="cms-work-list">
-                  {group.records.map((a) => (
-                    <li key={a.activity.id}>
-                      <Link to={`/admin/activities/${a.activity.id}`}>
-                        {a.content.title}
-                      </Link>
-                      {group.title === "退回提醒" && (
-                        <p>{a.activity.workingRevision?.rejectionNote}</p>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p>目前沒有待辦。</p>
-              )}
-            </section>
-          ))}
-        </div>
-      </ResourceState>
-    </section>
-  );
-}
 export default function ActivityManager({
   other = false,
 }: {
@@ -183,7 +124,7 @@ export default function ActivityManager({
                 </p>
               </div>
               <RevisionBadges resource={a.activity} />
-              <Link to={`/admin/activities/${a.activity.id}`}>
+              <Link className="admin-action-link" to={`/admin/activities/${a.activity.id}`}>
                 {a.activity.workingRevision?.status === "SUBMITTED"
                   ? "檢視送審版本"
                   : "開啟編輯"}{" "}

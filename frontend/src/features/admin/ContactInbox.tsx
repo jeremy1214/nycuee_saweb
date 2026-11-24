@@ -39,7 +39,7 @@ export function InboxSummary({ onSessionExpired }: AuthProps) {
     {loading && <p role="status">正在取得未讀數量…</p>}
     {data && <p>未讀訊息 <strong className="admin-count">{data.unreadCount}</strong> 則</p>}
     {error && <p className="admin-error" role="alert">{error} <button type="button" onClick={reload}>重試</button></p>}
-    <Link className="admin-text-link" to="/admin/contact-messages">開啟收件匣 →</Link>
+    <Link className="admin-text-link admin-action-link" to="/admin/contact-messages">開啟收件匣 →</Link>
   </div>;
 }
 
@@ -59,7 +59,7 @@ export function ContactInbox({ onSessionExpired }: AuthProps) {
   }, [data, page, read, setParams, totalPages]);
 
   return <section className="admin-card admin-inbox" aria-labelledby="admin-inbox-title">
-    <Link className="admin-text-link" to="/admin">← 管理總覽</Link>
+    <Link className="admin-text-link admin-action-link" to="/admin">← 管理總覽</Link>
     <h1 id="admin-inbox-title">聯絡訊息</h1>
     <p className="admin-description">查看訪客透過聯絡表單送來的問題。回覆請使用既有信箱。</p>
     <div className="admin-inbox-toolbar">
@@ -106,7 +106,7 @@ export function ContactMessageDetail({ onSessionExpired }: AuthProps) {
     } finally { setPending(false); }
   }
   return <section className="admin-card admin-inbox" aria-labelledby="admin-message-title">
-    <Link className="admin-text-link" to={`/admin/contact-messages${search}`}>← 返回收件匣</Link>
+    <Link className="admin-text-link admin-action-link" to={`/admin/contact-messages${search}`}>← 返回收件匣</Link>
     <h1 id="admin-message-title">訊息詳情</h1>
     {loading && <p role="status">正在載入訊息…</p>}
     {error && <div role="alert"><p className="admin-error">{error}</p><button className="admin-button" onClick={reload}>重試</button></div>}

@@ -300,7 +300,7 @@ function ActivityForm({
     op.error instanceof AuthError ? op.error.fieldErrors : undefined;
   return (
     <section className="cms-editor">
-      <Link to="/admin/activities">← 活動管理</Link>
+      <Link className="admin-action-link" to="/admin/activities">← 活動管理</Link>
       <div className="cms-page-heading">
         <div>
           <h1>{record ? content.title : "新增活動"}</h1>

@@ -4,6 +4,7 @@ import { ErrorNotice, Field, ResourceState, RevisionBadges, useCms, useOperation
 import { parseSiteContent, type SiteContentKind, type SiteContentMap, type SiteResource, type SiteRevision } from '../../../../shared/site-content';
 import { MediaBrowser } from './MediaManager';
 import { mediaPreview } from './mediaPreview';
+import { Modal } from '../../shared/components/ui/Modal';
 import { SiteContentSnapshot, type PublicSiteContent } from '../../shared/data/SiteContentProvider';
 import { HomeHero } from '../home/components/HomeHero';
 import { HeroCarousel } from '../home/components/HeroCarousel';
@@ -28,6 +29,31 @@ function blank(path: string): unknown {
   if (path.endsWith('.sections')) return { id: 'new-section', type: 'checklist', title: '', items: [''] };
   return '';
 }
+function SlideImageField({ image, alt, path, disabled, change }: {
+  image: string;
+  alt: string;
+  path: string;
+  disabled: boolean;
+  change: (image: string, alt: string) => void;
+}) {
+  const [choosing, setChoosing] = useState(false);
+
+  return <section className="cms-image-field">
+    <h4>輪播圖片</h4>
+    {image && <img src={mediaPreview(image)} alt={alt} />}
+    <Field label="圖片替代文字" path={`${path}.alt`}>
+      <input disabled={disabled} value={alt} onChange={event => change(image, event.target.value)} />
+    </Field>
+    {image && <p className="cms-muted">{image}</p>}
+    <button type="button" disabled={disabled} onClick={() => setChoosing(true)}>從媒體庫選取輪播圖片</button>
+    {choosing && !disabled && <Modal open title="選取輪播圖片" onClose={() => setChoosing(false)}>
+      <MediaBrowser scope={{ siteContentId: 'home' }} onSelect={(src, alt) => {
+        change(src, alt);
+        setChoosing(false);
+      }} />
+    </Modal>}
+  </section>;
+}
 function Fields({ value, path, change, disabled, itemTemplate }: { value: unknown; path: string; change: (value: unknown) => void; disabled: boolean; itemTemplate?: unknown }) {
   const name = path.split('.').at(-1)!.replace(/\[\d+\]$/, '');
   const label = labels[name] ?? name;
@@ -44,9 +70,16 @@ function Fields({ value, path, change, disabled, itemTemplate }: { value: unknow
     {path.endsWith('.sections') && <button type="button" onClick={() => change([...value, { id: 'new-process', type: 'process', title: '', items: [{ title: '', description: '' }] }])}>新增流程區塊</button>}
     {path.endsWith('.items') && value.some(item => typeof item === 'object') && <p>流程項目請填寫標題與說明。</p>}
   </fieldset>;
-  if (value && typeof value === 'object') return <fieldset disabled={disabled}><legend>{label === 'content' ? '內容欄位' : label}</legend>
-    {Object.entries(value).map(([key, child]) => <Fields key={key} value={child} path={`${path}.${key}`} disabled={disabled} itemTemplate={key === 'items' && 'type' in value && value.type === 'process' ? { title: '', description: '' } : undefined} change={next => change({ ...value, [key]: next })} />)}
-  </fieldset>;
+  if (value && typeof value === 'object') {
+    const slide = /^content\.slides\[\d+\]$/.test(path) ? value as SiteContentMap['home']['slides'][number] : null;
+    return <fieldset disabled={disabled}><legend>{label === 'content' ? '內容欄位' : label}</legend>
+      {Object.entries(value).map(([key, child]) => {
+        if (slide && key === 'alt') return null;
+        if (slide && key === 'image') return <SlideImageField key={key} image={slide.image} alt={slide.alt} path={path} disabled={disabled} change={(image, alt) => change({ ...slide, image, alt })} />;
+        return <Fields key={key} value={child} path={`${path}.${key}`} disabled={disabled} itemTemplate={key === 'items' && 'type' in value && value.type === 'process' ? { title: '', description: '' } : undefined} change={next => change({ ...value, [key]: next })} />;
+      })}
+    </fieldset>;
+  }
   return <Field label={label} path={path}>
     {name === 'type' || name === 'status' ? <input value={String(value ?? '')} readOnly />
       : name === 'description' || String(value ?? '').length > 150 ? <textarea disabled={disabled} value={String(value ?? '')} onChange={event => change(event.target.value)} />
@@ -61,8 +94,6 @@ function Editor({ kind, initial }: { kind: SiteContentKind; initial: SiteResourc
   const [resource, setResource] = useState(initial);
   const [content, setContent] = useState<SiteContentMap[SiteContentKind]>(() => structuredClone((initial.workingRevision ?? initial.publishedRevision ?? initial.latestRevision)!.content));
   const [preview, setPreview] = useState(false);
-  const [media, setMedia] = useState(false);
-  const [slideIndex, setSlideIndex] = useState(0);
   const [reason, setReason] = useState('');
   const [historyVersion, setHistoryVersion] = useState('');
   const [historical, setHistorical] = useState<SiteRevision>();
@@ -98,10 +129,6 @@ function Editor({ kind, initial }: { kind: SiteContentKind; initial: SiteResourc
       <button disabled={op.pending || dirty || !resource.publishedRevisionId} onClick={() => { if (window.confirm('確定下架這組公開內容？')) void op.run(() => command('unpublish')); }}>下架</button>
     </div>
     {frozen && <div><Field label="退回原因"><textarea value={reason} onChange={event => setReason(event.target.value)} /></Field><button disabled={op.pending || !reason.trim()} onClick={() => void op.run(() => command('reject', { reason }))}>退回</button></div>}
-    {kind === 'home' && <><button onClick={() => setMedia(!media)}>開啟／關閉首頁媒體庫</button>{media && <>
-      <Field label="套用到輪播項目"><select value={slideIndex} onChange={event => setSlideIndex(Number(event.target.value))}>{(content as SiteContentMap['home']).slides.map((slide, index) => <option key={index} value={index}>{index + 1} · {slide.title}</option>)}</select></Field>
-      <MediaBrowser scope={{ siteContentId: 'home' }} onSelect={frozen || op.pending ? undefined : (src, alt) => { const next = structuredClone(content) as SiteContentMap['home']; if (next.slides[slideIndex]) { next.slides[slideIndex].image = src; next.slides[slideIndex].alt = alt; edit(next); } }} />
-    </>}</>}
     <Fields value={content} path="content" disabled={op.pending || frozen} change={edit} />
     <h2>歷史版本</h2><ErrorNotice error={history.error} retry={history.reload} />
     <select aria-label="歷史版本" value={historyVersion} onChange={event => setHistoryVersion(event.target.value)}><option value="">選擇版本</option>{history.data?.items.map(revision => <option value={revision.id} key={revision.id}>版本 {revision.number} · {revision.status}</option>)}</select>

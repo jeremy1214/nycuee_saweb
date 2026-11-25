@@ -67,6 +67,7 @@ it("guides an editor from a draft to submission and an admin to publication", as
   expect(screen.getByRole("link", { name: "前往活動管理" })).toHaveAttribute("href", "/admin/activities");
   expect(screen.getByText(/儲存並送審.*退回提醒/)).toBeInTheDocument();
   expect(screen.queryByText(/發布送審版本/)).not.toBeInTheDocument();
+  expect(screen.queryByRole("link", { name: "編輯系學會總覽" })).not.toBeInTheDocument();
 
   fireEvent.click(screen.getByRole("link", { name: "前往工作總覽" }));
   const drafts = (await screen.findByRole("heading", { name: "可編輯草稿" })).closest("section")!;
@@ -85,6 +86,7 @@ it("guides an editor from a draft to submission and an admin to publication", as
   await screen.findByRole("heading", { name: helpTitle });
   fireEvent.click(screen.getByRole("button", { name: "切換管理員" }));
   expect(await screen.findByText(/發布送審版本/)).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "編輯系學會總覽" })).toHaveAttribute("href", "/admin/eesa/overview");
   fireEvent.click(screen.getByRole("link", { name: "前往工作總覽" }));
   const pending = (await screen.findByRole("heading", { name: "待審項目" })).closest("section")!;
   fireEvent.click(within(pending).getByRole("link", { name: activityTitle }));
@@ -95,6 +97,42 @@ it("guides an editor from a draft to submission and an admin to publication", as
   const published = await loadActivity("course-selection");
   expect(published.activity.workingRevision).toBeNull();
   expect(published.content.detail?.intro[0]).toBe(updatedIntro);
+});
+
+it.each([
+  {
+    link: "前往系學會管理",
+    item: "學術部",
+    tab: "介紹與圖片",
+    field: "段落",
+    value: "學術部協助同學規劃學習與交流活動。",
+  },
+  {
+    link: "前往系隊管理",
+    item: "男籃",
+    tab: "練習時間",
+    field: "段落／小標題",
+    value: "每週三下午四點練習。",
+  },
+])("guides an editor through organization updates via $link", async ({ link, item, tab, field, value }) => {
+  setMockRole("EDITOR");
+  open("/admin/help");
+
+  expect(await screen.findByText(/系學會與系隊請先點「儲存草稿」.*再點「送審」/)).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("link", { name: link }));
+  fireEvent.click(await screen.findByRole("link", { name: item }));
+  fireEvent.click(await screen.findByRole("button", { name: tab }));
+  fireEvent.change(screen.getAllByLabelText(field, { exact: true })[0], { target: { value } });
+  fireEvent.click(screen.getByRole("button", { name: "預覽" }));
+  await screen.findByText(value);
+  fireEvent.click(screen.getByRole("button", { name: "返回編輯" }));
+  await waitFor(() => expect(screen.getByRole("button", { name: "儲存草稿" })).toBeEnabled());
+  fireEvent.click(screen.getByRole("button", { name: "儲存草稿" }));
+  await screen.findByText("草稿已儲存。");
+  const submit = await screen.findByRole("button", { name: "送審" });
+  await waitFor(() => expect(submit).toBeEnabled());
+  fireEvent.click(submit);
+  await screen.findByRole("button", { name: "撤回送審" });
 });
 
 it("creates, previews, submits and publishes an activity through normal routes", async () => {

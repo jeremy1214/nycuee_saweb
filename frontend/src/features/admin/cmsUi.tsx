@@ -172,7 +172,7 @@ export function UnsavedChanges({ dirty }: { dirty: boolean }) {
       const target = event.target instanceof Element ? event.target.closest('a[href]') : null;
       if (!target || target.getAttribute('target') === '_blank' || target.hasAttribute('download')) return;
       const url = new URL(target.getAttribute('href')!, savedUrl);
-      if (url.href === savedUrl || target.closest('.cms-preview') || target.getAttribute('href')?.startsWith('#organization-field-')) return;
+      if (url.href === savedUrl || target.closest('.cms-preview')) return;
       if (!window.confirm('尚有未儲存的修改，確定要離開嗎？')) { event.preventDefault(); event.stopPropagation(); }
     };
     const pop = (event: PopStateEvent) => {

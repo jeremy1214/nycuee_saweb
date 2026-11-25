@@ -27,6 +27,7 @@ import {
 import { OrganizationManager, OrganizationEditor } from "./OrganizationManager";
 import { SiteContentManager } from "./SiteContentManager";
 import ActivityManager from "./ActivityManager";
+import { AdminHelp } from "./AdminHelp";
 import { WorkOverview } from "./WorkOverview";
 import ActivityEditor from "./ActivityEditor";
 import MediaManager from "./MediaManager";
@@ -188,7 +189,13 @@ export default function AdminRoutes() {
 
   const user = auth.status === "ready" ? auth.user : null;
   const routeGroups = [
-    { label: null, routes: [["/admin", "工作總覽", false]] },
+    {
+      label: null,
+      routes: [
+        ["/admin", "工作總覽", false],
+        ["/admin/help", "新手指南（Help）", false],
+      ],
+    },
     {
       label: "活動管理",
       routes: [
@@ -425,6 +432,7 @@ export default function AdminRoutes() {
                   </>,
                 )}
               />
+              <Route path="help" element={guard(<AdminHelp />)} />
               <Route path="activities" element={guard(<ActivityManager />)} />
               <Route
                 path="activities/:id"

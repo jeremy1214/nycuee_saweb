@@ -12,6 +12,7 @@ import { beforeEach, afterEach, expect, it, vi } from "vitest";
 import AdminRoutes from "./AdminRoutes";
 import { resetMock, setMockRole } from "./cmsMock";
 import { loadActivity, saveDraft } from "./cmsApi";
+import { logout } from "./api";
 vi.mock("./api", async (original) => ({
   ...(await original<object>()),
   isAdminMock: true,
@@ -44,6 +45,58 @@ function open(path = "/admin/activities/new", previous?: string) {
   render(<RouterProvider router={router} />);
   return router;
 }
+it("requires sign-in for a direct Help link", async () => {
+  await logout();
+  const router = open("/admin/help");
+
+  expect(await screen.findByRole("heading", { name: "後台登入" })).toBeInTheDocument();
+  expect(router.state.location.pathname).toBe("/admin/login");
+  expect(screen.queryByRole("heading", { name: "新手指南（Help）" })).not.toBeInTheDocument();
+});
+
+it("guides an editor from a draft to submission and an admin to publication", async () => {
+  setMockRole("EDITOR");
+  open("/admin");
+  const helpTitle = "新手指南（Help）";
+  const activityTitle = "選課大會";
+  const updatedIntro = "學長姐分享選課經驗，協助新生安排課表。";
+
+  fireEvent.click(await screen.findByRole("link", { name: helpTitle }));
+  await screen.findByRole("heading", { name: helpTitle });
+  expect(screen.getByRole("link", { name: helpTitle })).toHaveAttribute("aria-current", "page");
+  expect(screen.getByRole("link", { name: "前往活動管理" })).toHaveAttribute("href", "/admin/activities");
+  expect(screen.getByText(/儲存並送審.*退回提醒/)).toBeInTheDocument();
+  expect(screen.queryByText(/發布送審版本/)).not.toBeInTheDocument();
+
+  fireEvent.click(screen.getByRole("link", { name: "前往工作總覽" }));
+  const drafts = (await screen.findByRole("heading", { name: "可編輯草稿" })).closest("section")!;
+  fireEvent.click(within(drafts).getByRole("link", { name: activityTitle }));
+  fireEvent.click(await screen.findByRole("button", { name: "介紹與主圖" }));
+  fireEvent.change(screen.getByLabelText("段落 1 文字"), { target: { value: updatedIntro } });
+  fireEvent.click(screen.getByRole("button", { name: "預覽" }));
+  await screen.findByText(updatedIntro);
+  fireEvent.click(screen.getByRole("button", { name: "返回編輯" }));
+  fireEvent.click(screen.getByRole("button", { name: "儲存草稿" }));
+  await screen.findByText("已儲存草稿。");
+  fireEvent.click(screen.getByRole("button", { name: "儲存並送審" }));
+  await screen.findByRole("button", { name: "撤回送審" });
+
+  fireEvent.click(screen.getByRole("link", { name: helpTitle }));
+  await screen.findByRole("heading", { name: helpTitle });
+  fireEvent.click(screen.getByRole("button", { name: "切換管理員" }));
+  expect(await screen.findByText(/發布送審版本/)).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("link", { name: "前往工作總覽" }));
+  const pending = (await screen.findByRole("heading", { name: "待審項目" })).closest("section")!;
+  fireEvent.click(within(pending).getByRole("link", { name: activityTitle }));
+  fireEvent.click(await screen.findByRole("button", { name: "預覽" }));
+  await screen.findByText(updatedIntro);
+  fireEvent.click(screen.getByRole("button", { name: "發布送審版本" }));
+  await screen.findByText("操作已完成。");
+  const published = await loadActivity("course-selection");
+  expect(published.activity.workingRevision).toBeNull();
+  expect(published.content.detail?.intro[0]).toBe(updatedIntro);
+});
+
 it("creates, previews, submits and publishes an activity through normal routes", async () => {
   const router = open();
   await screen.findByLabelText("活動識別值");

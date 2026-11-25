@@ -124,6 +124,10 @@
 .admin-shell fieldset:disabled { opacity: .8; }
 .cms-panel { margin: 24px 0; padding: 26px; border: 1px solid #dce4e7; border-radius: 9px; background: white; }
 .cms-panel > :last-child { margin-bottom: 0; }
+.cms-help { max-width: 760px; }
+.cms-help-steps { padding-inline-start: 1.75rem; }
+.cms-help-steps > li::marker { color: var(--blue-dark); font-weight: 700; }
+.cms-help-steps p { line-height: 1.8; }
 .cms-filters { align-items: end; padding: 22px; border: 1px solid #dce4e7; border-radius: 8px; background: white; }
 .cms-filters .cms-field { margin: 0; flex: 1; min-width: 150px; }
 .cms-muted, .cms-loading { color: #5d7079; line-height: 1.7; font-size: .85rem; }
@@ -180,6 +184,12 @@
   .cms-record { flex-wrap: wrap; }
   .cms-record > div:first-child { flex-basis: 100%; }
   .cms-authenticated .admin-main { padding: 26px; }
+}
+@media (width > 760px) {
+  .cms-sidebar {
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+  }
 }
 @media (max-width: 760px) {
   .cms-authenticated { padding-left: 0; }
